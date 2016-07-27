@@ -1,0 +1,5 @@
+L'extraction a été effectuée sur les données d'un clustering par k-means++, sur des données dont certaines questions ont été filtrées, et on a choisi 1 run parmi les 20 effectués. Les paramètres du clustering étaient les suivants :
+-n_init= 500
+-n_iter = 300
+-batch_size=8000
+-n_clusters = 5

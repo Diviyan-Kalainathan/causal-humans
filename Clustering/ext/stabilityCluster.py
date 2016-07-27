@@ -1,0 +1,158 @@
+# -*- coding: utf-8 -*-
+
+import itertools
+import numpy as np
+from sklearn import datasets, metrics
+from sklearn.cluster import KMeans
+import pandas as pd
+
+from sklearn.decomposition import PCA
+from sklearn import preprocessing
+
+# set random seed
+#np.random.seed( 1000 )
+# load the sample dataset
+
+def calc_pairwise_stability( clusterings, metric ):
+	''' 
+	Calculate mean pairwise stability between a list of disjoint clusterings,
+	using the specified metric for measuring the similarity of two disjoint clusterings.
+	'''
+	sim_values = []
+	for i in range(len(clusterings)):
+		for j in range(i+1,len(clusterings)):
+			sim_values.append( metric( clusterings[i], clusterings[j] ) )
+	return np.array( sim_values ).mean()
+
+def calc_pairwise_stability_MeilaDistance( clusterings, num_clusters ):
+    
+    sim_values = []
+    for i in range(0,len(clusterings)):
+        for j in range(i+1,len(clusterings)):
+            sim_values.append( MeilaDistance( clusterings[i], clusterings[j], num_clusters) )
+	
+    return np.array( sim_values ).mean()
+ 
+ 
+def MeilaDistance( clustering1,clustering2, num_clusters ):
+    
+    n_samples = len(clustering1)
+    
+    clustering_1= np.zeros((n_samples,num_clusters))
+    clustering_2= np.zeros((n_samples,num_clusters))
+
+    for x in range(0,n_samples):
+        clustering_1[x,clustering1[x]]+=1
+        clustering_2[x,clustering2[x]]+=1
+    
+    confusion_matrix=np.dot(np.transpose(clustering_1),clustering_2)
+     
+    
+    max_confusion=0
+
+    
+    for perm in itertools.permutations(range(0,num_clusters)):
+        confusion=0
+        for i in range(0, num_clusters):
+            confusion += confusion_matrix[i, perm[i]]
+
+        if max_confusion<confusion:
+            max_confusion=confusion
+
+
+    distance=1-(max_confusion/n_samples)
+    
+    return distance
+    
+def kmeans_sample( X, k, sampling_ratio, init ):
+	''' 
+	Apply k-means clustering to a subset of samples from the specified dataset, 
+	and return a predicted clustering for the complete dataset based on the original centroids.
+	'''
+	# create a matrix with subset of samples
+	n_samples = X.shape[0]
+	indices = np.arange(n_samples)
+	np.random.shuffle( indices )
+	n_subset = int(n_samples * sampling_ratio) 
+	X_subset = X[indices[0:n_subset]] 
+	# cluster the subset
+	clusterer = KMeans(n_clusters=k, n_init=1, init=init, max_iter = 100)
+	clusterer.fit(X_subset)
+	# produce an assignment for all samples
+	return clusterer.predict(X)
+
+ 
+code = 'latin-1'
+path = ""
+filename = "scaleCBS.csv"
+scaleCBS = pd.read_csv(path + filename, sep=';',index_col = 0,  encoding = code)
+pca = PCA(n_components=9)
+resultPCA = pca.fit_transform(scaleCBS)
+X = preprocessing.scale(resultPCA)
+
+
+# test a range of values for number of cluster k
+kmin = 2
+kmax = 9
+runs = 10
+sampling_ratio = 1
+
+stability_kmeanPlusPlus_ARI_values = []
+stability_kmeanPlusPlus_Vmeasure_values = []
+stability_random_ARI_values = []
+stability_random_Vmeasure_values = []
+stability_kmeanPlusPlus_Meila_values = []   
+ 
+for k in range(kmin, kmax+1):
+	# apply clustering 
+    print("Generating clusterings for k=%d ..." % k)
+    clusterings_kmeansPlusPlus = [kmeans_sample( X, k, sampling_ratio, 'k-means++' ) for run in range(runs)]
+       
+
+       
+    clusterings_random = [kmeans_sample( X, k, sampling_ratio, 'random' ) for run in range(runs)]
+     # calculate stability for this value of k
+    
+    print ("Calculating stability score for k=%d from %d clusterings ..." % (k,len(clusterings_kmeansPlusPlus)))
+    
+    stability_kmeanPlusPlus_Meila = calc_pairwise_stability_MeilaDistance( clusterings_kmeansPlusPlus,k)
+    stability_kmeanPlusPlus_Meila_values.append(stability_kmeanPlusPlus_Meila)
+
+#    stability_kmeanPlusPlus_ARI = calc_pairwise_stability( clusterings_kmeansPlusPlus, metrics.adjusted_rand_score)
+#    stability_kmeanPlusPlus_Vmeasure = calc_pairwise_stability( clusterings_kmeansPlusPlus, metrics.v_measure_score) 
+#    stability_random_ARI = calc_pairwise_stability(clusterings_random, metrics.adjusted_rand_score)
+#    stability_random_Vmeasure = calc_pairwise_stability(clusterings_random, metrics.v_measure_score)
+
+
+#    stability_kmeanPlusPlus_ARI_values.append(stability_kmeanPlusPlus_ARI)
+#    stability_kmeanPlusPlus_Vmeasure_values.append(stability_kmeanPlusPlus_Vmeasure)
+#    stability_random_ARI_values.append(stability_random_ARI)
+#    stability_random_Vmeasure_values.append(stability_random_Vmeasure )
+
+
+np.savetxt('stability_kmeanPlusPlus_Meila_values.csv', stability_kmeanPlusPlus_Meila_values, delimiter=';')   
+#np.savetxt('stability_kmeanPlusPlus_ARI_values.csv', stability_kmeanPlusPlus_ARI_values, delimiter=';')   
+#np.savetxt('stability_kmeanPlusPlus_Vmeasure_values.csv', stability_kmeanPlusPlus_Vmeasure_values, delimiter=';')   
+#np.savetxt('stability_random_ARI_values.csv', stability_random_ARI_values, delimiter=';')   
+#np.savetxt('stability_random_Vmeasure_values.csv', stability_random_Vmeasure_values, delimiter=';')   
+
+# Plot stability for each value of K 
+import matplotlib.pyplot as plt
+fig = plt.figure(figsize=(8,5))
+#plt.plot(range(kmin, kmax+1), stability_kmeanPlusPlus_ARI_values, 'bo-', label = 'kmean++_ARI')
+#plt.plot(range(kmin, kmax+1), stability_kmeanPlusPlus_Vmeasure_values, 'ro-', label = 'kmean++_Vmeasure')
+#plt.plot(range(kmin, kmax+1), stability_random_ARI_values, 'go-', label = 'random_ARI')
+#plt.plot(range(kmin, kmax+1), stability_random_Vmeasure_values, 'ko-', label = 'random_Vmeasure')
+
+plt.plot(range(kmin, kmax+1), stability_kmeanPlusPlus_Meila_values, 'ko-', label = 'random_Vmeasure')
+
+plt.xlabel('Number of clusters (k)')
+plt.ylabel('Stability')
+plt.xticks(range(kmin, kmax+1))
+
+plt.legend();
+plt.show()
+ 
+ 
+
+
