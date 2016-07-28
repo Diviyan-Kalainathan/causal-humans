@@ -15,13 +15,13 @@ plot = 3  # Var for the type of plot
 # 2: graph of the most significant vars
 # 3: Same as #2 but not with abs values
 # 4: Correlation between Vars categories and axis.
-path = 'output/raw_indent_vectors_ao_~6.csv'
+path = 'output/raw_indent_vectors_ws_~6.csv'
 
 points_toplot = 50
 analysed_dimension = 1
 plot_y = []
 colors = ['0.75', 'b', 'r', 'c', 'y', 'm', 'k', 'g']
-flags = False  # Separate the flags from the categories or not
+flags = True  # Separate the flags from the categories or not
 
 # Creating a dictionary of var names and their category
 path2 = 'input/filtered_data.csv'

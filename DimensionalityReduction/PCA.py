@@ -18,10 +18,10 @@ category = []
 vp = False  # Var to multiply W by sqrt of eigenvalue
 mode = 'O'  # O for objective, S for subjective and '' to deactivate
 obj_subj = []
-nb_dimensions = 6
+nb_dimensions = 9
 
 IDF = True
-file_name = 'ao_~6'
+file_name = 'ao_~9'
 
 with open('input/Variables_info.csv', 'rb') as datafile:
     var_reader = csv.reader(datafile, delimiter=',')
@@ -165,7 +165,8 @@ for i in range(0, len(eigvalues)):
 for i in range(0, len(eigvalues)):
     plt.plot(i, func[i], 'go')
 
-plt.show()
+plt.savefig('output/inertia_'+file_name+'.pdf')
+plt.clf()
 
 func2 = []
 for i in range(0, len(eigvalues)):
@@ -174,7 +175,8 @@ for i in range(0, len(eigvalues)):
 for i in range(0, len(eigvalues)):
     plt.plot(i, func2[i], 'go')
 
-plt.show()
+plt.savefig('output/values_'+file_name+'.pdf')
+plt.clf()
 
 s_eigvalues = numpy.sort(eigvalues)
 
@@ -220,7 +222,7 @@ for i in range(0, len(toprint[:, 1])):
     elif color_type[i] == 'FD':
         plt.plot(toprint[i, 0], toprint[i, 1], 'yx')
 
-plt.show()
+plt.savefig('output/tsne1_'+file_name+'.pdf')
 plt.clf()
 
 categ_colors = ['0.75', 'g', 'r', 'b', 'y', 'c', 'm', 'k']
@@ -228,7 +230,7 @@ categ_colors = ['0.75', 'g', 'r', 'b', 'y', 'c', 'm', 'k']
 for i in range(0, len(toprint[:, 1])):
     plt.plot(toprint[i, 0], toprint[i, 1], 'x', color=categ_colors[category_type[i]])
 
-plt.show()
+plt.savefig('output/tsne2_'+file_name+'.pdf')
 plt.clf()
 
 # Color variables
@@ -248,7 +250,7 @@ for i in range(0, len(toprint[:, 1])):
     elif color_type[i] == 'FD':
         plt.plot(toprint[i, 0], toprint[i, 1], 'yx')
 
-plt.show()
+plt.savefig('output/2D_'+file_name+'.pdf')
 
 # Transforming points into new subspace
 

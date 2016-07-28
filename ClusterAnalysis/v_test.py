@@ -6,7 +6,7 @@ Date : 28/06/2016
 '''
 import csv,numpy
 
-def v_type(input_data,data_folder,num_clusters, num_vars, list_vars):
+def v_test(input_data,data_folder,num_clusters, num_vars, list_vars):
     """
     :param input_data: Data used to do the clustering(String)
     :param data_folder: Folder where the clustering output is(String)
@@ -27,6 +27,12 @@ def v_type(input_data,data_folder,num_clusters, num_vars, list_vars):
             totaldata[n,0]=numpy.mean(col_data)
             totaldata[n,1]=numpy.std(col_data)
 
+    cluster_size=numpy.zeros((num_clusters))
+    for i in range(num_clusters):
+        file = open('output/'+ data_folder +'/cluster_'+str(i)+'.csv')
+        cluster_size[i] = len(file.readlines())-2
+
+    total_size=numpy.sum(cluster_size)
     for num_file in range(num_clusters):
         with open('output/' + data_folder + '/cluster_similarity_' + str(int(num_file)) + '.csv', 'wb') as outputfile:
             datawriter = csv.writer(outputfile, delimiter=';', quotechar='|')
@@ -42,7 +48,8 @@ def v_type(input_data,data_folder,num_clusters, num_vars, list_vars):
                 for row in datareader:
                     name_value+=[row[n_var]]
 
-                result=[list_vars[n_var],(abs(numpy.mean(name_value)-totaldata[n_var,0])/totaldata[n_var,1])] # ! Calcul v-type
+                result=[list_vars[n_var],((numpy.mean(name_value)-totaldata[n_var,0])/ numpy.sqrt(((total_size-cluster_size[num_file])/(total_size-1))*((totaldata[n_var,1]**2)/cluster_size[num_file])))]
+                # ! Calcul v-type
                 with open('output/' + data_folder + '/cluster_similarity_' + str(int(num_file)) + '.csv', 'a') as outputfile:
                     datawriter = csv.writer(outputfile, delimiter=';', quotechar='|',
                                             lineterminator='\n')

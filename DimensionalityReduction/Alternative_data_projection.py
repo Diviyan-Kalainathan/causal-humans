@@ -19,10 +19,10 @@ category = []
 vp = False  # Var to multiply W by sqrt of eigenvalue
 mode = 'O'  # O for objective, S for subjective and '' to deactivate
 obj_subj=[]
-nb_dimensions=6
+nb_dimensions=8
 
 IDF = True
-file_name = 'wo_~6'
+file_name = 'wo_~8'
 
 with open('input/Variables_info_modif.csv', 'rb') as datafile:
     var_reader = csv.reader(datafile, delimiter=',')
@@ -134,6 +134,7 @@ for i in range(0, n_features):
         proc_data[i, :] = (inputdata[i, :] - mean) / (sd + 1)  # The +1 may affect the results
     else:
         if color_type[i] == 'C':
+            #Applying regular normalization
 
             if sd == 0:
                 proc_data[i, :] = 0.0
@@ -143,9 +144,11 @@ for i in range(0, n_features):
                 proc_data[i, :] = (inputdata[i, :] - mean) / (sd)
 
         else:
+            #Applying inverse document frequency smooth
+
             if not sum(inputdata[i, :]) == 0:
                 print(sum(inputdata[i, :]),)
-                proc_data[i, :] = (inputdata[i, :] / sum(inputdata[i, :]))
+                proc_data[i, :] = inputdata[i, :] * numpy.log( 1 + 31112/sum(inputdata[i, :]))
             else:
                 proc_data[i, :] = 0.0
 
@@ -180,6 +183,7 @@ for i in range(0, len(eigvalues)):
     plt.plot(i, func[i], 'go')
 
 plt.show()
+plt.clf()
 
 func2 = []
 for i in range(0, len(eigvalues)):
@@ -189,6 +193,7 @@ for i in range(0, len(eigvalues)):
     plt.plot(i, func2[i], 'go')
 
 plt.show()
+plt.clf()
 
 s_eigvalues = sorted(eigvalues, reverse=True)
 
@@ -235,7 +240,7 @@ for i in range(0, len(toprint[:, 1])):
     elif color_type[i] == 'FD':
         plt.plot(toprint[i, 0], toprint[i, 1], 'yx')
 
-plt.show()
+plt.savefig('output/tsne1_'+file_name+'.pdf')
 plt.clf()
 categ_colors=['0.75','g','r','b','y','c','m','k']
 
@@ -244,7 +249,7 @@ for i in range(0, len(toprint[:, 1])):
     plt.plot(toprint[i, 0], toprint[i, 1], 'x', color=categ_colors[category_type[i]])
 
 
-plt.show()
+plt.savefig('output/tsne2_'+file_name+'.pdf')
 plt.clf()
 
 # Color variables
@@ -264,7 +269,7 @@ for i in range(0, len(toprint[:, 1])):
     elif color_type[i] == 'FD':
         plt.plot(toprint[i, 0], toprint[i, 1], 'yx')
 
-plt.show()
+plt.savefig('output/2D_'+file_name+'.pdf')
 # Transforming points into new subspace
 
 
