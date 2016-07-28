@@ -16,10 +16,13 @@ num_bool = []
 spec_note = []
 color_type = []
 category = []
-vp = True  # Var to multiply W by sqrt of eigenvalue
-mode = 'S'  # O for objective, S for subjective and '' to deactivate
+vp = False  # Var to multiply W by sqrt of eigenvalue
+mode = 'O'  # O for objective, S for subjective and '' to deactivate
 obj_subj=[]
-nb_dimensions=3
+nb_dimensions=6
+
+IDF = True
+file_name = 'wo_~6'
 
 with open('input/Variables_info_modif.csv', 'rb') as datafile:
     var_reader = csv.reader(datafile, delimiter=',')
@@ -127,10 +130,24 @@ for i in range(0, n_features):
     mean = numpy.mean(inputdata[i, :])
 
     sd = numpy.std(inputdata[i, :])
-    if sd < 1.0:
-        print(sd)
+    if not IDF:
+        proc_data[i, :] = (inputdata[i, :] - mean) / (sd + 1)  # The +1 may affect the results
+    else:
+        if color_type[i] == 'C':
 
-    proc_data[i, :] = (inputdata[i, :] - mean) / (sd + 1)
+            if sd == 0:
+                proc_data[i, :] = 0.0
+            else:
+                if sd < 1:
+                    print('SD < 1 value! : ' + str(sd))
+                proc_data[i, :] = (inputdata[i, :] - mean) / (sd)
+
+        else:
+            if not sum(inputdata[i, :]) == 0:
+                print(sum(inputdata[i, :]),)
+                proc_data[i, :] = (inputdata[i, :] / sum(inputdata[i, :]))
+            else:
+                proc_data[i, :] = 0.0
 
 print(proc_data)
 print('Done.')
@@ -177,7 +194,7 @@ s_eigvalues = sorted(eigvalues, reverse=True)
 
 print(s_eigvalues)
 print(eigvalues)
-numpy.savetxt('output/eigvalues_w_svp+_5.csv', eigvalues, delimiter=';')
+numpy.savetxt('output/eigvalues_' + file_name + '.csv', eigvalues, delimiter=';')
 
 print('Done.')
 # print(repr(eig_vec1))
@@ -262,7 +279,7 @@ print('Done.')
 print('--Save Data--')
 W_t = numpy.transpose(W)
 
-with open('output/ident_vectors_w_svp+_5.csv', 'wb') as sortedfile:
+with open('output/ident_vectors_' + file_name + '.csv', 'wb') as sortedfile:
     datawriter = csv.writer(sortedfile, delimiter=';', quotechar='|')
     datawriter.writerow(['10 dimensions eig-vectors -md'])
 
@@ -271,14 +288,14 @@ for i in range(0, n_features):
     output_s += [header[i]]
     for j in range(0, nb_dimensions):
         output_s += [str(W_t[i, j])]
-    with open('output/ident_vectors_w_svp+_5.csv', 'a') as sortedfile:
+    with open('output/ident_vectors_' + file_name + '.csv', 'a') as sortedfile:
         datawriter = csv.writer(sortedfile, delimiter=';', quotechar='|',
                                 lineterminator='\n')
         datawriter.writerow(output_s)
 
 # Save data
 
-numpy.savetxt('output/computed_data_w_svp+_5.csv', computed_data, delimiter=';')
-numpy.savetxt('output/raw_indent_vectors_w_svp+_5.csv', numpy.transpose(W), delimiter=';')
+numpy.savetxt('output/computed_data_' + file_name + '.csv', computed_data, delimiter=';')
+numpy.savetxt('output/raw_indent_vectors_' + file_name + '.csv', numpy.transpose(W), delimiter=';')
 
 print('Done.')

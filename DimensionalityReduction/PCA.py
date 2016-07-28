@@ -8,21 +8,20 @@ Date : 1/06/2016
 import numpy, csv, re
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
-
 # Load var info
 num_bool = []
 spec_note = []
-type_var=[]
+type_var = []
 color_type = []
 category = []
 
 vp = False  # Var to multiply W by sqrt of eigenvalue
 mode = 'O'  # O for objective, S for subjective and '' to deactivate
-obj_subj=[]
-nb_dimensions=5
+obj_subj = []
+nb_dimensions = 6
 
-IDF=True
-file_name='o_~5'
+IDF = True
+file_name = 'ao_~6'
 
 with open('input/Variables_info.csv', 'rb') as datafile:
     var_reader = csv.reader(datafile, delimiter=',')
@@ -31,12 +30,11 @@ with open('input/Variables_info.csv', 'rb') as datafile:
         type_var += [var_row[1]]
         num_bool += [var_row[3]]
         spec_note += [var_row[4]]
-        category+=[int(var_row[5])]
-        obj_subj+=[var_row[6]]
-
+        category += [int(var_row[5])]
+        obj_subj += [var_row[6]]
 
     category_type = []
-    obj_subj_type=[]
+    obj_subj_type = []
     row_len = 0
     for num_col in range(0, 541):
         if spec_note[num_col] != 'I':
@@ -58,7 +56,7 @@ with open('input/Variables_info.csv', 'rb') as datafile:
 
                 color_type += ['FD']
                 category_type += [category[num_col]]
-                obj_subj_type += [ obj_subj[num_col]]
+                obj_subj_type += [obj_subj[num_col]]
 
 print('Row len/n. features : ' + str(row_len))
 # sarse_matrix = lil_matrix((input_length, row_len), dtype=numpy.int8)
@@ -70,8 +68,8 @@ n_features = row_len
 
 print('--Load dataset--')
 inputdata = numpy.zeros((n_features, 31112))
-inc=0
-print len(category_type) , len(color_type) ,row_len
+inc = 0
+print len(category_type), len(color_type), row_len
 with open('output/prepared_data.csv', 'rb') as datafile:
     var_reader = csv.reader(datafile, delimiter=';')
     header = next(var_reader)
@@ -79,16 +77,16 @@ with open('output/prepared_data.csv', 'rb') as datafile:
     for row in var_reader:
         for i in range(0, n_features):
             if (not re.search('[a-zA-Z]', row[i])) and \
-                    (mode == '' or (mode == 'O' and obj_subj_type[i]=='O' )
-                     or (mode == 'S' and obj_subj_type[i]=='S' )):
+                    (mode == '' or (mode == 'O' and obj_subj_type[i] == 'O')
+                     or (mode == 'S' and obj_subj_type[i] == 'S')):
 
-                if '.' not in row[i]:
-                    inputdata[i, num_row] = int(row[i])
-                else:
-                    inputdata[i, num_row] = float(row[i])
+                # if '.' not in row[i]:
+                #    inputdata[i, num_row] = int(row[i])
+                # else:
+                inputdata[i, num_row] = float(row[i])
             else:
-                inputdata[i, num_row] = 0
-                inc+=1
+                inputdata[i, num_row] = 0.0
+                inc += 1
 
         num_row += 1
         if num_row % 5000 == 0:
@@ -113,17 +111,31 @@ for i in range(0, n_features):
 
     sd = numpy.std(inputdata[i, :])
     if not IDF:
-        proc_data[i, :] = (inputdata[i, :] - mean) / (sd + 1) #The +1 may affect the results
-    else:
-        if color_type[i]=='C':
-            proc_data[i, :] = (inputdata[i, :] - mean) / (sd)
-            if sd<1:
-                print('SD < 1 value!')
+        if sd == 0:
+            proc_data[i, :] = 0.0
         else:
-            proc_data[i,:] = (inputdata[i,:]/sum(inputdata[i,:]))
+            if sd < 1:
+                print('SD < 1 value! : ' + str(sd))
+            proc_data[i, :] = (inputdata[i, :] - mean) / (sd )  # The +1 may affect the results
+    else:
+        if color_type[i] == 'C':
+            #Applying regular normalization
+            if sd == 0:
+                proc_data[i, :] = 0.0
+            else:
+                if sd < 1:
+                    print('SD < 1 value! : ' + str(sd))
+                proc_data[i, :] = (inputdata[i, :] - mean) / (sd)
 
+        else:
+            #Applying inverse document frequency smooth
+            if not sum(inputdata[i, :]) == 0:
+                print(sum(inputdata[i, :]),)
+                proc_data[i, :] = inputdata[i, :] * numpy.log( 1 + 31112/sum(inputdata[i, :]))
+            else:
+                proc_data[i, :] = 0.0
 
-            print(proc_data)
+print(proc_data)
 print('Done.')
 # print(inputdata[500])
 # Scatter matrix
@@ -136,7 +148,7 @@ eigvalues, eigvectors = numpy.linalg.eig(covmat)
 
 # eigvalues_sorted.sort(reverse=True)
 # print(eigvalues_sorted2)
-
+#eigvalues=eigvalues.real
 print(len(eigvalues))
 print(numpy.shape(eigvalues))
 sum2 = 0
@@ -172,7 +184,7 @@ print(s_eigvalues)
 
 print('Done.')
 
-numpy.savetxt('output/eigvalues_'+file_name+'.csv', eigvalues, delimiter=';')
+numpy.savetxt('output/eigvalues_' + file_name + '.csv', eigvalues, delimiter=';')
 
 # Transform matrix
 print('--Transform matrix & points--')
@@ -190,7 +202,7 @@ print(numpy.shape(W))
 
 W = numpy.transpose(W)
 
-#Applying t-SNE to var projected in the n-dim subspace
+# Applying t-SNE to var projected in the n-dim subspace
 model = TSNE(n_components=2)
 numpy.set_printoptions(suppress=True)
 toprint = model.fit_transform(numpy.transpose(W))
@@ -211,18 +223,16 @@ for i in range(0, len(toprint[:, 1])):
 plt.show()
 plt.clf()
 
-categ_colors=['0.75','g','r','b','y','c','m','k']
+categ_colors = ['0.75', 'g', 'r', 'b', 'y', 'c', 'm', 'k']
 
 for i in range(0, len(toprint[:, 1])):
-
     plt.plot(toprint[i, 0], toprint[i, 1], 'x', color=categ_colors[category_type[i]])
-
 
 plt.show()
 plt.clf()
 
 # Color variables
-toprint =  eigvectors[:, 0:2]
+toprint = eigvectors[:, 0:2]
 
 for i in range(0, len(toprint[:, 1])):
 
@@ -240,8 +250,6 @@ for i in range(0, len(toprint[:, 1])):
 
 plt.show()
 
-
-
 # Transforming points into new subspace
 
 
@@ -253,25 +261,23 @@ print('Done.')
 
 W_t = numpy.transpose(W)
 
-
 # Save data
 print('--Save Data--')
 
-with open('output/ident_vectors_'+file_name+'.csv', 'wb') as sortedfile:
+with open('output/ident_vectors_' + file_name + '.csv', 'wb') as sortedfile:
     datawriter = csv.writer(sortedfile, delimiter=';', quotechar='|')
-    datawriter.writerow([ str(nb_dimensions)+' dimensions eig-vectors'])
+    datawriter.writerow([str(nb_dimensions) + ' dimensions eig-vectors'])
 
 for i in range(0, n_features):
     output_s = []
     output_s += [header[i]]
     for j in range(0, nb_dimensions):
         output_s += [str(W_t[i, j])]
-    with open('output/ident_vectors_'+file_name+'.csv', 'a') as sortedfile:
+    with open('output/ident_vectors_' + file_name + '.csv', 'a') as sortedfile:
         datawriter = csv.writer(sortedfile, delimiter=';', quotechar='|',
                                 lineterminator='\n')
         datawriter.writerow(output_s)
 
-
-numpy.savetxt('output/computed_data_'+file_name+'.csv', computed_data, delimiter=';')
-numpy.savetxt('output/raw_indent_vectors_'+file_name+'.csv', numpy.transpose(W), delimiter=';')
+numpy.savetxt('output/computed_data_' + file_name + '.csv', computed_data, delimiter=';')
+numpy.savetxt('output/raw_indent_vectors_' + file_name + '.csv', numpy.transpose(W), delimiter=';')
 print('Done.')
