@@ -16,12 +16,13 @@ type_var=[]
 color_type = []
 category = []
 
-vp = True  # Var to multiply W by sqrt of eigenvalue
+vp = False  # Var to multiply W by sqrt of eigenvalue
 mode = 'O'  # O for objective, S for subjective and '' to deactivate
 obj_subj=[]
 nb_dimensions=5
 
-
+IDF=True
+file_name='o_~5'
 
 with open('input/Variables_info.csv', 'rb') as datafile:
     var_reader = csv.reader(datafile, delimiter=',')
@@ -111,10 +112,18 @@ for i in range(0, n_features):
     mean = numpy.mean(inputdata[i, :])
 
     sd = numpy.std(inputdata[i, :])
+    if not IDF:
+        proc_data[i, :] = (inputdata[i, :] - mean) / (sd + 1) #The +1 may affect the results
+    else:
+        if color_type[i]=='C':
+            proc_data[i, :] = (inputdata[i, :] - mean) / (sd)
+            if sd<1:
+                print('SD < 1 value!')
+        else:
+            proc_data[i,:] = (inputdata[i,:]/sum(inputdata[i,:]))
 
-    proc_data[i, :] = (inputdata[i, :] - mean) / (sd + 1)
 
-print(proc_data)
+            print(proc_data)
 print('Done.')
 # print(inputdata[500])
 # Scatter matrix
@@ -163,7 +172,7 @@ print(s_eigvalues)
 
 print('Done.')
 
-numpy.savetxt('output/eigvalues_a_ovp+5.csv', eigvalues, delimiter=';')
+numpy.savetxt('output/eigvalues_'+file_name+'.csv', eigvalues, delimiter=';')
 
 # Transform matrix
 print('--Transform matrix & points--')
@@ -248,21 +257,21 @@ W_t = numpy.transpose(W)
 # Save data
 print('--Save Data--')
 
-with open('output/ident_vectors_a_ovp+5.csv', 'wb') as sortedfile:
+with open('output/ident_vectors_'+file_name+'.csv', 'wb') as sortedfile:
     datawriter = csv.writer(sortedfile, delimiter=';', quotechar='|')
-    datawriter.writerow(['10 dimensions eig-vectors'])
+    datawriter.writerow([ str(nb_dimensions)+' dimensions eig-vectors'])
 
 for i in range(0, n_features):
     output_s = []
     output_s += [header[i]]
     for j in range(0, nb_dimensions):
         output_s += [str(W_t[i, j])]
-    with open('output/ident_vectors_a_ovp+5.csv', 'a') as sortedfile:
+    with open('output/ident_vectors_'+file_name+'.csv', 'a') as sortedfile:
         datawriter = csv.writer(sortedfile, delimiter=';', quotechar='|',
                                 lineterminator='\n')
         datawriter.writerow(output_s)
 
 
-numpy.savetxt('output/computed_data_a_ovp+5.csv', computed_data, delimiter=';')
-numpy.savetxt('output/raw_indent_vectors_a_ovp+5.csv', numpy.transpose(W), delimiter=';')
+numpy.savetxt('output/computed_data_'+file_name+'.csv', computed_data, delimiter=';')
+numpy.savetxt('output/raw_indent_vectors_'+file_name+'.csv', numpy.transpose(W), delimiter=';')
 print('Done.')
