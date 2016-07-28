@@ -11,7 +11,7 @@ from sklearn import metrics
 
 def Clustering_performance_evaluation(mode, folder_name, run1, run2, num_clusters, num_init):
     """
-    :param mode: selects which distance is to be used
+    :param mode: selects which metric is to be used
     :param folder_name: Folder of the runs (String)
     :param run1: Number of the run 1 (int)
     :param run2: Number of the run 2 (int)

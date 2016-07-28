@@ -19,7 +19,8 @@ paths = ['ao','ao_vp','as','as_vp','wo','wo_vp','ws','ws_vp']
 
 mode = 1
 #1 : Dist by Marina Meila
-#2 : Dist
+#2 : adjusted rand index
+#3 : v-mesure
 
 for itr in range(len(paths)):
     print 'itr : ', itr
@@ -38,7 +39,7 @@ for itr in range(len(paths)):
                 dist += [performance_evaluation.Clustering_performance_evaluation(mode,path, k, j, i, n_init)]
 
         print dist
-        numpy.savetxt('output/' + path + '/resultdist_' + str(i) + '.csv', dist, delimiter=';')
+        numpy.savetxt('output/' + path + '/dist_ari_' + str(i) + '.csv', dist, delimiter=';')
 
         n_init=500
         path = paths[itr]+'km++_' + str(i)
@@ -50,6 +51,6 @@ for itr in range(len(paths)):
                 dist += [performance_evaluation.Clustering_performance_evaluation(mode,path, k, j, i, n_init)]
 
         print dist
-        numpy.savetxt('output/' + path + '/resultdist_' + str(i) + '.csv', dist, delimiter=';')
+        numpy.savetxt('output/' + path + '/dist_ari_' + str(i) + '.csv', dist, delimiter=';')
 
 

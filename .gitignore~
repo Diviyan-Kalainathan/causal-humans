@@ -9,7 +9,7 @@
 *.csv#
 *.iml
 *.ods
-
+Data_analysis/
 #Except python files
 !.gitignore
 !*/*.py
