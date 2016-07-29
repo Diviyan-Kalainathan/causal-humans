@@ -16,12 +16,12 @@ color_type = []
 category = []
 
 vp = False  # Var to multiply W by sqrt of eigenvalue
-mode = 'O'  # O for objective, S for subjective and '' to deactivate
+mode = 'S'  # O for objective, S for subjective and '' to deactivate
 obj_subj = []
-nb_dimensions = 9
+nb_dimensions = 4
 
 IDF = True
-file_name = 'ao_~9'
+file_name = 'as_~4'
 
 with open('input/Variables_info.csv', 'rb') as datafile:
     var_reader = csv.reader(datafile, delimiter=',')

@@ -17,7 +17,9 @@ n_runs = 20
 n_iter = 300
 paths = ['ao','ao_vp','as','as_vp','wo','wo_vp','ws','ws_vp']
 
-mode = 1
+itr= int(sys.argv[1])
+
+#mode = 2
 #1 : Dist by Marina Meila
 #2 : adjusted rand index
 #3 : v-mesure
