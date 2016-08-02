@@ -17,17 +17,17 @@ n_runs = 20
 n_iter = 300
 paths = ['ao','ao_vp','as','as_vp','wo','wo_vp','ws','ws_vp']
 
-input_data = ['input/ao+/computed_data_a_o+5.csv',
-              'input/ao+/computed_data_a_ovp+5.csv',
-              'input/as+/computed_data_a_s+3.csv',
-              'input/as+/computed_data_a_svp+3.csv',
-              'input/wo+/computed_data_w_o+_5.csv',
-              'input/wo+/computed_data_w_ovp+_5.csv',
-              'input/ws+/computed_data_w_s+_5.csv',
-              'input/ws+/computed_data_w_svp+_5.csv',
+input_data = ['input/ao~/computed_data_ao_~9.csv',
+              'input/ao~/computed_data_ao_vp~9.csv',
+              'input/as~/computed_data_as_~4.csv',
+              'input/as~/computed_data_as_vp~4.csv',
+              'input/wo~/computed_data_wo_~8.csv',
+              'input/wo~/computed_data_wo_vp~8.csv',
+              'input/ws~/computed_data_ws_~5.csv',
+              'input/ws~/computed_data_ws_~5.csv',
               ]
 
-dimensions = [5,5,3,3,5,5,3,3]
+dimensions = [9,9,4,4,8,8,5,5]
 
 itr= int(sys.argv[1])
 
@@ -42,10 +42,16 @@ for i in n_clusters:
     dist = []
     for k in range(0, n_runs - 1):
         for j in range(k + 1, n_runs):
-            dist += [performance_evaluation.distance_clustering(path, k, j, i, n_init)]
+            dist += [performance_evaluation.Clustering_performance_evaluation(2,path, k, j, i, n_init)]
 
-    print dist
-    numpy.savetxt('output/' + path + '/resultdist_' + str(i) + '.csv', dist, delimiter=';')
+    numpy.savetxt('output/' + path + '/resultdist_ari' + str(i) + '.csv', dist, delimiter=';')
+
+    dist = []
+    for k in range(0, n_runs - 1):
+        for j in range(k + 1, n_runs):
+            dist += [performance_evaluation.Clustering_performance_evaluation(3, path, k, j, i, n_init)]
+
+    numpy.savetxt('output/' + path + '/resultdist_vm' + str(i) + '.csv', dist, delimiter=';')
 
 
 # Kmeans++
@@ -64,8 +70,15 @@ for i in n_clusters:
     dist = []
     for k in range(0, n_runs - 1):
         for j in range(k + 1, n_runs):
-            dist += [performance_evaluation.distance_clustering(path, k, j, i, n_init)]
+            dist += [performance_evaluation.Clustering_performance_evaluation(2,path, k, j, i, n_init)]
 
-    print dist
-    numpy.savetxt('output/' + path + '/resultdist_' + str(i) + '.csv', dist, delimiter=';')
+    numpy.savetxt('output/' + path + '/resultdist_ari' + str(i) + '.csv', dist, delimiter=';')
+
+    dist = []
+
+    for k in range(0, n_runs - 1):
+        for j in range(k + 1, n_runs):
+            dist += [performance_evaluation.Clustering_performance_evaluation(3, path, k, j, i, n_init)]
+
+    numpy.savetxt('output/' + path + '/resultdist_vm' + str(i) + '.csv', dist, delimiter=';')
 

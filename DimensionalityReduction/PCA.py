@@ -15,13 +15,13 @@ type_var = []
 color_type = []
 category = []
 
-vp = False  # Var to multiply W by sqrt of eigenvalue
-mode = 'S'  # O for objective, S for subjective and '' to deactivate
+vp = True  # Var to multiply W by sqrt of eigenvalue
+mode = ''  # O for objective, S for subjective and '' to deactivate
 obj_subj = []
-nb_dimensions = 4
+nb_dimensions = 10
 
 IDF = True
-file_name = 'as_~4'
+file_name = 'aa_~vp10'
 
 with open('input/Variables_info.csv', 'rb') as datafile:
     var_reader = csv.reader(datafile, delimiter=',')
@@ -165,7 +165,7 @@ for i in range(0, len(eigvalues)):
 for i in range(0, len(eigvalues)):
     plt.plot(i, func[i], 'go')
 
-plt.savefig('output/inertia_'+file_name+'.pdf')
+#plt.show()
 plt.clf()
 
 func2 = []
@@ -175,7 +175,7 @@ for i in range(0, len(eigvalues)):
 for i in range(0, len(eigvalues)):
     plt.plot(i, func2[i], 'go')
 
-plt.savefig('output/values_'+file_name+'.pdf')
+#plt.show()
 plt.clf()
 
 s_eigvalues = numpy.sort(eigvalues)

@@ -98,6 +98,7 @@ def v_test(input_data, computed_data, list_vars, folder, type_var):
                                  1 - (numpy.sum(prep_data[n_var, :]) / num_total_items)) * (
                                             (num_sample_items * numpy.sum(prep_data[n_var, :])) / num_total_items)))
                     result = [list_vars[n_var], r_high, r_low]
+
                 except ZeroDivisionError and ValueError:
                     result = [list_vars[n_var], 0, 0]
                     print('ZDE')

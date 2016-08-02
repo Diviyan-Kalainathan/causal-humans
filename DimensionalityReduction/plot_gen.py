@@ -10,15 +10,15 @@ which the vars belong to
 import csv, numpy
 import matplotlib.pyplot as plt
 
-plot = 3  # Var for the type of plot
+plot = 4  # Var for the type of plot
 # 1: Graph of evolution of weight according to variables sorted by category*
 # 2: graph of the most significant vars
 # 3: Same as #2 but not with abs values
 # 4: Correlation between Vars categories and axis.
-path = 'output/raw_indent_vectors_ws_~6.csv'
+path = 'output/aa~/raw_indent_vectors_aa_~10.csv'
 
 points_toplot = 50
-analysed_dimension = 1
+analysed_dimension = 0
 plot_y = []
 colors = ['0.75', 'b', 'r', 'c', 'y', 'm', 'k', 'g']
 flags = True  # Separate the flags from the categories or not

@@ -17,15 +17,14 @@ n_runs = 20
 n_iter = 300
 paths = ['ao','ao_vp','as','as_vp','wo','wo_vp','ws','ws_vp']
 
-itr= int(sys.argv[1])
 
-#mode = 2
+mode = 3
 #1 : Dist by Marina Meila
 #2 : adjusted rand index
 #3 : v-mesure
 
 for itr in range(len(paths)):
-    print 'itr : ', itr
+    print 'itr vm: ', itr
     for i in n_clusters:
         print ' - number of clusters : ', i
 
@@ -41,7 +40,7 @@ for itr in range(len(paths)):
                 dist += [performance_evaluation.Clustering_performance_evaluation(mode,path, k, j, i, n_init)]
 
         print dist
-        numpy.savetxt('output/' + path + '/dist_ari_' + str(i) + '.csv', dist, delimiter=';')
+        numpy.savetxt('output/' + path + '/dist_vm_' + str(i) + '.csv', dist, delimiter=';')
 
         n_init=500
         path = paths[itr]+'km++_' + str(i)
@@ -53,6 +52,6 @@ for itr in range(len(paths)):
                 dist += [performance_evaluation.Clustering_performance_evaluation(mode,path, k, j, i, n_init)]
 
         print dist
-        numpy.savetxt('output/' + path + '/dist_ari_' + str(i) + '.csv', dist, delimiter=';')
+        numpy.savetxt('output/' + path + '/dist_vm_' + str(i) + '.csv', dist, delimiter=';')
 
 

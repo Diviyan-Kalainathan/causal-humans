@@ -30,8 +30,8 @@ def minibatch_kmeans(num_clusters, num_init, size_batch, folder_name,
 
     for run in range(0, num_runs):
 
-        print '---run n : ', run
         N = num_clusters
+        print N,'--run n : ', run
 
         # Creating colors to plot according to which cluster the points belong to
 
