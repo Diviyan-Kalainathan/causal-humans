@@ -15,13 +15,16 @@ plot = 4  # Var for the type of plot
 # 2: graph of the most significant vars
 # 3: Same as #2 but not with abs values
 # 4: Correlation between Vars categories and axis.
-path = 'output/aa~/raw_indent_vectors_aa_~10.csv'
+path = 'output/wa~/raw_indent_vectors_wa_~6.csv'
 
 points_toplot = 50
 analysed_dimension = 0
 plot_y = []
 colors = ['0.75', 'b', 'r', 'c', 'y', 'm', 'k', 'g']
-flags = True  # Separate the flags from the categories or not
+category_labels = ['Drapeaux', 'Activite\n professionnelle', 'Organisation du \ntemps de travail'
+        , 'Contraintes, \nprevention et accidents', 'Organisation du travail'
+        , 'Sante', 'Carriere et contexte social', 'Auto-questionnaire']
+flags = False  # Separate the flags from the categories or not
 
 # Creating a dictionary of var names and their category
 path2 = 'input/filtered_data.csv'
@@ -97,7 +100,7 @@ elif plot == 2:
 elif plot == 3:
 
     abs_val = []
-
+    used_colors=numpy.zeros((len(colors)))
     for i in range(len(dic[1])):
         plot_y += [(data[i, analysed_dimension])]
         abs_val += [abs(data[i, analysed_dimension])]
@@ -111,6 +114,15 @@ elif plot == 3:
     plt.xticks(xrange(points_toplot), dic[0][:points_toplot], rotation='60')
     for j in range(points_toplot):
         pltbar[j].set_color(colors[dic[1][j]])
+        if used_colors[dic[1][j]]==0:
+            pltbar[j].set_label(category_labels[dic[1][j]])
+
+        used_colors[dic[1][j]]=1
+
+    plt.title(str(points_toplot) +' Variables ayant le plus de poids sur l\'axe '+str(analysed_dimension))
+    plt.xlabel('Variables')
+    plt.ylabel('Poids')
+    plt.legend()
 
 elif plot == 4:
 
@@ -150,7 +162,7 @@ elif plot == 4:
         for i in range(len(separ) - 1):
             # if i==1:
             # print(numpy.sum(numpy.power(sorted_data[l][separ[i]:separ[i+1]],2)))
-            plot_x[i, l] = numpy.sum(numpy.power(sorted_data[l][separ[i]:separ[i + 1]], 2))/(separ[i+1]-separ[i])
+            plot_x[i, l] = numpy.sum(numpy.power(sorted_data[l][separ[i]:separ[i + 1]], 2))#/(separ[i+1]-separ[i])
         if vp:
             plot_x[:, l] /= numpy.sum(numpy.power(sorted_data[l], 2))
             # print(numpy.sum(numpy.power(sorted_data[0], 2)))
@@ -161,11 +173,11 @@ elif plot == 4:
     print dic[0][separ[1]:separ[2]]
     print idx_sort[separ[1]:separ[2]]
 
-    xlegend = ['Flags', 'Professional activity', 'Work time organization'
-        , 'Constraints, prevention & accidents', 'Work organization'
-        , 'Health', 'Background & career', 'Self survey']
+    xlegend = ['Drapeaux', 'Activite\n professionnelle', 'Organisation du \ntemps de travail'
+        , 'Contraintes, \nprevention et accidents', 'Organisation du travail'
+        , 'Sante', 'Carriere et contexte social', 'Auto-questionnaire']
     plt.matshow(plot_x)
-    plt.title('Correlation matrix of weights between categories and dimensions')
+    plt.title('Matrice de l\'influence des poids des categories sur les axes')
     plt.xlabel('Dimensions')
     plt.ylabel('Categories')
     plt.yticks(xrange(len(plot_x[:, 0])), xlegend, rotation='0')

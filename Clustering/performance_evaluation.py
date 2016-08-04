@@ -21,9 +21,8 @@ def Clustering_performance_evaluation(mode, folder_name, run1, run2, num_cluster
 
     """
     numpy.set_printoptions(threshold='nan')
-
+    print('-'+str(num_clusters)+'---performance evaluation between runs : ' + str(run1) + ' ,' + str(run2))
     valid_data= True
-
     #Checking if the data is valid by loading & testing the shape of it
     try:
         data_1=numpy.loadtxt('output/'+folder_name+'/cluster_predictions_c'+ str(num_clusters)
@@ -43,7 +42,6 @@ def Clustering_performance_evaluation(mode, folder_name, run1, run2, num_cluster
         n_samples=data_1.shape[0]
         data_1 = numpy.asarray(sorted(data_1, key=lambda x: x[1]))
         data_2 = numpy.asarray(sorted(data_2, key=lambda x: x[1]))
-
         if mode==1:
             #Distance defined by Marina Meila : k! complexity
             clustering_1=numpy.zeros((n_samples,num_clusters))

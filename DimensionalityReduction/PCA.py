@@ -139,7 +139,7 @@ print(proc_data)
 print('Done.')
 # print(inputdata[500])
 # Scatter matrix
-print('--Scatter Matrix--')
+print('--Covariance Matrix--')
 covmat = numpy.cov(proc_data)
 print('Done.')
 # Computing eigenvalues & eigenvectors

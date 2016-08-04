@@ -58,7 +58,7 @@ def minibatch_kmeans(num_clusters, num_init, size_batch, folder_name,
 
         # For the first run, creating plots
 
-        if run == 0:
+        if False:#run == 0:
 
             # TSNE
             # For t-SNE, choosing 4000 random points to plot
