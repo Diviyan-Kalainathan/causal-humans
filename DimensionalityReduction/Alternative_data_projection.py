@@ -16,13 +16,13 @@ num_bool = []
 spec_note = []
 color_type = []
 category = []
-vp = True  # Var to multiply W by sqrt of eigenvalue
+vp = False  # Var to multiply W by sqrt of eigenvalue
 mode = ''  # O for objective, S for subjective and '' to deactivate
 obj_subj=[]
-nb_dimensions=12
+nb_dimensions=6
 
-IDF = True
-file_name = 'wa_vp~12'
+IDF = False
+file_name = 'wa_sd_~6'
 
 with open('input/Variables_info_modif.csv', 'rb') as datafile:
     var_reader = csv.reader(datafile, delimiter=',')
@@ -136,7 +136,7 @@ for i in range(0, n_features):
         if color_type[i] == 'C':
             #Applying regular normalization
 
-            if sd == 0:
+            if sd < 0.05:
                 proc_data[i, :] = 0.0
             else:
                 if sd < 1:
@@ -182,7 +182,7 @@ for i in range(0, len(eigvalues)):
 for i in range(0, len(eigvalues)):
     plt.plot(i, func[i], 'go')
 
-plt.show()
+#plt.show()
 plt.clf()
 
 func2 = []
@@ -192,7 +192,7 @@ for i in range(0, len(eigvalues)):
 for i in range(0, len(eigvalues)):
     plt.plot(i, func2[i], 'go')
 
-plt.show()
+#plt.show()
 plt.clf()
 
 s_eigvalues = sorted(eigvalues, reverse=True)

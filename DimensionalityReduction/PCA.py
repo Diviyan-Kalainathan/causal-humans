@@ -15,13 +15,13 @@ type_var = []
 color_type = []
 category = []
 
-vp = True  # Var to multiply W by sqrt of eigenvalue
+vp = False  # Var to multiply W by sqrt of eigenvalue
 mode = ''  # O for objective, S for subjective and '' to deactivate
 obj_subj = []
-nb_dimensions = 10
+nb_dimensions = 8
 
-IDF = True
-file_name = 'aa_~vp10'
+IDF = False
+file_name = 'aa_sd_~8'
 
 with open('input/Variables_info.csv', 'rb') as datafile:
     var_reader = csv.reader(datafile, delimiter=',')
@@ -120,7 +120,7 @@ for i in range(0, n_features):
     else:
         if color_type[i] == 'C':
             #Applying regular normalization
-            if sd == 0:
+            if sd < 0.05:
                 proc_data[i, :] = 0.0
             else:
                 if sd < 1:
