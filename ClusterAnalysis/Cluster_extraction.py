@@ -8,9 +8,9 @@ import numpy, csv
 from matplotlib import pyplot as plt
 import Similarity_analysis
 
-input_file = 'cluster_centers_c8_n500_r16-subj.csv'
+input_file = 'cluster_predictions_c8_n500_r12-subj.csv'
 output_folder = 'Cluster_separation_3'
-
+v_test=False
 ####Preparing data analysis for V-test
 
 with open('input/prepared_data.csv', 'rb') as datafile:
@@ -93,79 +93,88 @@ name_clusters = (set((clusters[:, 0])))
     print(line_idx)
     print(len(clusters[:,0]))
     Similarity_analysis.var_similarity(output_folder,len(name_clusters),len(header_input),header_input)'''  # No separation
+if v_test:
+    print('V-test Analysis')
+    # Vtest analysis
+    prep_data = numpy.loadtxt('input/prep_numpyarray.csv', delimiter=';')
+    print('--Computing total mean and std values')
+    total_mean = numpy.zeros((prep_data.shape[0]))
+    total_std = numpy.zeros((prep_data.shape[0]))
+    num_total_items = float(prep_data.shape[1])
+    v_test_results = numpy.zeros((prep_data.shape[0], len(name_clusters)))
 
-print('V-test Analysis')
-# Vtest analysis
-prep_data = numpy.loadtxt('input/prep_numpyarray.csv', delimiter=';')
-print('--Computing total mean and std values')
-total_mean = numpy.zeros((prep_data.shape[0]))
-total_std = numpy.zeros((prep_data.shape[0]))
-num_total_items = float(prep_data.shape[1])
-v_test_results = numpy.zeros((prep_data.shape[0], len(name_clusters)))
-
-for ques in range(prep_data.shape[0]):
-    total_mean[ques] = numpy.mean(prep_data[ques, :])
-    total_std[ques] = numpy.std(prep_data[ques, :])
-print('--Computing v-tests on all vars')
-for var in range(row_len):
-    print('--- var : ' + str(var))
-    cluster_values = [[] for j in range(len(name_clusters))]
-
-    for ppl in range(prep_data.shape[1]):
-        cluster_values[int(clusters[ppl, 0])] += [prep_data[var, ppl]]
-
-    for n_cluster in range(len(name_clusters)):
-        res = 0
-        if color_type[var] == 'C':
-            try:
-
-                res = ((numpy.mean(cluster_values[n_cluster]) - total_mean[var]) / numpy.sqrt(
-                    ((num_total_items - (len(cluster_values[n_cluster])) / (num_total_items - 1)) * (
-                        (numpy.power(total_std[var], 2)) / float(len(cluster_values[n_cluster]))))))
-
-
-            except ZeroDivisionError:
-                res = 0
-
-        else:
-            try:
-                if numpy.sqrt(((num_total_items - len(cluster_values[n_cluster])) / (num_total_items - 1)) * (
-                            1 - (numpy.sum(prep_data[var, :]) / num_total_items)) * (
-                            (len(cluster_values[n_cluster]) * numpy.sum(prep_data[var, :])) / num_total_items)) < 0.0001:
-                    raise ValueError
-
-                res = ((numpy.sum(cluster_values[n_cluster]) - (
-                    float(len(cluster_values[n_cluster])) * numpy.sum(prep_data[var, :])) / num_total_items) /
-                       numpy.sqrt(((num_total_items - len(cluster_values[n_cluster])) / (num_total_items - 1)) * (
-                           1 - (numpy.sum(prep_data[var, :]) / num_total_items)) * (
-                                      (len(cluster_values[n_cluster]) * numpy.sum(prep_data[var, :])) / num_total_items)))
-
-
-            except ZeroDivisionError and ValueError:
-                res = 0
-                print('ZDE')
-
-        v_test_results[var, n_cluster] = res
-
-with open('output/' + output_folder + '/v-tests.csv', 'wb') as outputfile:
-    datawriter = csv.writer(outputfile, delimiter=';', quotechar='|')
-    datawriter.writerow(['V-tests'])
-
+    for ques in range(prep_data.shape[0]):
+        total_mean[ques] = numpy.mean(prep_data[ques, :])
+        total_std[ques] = numpy.std(prep_data[ques, :])
+    print('--Computing v-tests on all vars')
     for var in range(row_len):
-        w_row = []
-        w_row += [header[var]]
+        print('--- var : ' + str(var))
+        cluster_values = [[] for j in range(len(name_clusters))]
+
+        for ppl in range(prep_data.shape[1]):
+            cluster_values[int(clusters[ppl, 0])] += [prep_data[var, ppl]]
+
         for n_cluster in range(len(name_clusters)):
-            w_row += [str(v_test_results[var, n_cluster])]
+            res = 0
+            if color_type[var] == 'C':
+                try:
 
-        datawriter.writerow(w_row)
+                    res = ((numpy.mean(cluster_values[n_cluster]) - total_mean[var]) / numpy.sqrt(
+                        ((num_total_items - (len(cluster_values[n_cluster])) / (num_total_items - 1)) * (
+                            (numpy.power(total_std[var], 2)) / float(len(cluster_values[n_cluster]))))))
 
-numpy.savetxt('output/'+output_folder+'/numpy-v-test.csv',v_test_results ,delimiter=';')
+
+                except ZeroDivisionError:
+                    res = 0
+
+            else:
+                try:
+                    if numpy.sqrt(((num_total_items - len(cluster_values[n_cluster])) / (num_total_items - 1)) * (
+                                1 - (numpy.sum(prep_data[var, :]) / num_total_items)) * (
+                                (len(cluster_values[n_cluster]) * numpy.sum(prep_data[var, :])) / num_total_items)) < 0.0001:
+                        raise ValueError
+
+                    res = ((numpy.sum(cluster_values[n_cluster]) - (
+                        float(len(cluster_values[n_cluster])) * numpy.sum(prep_data[var, :])) / num_total_items) /
+                           numpy.sqrt(((num_total_items - len(cluster_values[n_cluster])) / (num_total_items - 1)) * (
+                               1 - (numpy.sum(prep_data[var, :]) / num_total_items)) * (
+                                          (len(cluster_values[n_cluster]) * numpy.sum(prep_data[var, :])) / num_total_items)))
+
+
+                except ZeroDivisionError and ValueError:
+                    res = 0
+                    print('ZDE')
+
+            v_test_results[var, n_cluster] = res
+
+    with open('output/' + output_folder + '/v-tests.csv', 'wb') as outputfile:
+        datawriter = csv.writer(outputfile, delimiter=';', quotechar='|')
+        datawriter.writerow(['V-tests'])
+
+        for var in range(row_len):
+            w_row = []
+            w_row += [header[var]]
+            for n_cluster in range(len(name_clusters)):
+                w_row += [str(v_test_results[var, n_cluster])]
+
+            datawriter.writerow(w_row)
+
+    numpy.savetxt('output/'+output_folder+'/numpy-v-test.csv',v_test_results ,delimiter=';')
 
 c=0
 hist_data=numpy.zeros((len(name_clusters)))
 for i in name_clusters:
-    hist_data[c]= ((clusters[:, 0]).tolist).count(i)
+    hist_data[c]+= ((clusters[:, 0]).tolist()).count(i)
+
     c+=1
 
-plt.hist(hist_data)
+print(hist_data)
+
+
+ind = numpy.arange(c)  # the x locations for the groups
+width = 0.7       # the width of the bars
+
+fig, ax = plt.subplots()
+rects1 = ax.bar(ind, hist_data, width, color='g' ,align='center')
+
 plt.show()
