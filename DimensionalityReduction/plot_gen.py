@@ -15,15 +15,15 @@ plot = 4  # Var for the type of plot
 # 2: graph of the most significant vars
 # 3: Same as #2 but not with abs values
 # 4: Correlation between Vars categories and axis.
-path = 'output/wa~/raw_indent_vectors_wa_~6.csv'
+path = 'output/ws~/raw_indent_vectors_ws_~5.csv'
 
 points_toplot = 50
 analysed_dimension = 0
 plot_y = []
 colors = ['0.75', 'b', 'r', 'c', 'y', 'm', 'k', 'g']
 category_labels = ['Drapeaux', 'Activite\n professionnelle', 'Organisation du \ntemps de travail'
-        , 'Contraintes, \nprevention et accidents', 'Organisation du travail'
-        , 'Sante', 'Carriere et contexte social', 'Auto-questionnaire']
+        , 'Contraintes pysiques, \nprevention et accidents', 'Organisation du travail'
+        , 'Sante', 'Parcours familial \net professionnel', 'Risques \npsychosociaux']
 flags = False  # Separate the flags from the categories or not
 
 # Creating a dictionary of var names and their category
@@ -163,7 +163,10 @@ elif plot == 4:
             # if i==1:
             # print(numpy.sum(numpy.power(sorted_data[l][separ[i]:separ[i+1]],2)))
             plot_x[i, l] = numpy.sum(numpy.power(sorted_data[l][separ[i]:separ[i + 1]], 2))#/(separ[i+1]-separ[i])
+            #plot_x[i, l] = numpy.sum(abs(sorted_data[l][separ[i]:separ[i + 1]]))  # /(separ[i+1]-separ[i])
+
         if vp:
+            #plot_x[:, l] /= numpy.sum(numpy.power(sorted_data[l], 2))
             plot_x[:, l] /= numpy.sum(numpy.power(sorted_data[l], 2))
             # print(numpy.sum(numpy.power(sorted_data[0], 2)))
     if not flags:
@@ -176,12 +179,19 @@ elif plot == 4:
     xlegend = ['Drapeaux', 'Activite\n professionnelle', 'Organisation du \ntemps de travail'
         , 'Contraintes, \nprevention et accidents', 'Organisation du travail'
         , 'Sante', 'Carriere et contexte social', 'Auto-questionnaire']
-    plt.matshow(plot_x)
+    if flags:
+        plt.matshow(plot_x)
+    else:
+        print(plot_x.shape)
+        plot_x=plot_x[1:,:]
+        print(plot_x.shape)
+        plt.matshow(plot_x)#[1:,:])
+        category_labels=category_labels[1:]
     plt.title('Matrice de l\'influence des poids des categories sur les axes')
-    plt.xlabel('Dimensions')
+    plt.xlabel('Axes')
     plt.ylabel('Categories')
-    plt.yticks(xrange(len(plot_x[:, 0])), xlegend, rotation='0')
-
+    plt.yticks(xrange(len(plot_x[:, 0])), category_labels, rotation='0')
+    plt.subplots_adjust()
     plt.colorbar()
 
 plt.show()

@@ -27,7 +27,7 @@ with open('input/Variables_info.csv', 'rb') as datafile:
             spec_note += [var_row[4]]
 
 
-with open('input/filtered_data.csv', 'rb') as datafile:
+with open('input/n_converted_data.csv', 'rb') as datafile:
     datareader = csv.reader(datafile, delimiter=';')
     header_input = next(datareader)
 
@@ -48,7 +48,7 @@ with open('input/filtered_data.csv', 'rb') as datafile:
     num_row=0
     for row in datareader:
 
-        for i in range(0, 2462):
+        for i in range(0, 2463):
 
             if not re.search('[a-zA-Z]', row[i]): ##Must recode values : Re is not to be used !
                 if '.' not in row[i]:
@@ -71,14 +71,14 @@ with open('input/filtered_data.csv', 'rb') as datafile:
         c_var_mean[0,indx]=numpy.average(inputdata[:,j],weights=(inputdata[:,flags_index[indx]]).astype(bool))
         indx+=1
 
-with open('output/prepared_data.csv', 'wb') as outputfile:
+with open('output/n_prepared_data.csv', 'wb') as outputfile:
     datawriter = csv.writer(outputfile, delimiter=';', quotechar='|')
     datawriter.writerow(header_input)
 
 
 
     #Replace values
-with open('input/filtered_data.csv', 'rb') as datafile:
+with open('input/n_converted_data.csv', 'rb') as datafile:
     datareader = csv.reader(datafile, delimiter=';')
     header_input = next(datareader)
     for row in datareader:
@@ -88,7 +88,7 @@ with open('input/filtered_data.csv', 'rb') as datafile:
                 row[c_var_index[indx]]=str(c_var_mean[0,indx])
             indx+=1
 
-        with open('output/prepared_data.csv', 'a') as outputfile:
+        with open('output/n_prepared_data.csv', 'a') as outputfile:
             datawriter = csv.writer(outputfile, delimiter=';', quotechar='|',
                                     lineterminator='\n')
             datawriter.writerow(row)

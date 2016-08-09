@@ -8,14 +8,14 @@ Author : Diviyan Kalainathan
 import csv
 #Extraction of data
 
-with open('input/datacsv.csv', 'rb') as datafile:
+with open('output/converted_data.csv', 'rb') as datafile:
     datareader = csv.reader(datafile,delimiter=';')
     header = next(datareader)
     writedlines=0
     print(len(header))
 
 #Defining the filters
-    with open('output/nc_filtered_data.csv', 'wb') as sortedfile:
+    with open('output/n_filtered_data.csv', 'wb') as sortedfile:
         datawriter = csv.writer(sortedfile, delimiter=';', quotechar='|')
         datawriter.writerow(header)
     print(header)
@@ -45,7 +45,7 @@ with open('input/datacsv.csv', 'rb') as datafile:
 
         if usefuldata:
             writedlines+=1
-            with open('output/nc_filtered_data.csv', 'a') as sortedfile:
+            with open('output/n_filtered_data.csv', 'a') as sortedfile:
                 datawriter = csv.writer(sortedfile, delimiter=';', quotechar='|',
                                          lineterminator='\n')
                 datawriter.writerow(row)

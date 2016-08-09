@@ -28,7 +28,7 @@ with open('input/Variables_info.csv', 'rb') as datafile:
 
 # initialize the sparse matrix of flags
 
-with open('input/datacsv.csv', 'rb') as datafile:
+with open('output/nc_filtered_data.csv', 'rb') as datafile:
     input_length = sum(1 for row in datafile) - 1
     print('Lines to process : ' + repr(input_length))
     row_len = 0
@@ -45,7 +45,7 @@ with open('input/datacsv.csv', 'rb') as datafile:
                 # This computation is now made in order to cross-check the columns
 print('Done.')
 print('--Processing data--')
-with open('input/datacsv.csv', 'rb') as datafile:
+with open('output/nc_filtered_data.csv', 'rb') as datafile:
     # Warning: the first var must not be a flag
 
     datareader = csv.reader(datafile, delimiter=';', quotechar='"')
@@ -657,5 +657,5 @@ S = flag_vector.todense()
 print('Done.')
 print('--Saving data--')
 numpy.savetxt("output/flag_vector.csv", S, fmt='%i', delimiter=',')
-print('Done.')'''
+print('Done.')''' #No sparse matrix conversion
 print ('End of program')

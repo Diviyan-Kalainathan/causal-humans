@@ -2,7 +2,7 @@
 Analyses the clusters and returns v-type of vars
 Author : Diviyan Kalainathan
 Date : 28/06/2016
-
+DEPRECATED - Use plot-gen/Cluster_extraction instead
 '''
 import csv,numpy
 

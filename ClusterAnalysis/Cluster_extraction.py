@@ -4,16 +4,16 @@ Author : Diviyan Kalainathan
 Date : 28/06/2016
 '''
 
-import numpy, csv
+import numpy, csv,os
 from matplotlib import pyplot as plt
 import Similarity_analysis
 
-input_file = 'cluster_predictions_c8_n500_r12-subj.csv'
-output_folder = 'Cluster_separation_3'
-v_test=False
+input_file = 'cluster_predictions_c4_n500_r13-subj.csv'
+output_folder = 'Cluster_4_subj'
+v_test=True
 ####Preparing data analysis for V-test
 
-with open('input/prepared_data.csv', 'rb') as datafile:
+with open('input/n_prepared_data.csv', 'rb') as datafile:
     var_reader = csv.reader(datafile, delimiter=';')
     header = next(var_reader)
 
@@ -62,8 +62,9 @@ with open('input/Variables_info.csv', 'rb') as datafile:
 
 ####
 
-
-print('Separating clusters on multiple files')
+if not os.path.exists('output/'+output_folder):
+    os.makedirs('output/'+output_folder)
+print('Separating clusters to multiple files')
 clustering_input = numpy.loadtxt('input/' + input_file, delimiter=';')
 clusters = numpy.asarray(sorted(clustering_input, key=lambda x: x[1]))
 
@@ -96,7 +97,7 @@ name_clusters = (set((clusters[:, 0])))
 if v_test:
     print('V-test Analysis')
     # Vtest analysis
-    prep_data = numpy.loadtxt('input/prep_numpyarray.csv', delimiter=';')
+    prep_data = numpy.loadtxt('input/n_prep_numpyarray.csv', delimiter=';')
     print('--Computing total mean and std values')
     total_mean = numpy.zeros((prep_data.shape[0]))
     total_std = numpy.zeros((prep_data.shape[0]))
@@ -176,5 +177,8 @@ width = 0.7       # the width of the bars
 
 fig, ax = plt.subplots()
 rects1 = ax.bar(ind, hist_data, width, color='g' ,align='center')
+plt.xlabel('Clusters')
+plt.ylabel('Nombre de personnes dans le cluster')
+plt.title('Repartition des personnes dans les clusters')
 
-plt.show()
+plt.savefig('output/'+output_folder+'/hist_repar.pdf')

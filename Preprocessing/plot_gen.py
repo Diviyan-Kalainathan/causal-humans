@@ -80,8 +80,8 @@ ax.set_ylabel('Proportion des types de questions')
 ax.set_title('Proportion des types de questions en fonction des categories')
 ax.set_xticks(ind + width)
 ax.set_xticklabels(['Drapeaux', 'Activite\n professionnelle', 'Organisation du \ntemps de travail'
-        , 'Contraintes, \nprevention et accidents', 'Organisation du travail'
-        , 'Sante', 'Carriere et contexte social', 'Auto-questionnaire'])
+        , 'Contraintes \nphysiques, \nprevention et accidents', 'Organisation du travail'
+        , 'Sante', 'Parcours familial \net professionnel', 'Risques \n pyschosociaux'])
 
 ax.legend((rects1[0], rects2[0]), ('Objectives', 'Subjectives'))
 

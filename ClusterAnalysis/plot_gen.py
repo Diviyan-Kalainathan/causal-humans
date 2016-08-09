@@ -3,12 +3,15 @@ Plotting results / V-test analysis
 Author : Diviyan Kalainathan
 Date : 4/08/2016
 '''
-import csv, numpy, heapq
+import csv, numpy, heapq,os
 from matplotlib import pyplot as plt
 
-output_folder = 'Cluster_separation_3'
+output_folder = 'Cluster_8_subj'
 
-var_to_analyze = [('naf17', 17), ('tranchre', 14)]
+var_to_analyze = [('naf17', 17), ('tranchre', 14),('statut',10),('typemploi',7),('csei',18),('diplome',9),
+                  ('public',2),('public1',4),('public2',4),('tension1',2),('tension2',2),('tension3',2),('tension4',2),
+                  ('who',1),('nbsal',5),('sexe',2)]
+
 inputfile = 'output/' + output_folder + '/numpy-v-test.csv'
 
 mode = 1
@@ -20,39 +23,119 @@ if mode == 1:
     inputdata = numpy.loadtxt(inputfile, delimiter=';')
     n_clusters = inputdata.shape[1]
     for var in var_to_analyze:
-        with open('input/prepared_data.csv', 'rb') as datafile:
+        with open('input/n_prepared_data.csv', 'rb') as datafile:
             var_reader = csv.reader(datafile, delimiter=';')
             header = next(var_reader)
 
         name_var = var[0]
         num_var = var[1]
-
+        print(name_var),
         v_test_matrix = numpy.zeros((num_var, n_clusters))
         print(v_test_matrix.shape)
         var_names = []
         row = 0
-        for i in [i for i, x in enumerate(header) if (x[0:len(name_var)] == name_var and x[-4:] != 'flag')]:
+        for i in [i for i, x in enumerate(header) if (x[0:len(name_var)] == name_var and ( x[0:len(name_var)+1] == name_var+'_' or num_var==1) and x[-4:] != 'flag')]:
             v_test_matrix[row, :] = inputdata[i, :]
             var_names += [header[i]]
             row += 1
+        if name_var=='diplome':
+            print(var_names)
 
-        plt.matshow(v_test_matrix, vmin=-15, vmax=15)
+        if name_var=='naf17':
+            var_names=['Agriculture, sylviculture et peche','Fabrication de denrees alimentaires'
+                        ,'Cokefaction et raffinage','Fabrication d\'equipements electriques, electroniques',
+                        'Fabrication de materiels de transport',
+                        'Fabrication d\'autres produits industriels',
+                        'Industries extractives, energie, eau, gestion des dechets',
+                        'Construction',
+                        'Commerce ; reparation d\'automobiles et de motocycles',
+                        'Transports et entreposage',
+                        'Hebergement et restauration',
+                        'Information et communication',
+                        'Activites financieres et d\'assurance',
+                        'Activites immobilieres',
+                        'Activites scientifiques ; services administratifs et de soutien',
+                        'Administration publique, enseignement, sante humaine, action sociale',
+                        'Autres activites de services']
+
+        elif name_var=='csei' :
+            var_names = [
+                        'Agriculteurs exploitants',
+                        'Artisans',
+                        'Commercants et assimiles',
+                        'Chefs d\'entreprise de 10 salaries ou plus',
+                       'Professions liberales',
+                       'Cadres de la fonction publique, professions intellectuelles et artistiques',
+                        'Cadres d\'entreprise',
+                        'Professions intermediaires de l\'enseignement, de la sante, de la fonction publique et assimiles',
+                        'Professions intermediaires administratives et commerciales des entreprises',
+                        'Techniciens',
+                        'Contremaitres, agents de maitrise',
+                        'Employes de la fonction publique',
+                        'Employes administratifs d\'entreprise',
+                        'Employes de commerce',
+                        'Personnels des services directs aux particuliers',
+                        'Ouvriers qualifies',
+                        'Ouvriers non qualifies',
+                        'Ouvriers agricoles']
+
+        elif name_var == 'diplome':
+            var_names = ['0. Aucun diplome',
+                        '1. CEP (certificat d\'etudes primaires)',
+                        '2. Brevet des colleges, BEPC, brevet elementaire',
+                        '3. CAP, BEP ou diplome de ce niveau',
+                        '4. Baccalaureat technologique ou professionnel ou diplome de ce niveau',
+                        '5. Baccalaureat general ',
+                        '6. Diplome de niveau Bac+2',
+                        '7. Diplome de niveau bac +3 ou bac +4',
+                        '8. Diplome de niveau superieur a bac+4']
+
+        elif name_var == 'statut':
+            var_names = ['1. Salarie de l\'etat ',
+                        '2. Salarie d\'une collectivite territoriale ',
+                        '3. Salarie d\'un hopital public',
+                        '4. Salarie d\'un etablissement de sante prive (a but lucratif ou non lucratif)',
+                        '5. Salarie du secteur public social et medico-social ',
+                        '6. Salarie d\'une entreprise, d\'un artisan, d\'une association ',
+                        '7. Salarie d\'un ou plusieurs particuliers',
+                        '8. Vous aidez un membre de votre famille dans son travail sans etre remunere',
+                        '9. Chef d\'entreprise salarie, PDG, gerant minoritaire, associe',
+                        '10. Independant ou a votre compte']
+        elif name_var=='typemploi':
+            var_names=['1. Contrat d\'apprentissage ou de professionnalisation',
+                        '2. Placement par une agence d\'interim',
+                        '3. Stage remunere en entreprise',
+                        '4. Emploi aide ',
+                        '5. Autre emploi a duree limitee, CDD, contrat court, saisonnier, vacataire, etc.',
+                        '6. Emploi sans limite de duree, CDI, titulaire de la fonction publique',
+                        '7. Travail sans contrat']
+
+        elif name_var == 'sexe':
+            var_names = ['Homme','Femme']
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        draw= ax.matshow(v_test_matrix, vmin=-15, vmax=15)
+        #PCM = ax.get_children()[2]
+
         # fig, ax1 = plt.subplots()
         # fig=plt.pcolor(v_test_matrix, vmin=-20, vmax=20,linestyle=':')
-        plt.title('Matrice des v-test des ' + name_var + ' par rapport aux clusters')
+
+        plt.title('v-test : ' + name_var ,y=1.08)
         plt.xlabel('Clusters')
         plt.ylabel(name_var)
         plt.yticks(xrange(len(var_names)), var_names, rotation='0')
         # x0, x1 = ax1.get_xlim()
         # y0, y1 = ax1.get_ylim()
         # ax1.set_aspect(abs(x1 - x0) / abs(y1 - y0))
+        fig.subplots_adjust(right=1,top=0.88,left=0.15)
+        cbar_ax = fig.add_axes()
+        fig.colorbar(draw, cax=cbar_ax)
 
-        plt.colorbar()
+       # fig.colorbar(ax)
+        #plt.tight_layout()
         plt.show()
-
-
-
-
+        #plt.savefig('output/'+output_folder+'/matrix-vt-'+name_var+'.pdf')
 
 
 elif mode == 2:
@@ -100,11 +183,16 @@ elif mode == 2:
     # for col in range(len(data[1])-1))
     print(header)
 elif mode == 3:
-    # 1 is objective
-    # 2 is subjective
+    # 2 is objective
+    # 1 is subjective
 
-    clustering1 = 'cluster_predictions_c8_n500_r12-obj.csv'
     clustering2 = 'cluster_predictions_c8_n500_r12-subj.csv'
+    clustering1 = 'cluster_predictions_c7_n500_r5-subj.csv'
+
+    result_folder= 'output/subj8Xsubj6/'
+
+    if not os.path.exists(result_folder):
+        os.makedirs(result_folder)
 
     clustering_input_1 = numpy.loadtxt('input/' + clustering1, delimiter=';')
     clusters_1 = numpy.asarray(sorted(clustering_input_1, key=lambda x: x[1]))
@@ -134,10 +222,21 @@ elif mode == 3:
             inters_min_card_c_matrix[row, col] = float(count_matrix[row, col]) \
                                                  / min(sum(count_matrix[row, :]), sum(count_matrix[:, col]))
 
-    plt.matshow(inters_min_card_c_matrix)
-    plt.title('Matrice de croisement des clusters subjectifs sur les clusters objectifs')
-    plt.xlabel('Clusters objectifs')
-    plt.ylabel('Clusters subjectifs')
+    plt.matshow(inters_union_matrix,)
+    #plt.title('Matrice de croisement des clusters subjectifs sur les clusters objectifs')
+    #plt.xlabel('Clusters objectifs')
+    #plt.ylabel('Clusters subjectifs')
 
     plt.colorbar()
-    plt.show()
+    plt.savefig(result_folder+'/comp_m_union.pdf')
+    plt.clf()
+
+    plt.matshow(inters_min_card_c_matrix)
+    #plt.title('Matrice de croisement des clusters subjectifs sur les clusters objectifs')
+    #plt.xlabel('Clusters objectifs')
+   # plt.ylabel('Clusters subjectifs')
+
+    plt.colorbar()
+    plt.savefig(result_folder + '/comp_m_min.pdf')
+
+print('Done !')
