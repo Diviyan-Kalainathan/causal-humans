@@ -8,9 +8,9 @@ import numpy, csv,os
 from matplotlib import pyplot as plt
 import Similarity_analysis
 
-input_file = 'cluster_predictions_c4_n500_r13-subj.csv'
-output_folder = 'Cluster_4_subj'
-v_test=True
+input_file = 'cluster_predictions_c8_n500_r12-subj.csv'
+output_folder = 'Cluster_8_subj'
+v_test=False
 ####Preparing data analysis for V-test
 
 with open('input/n_prepared_data.csv', 'rb') as datafile:
@@ -70,30 +70,36 @@ clusters = numpy.asarray(sorted(clustering_input, key=lambda x: x[1]))
 
 name_clusters = (set((clusters[:, 0])))
 
-'''with open('input/nc_filtered_data.csv', 'rb') as datafile:
-    datareader = csv.reader(datafile, delimiter=';')
-    header_input = next(datareader)
+#with open('input/n_prep_numpyarray.csv', 'rb') as datafile:
+   # datareader = csv.reader(datafile, delimiter=';')
+   # header_input = next(datareader)
+datafile=numpy.loadtxt('input/n_prep_numpyarray.csv',delimiter=';')
+# Create n output files for n clusters
+print(datafile.shape)
+for i in name_clusters:
+    with open('output/'+ output_folder +'/cluster_'+str(int(i))+'.csv', 'wb') as outputfile:
+        datawriter = csv.writer(outputfile, delimiter=';', quotechar='|')
+        #datawriter.writerow(['Data extracted from : '+ input_file])
+        #datawriter.writerow(header_input)
 
-    # Create n output files for n clusters
-    for i in name_clusters:
-        with open('output/'+ output_folder +'/cluster_'+str(int(i))+'.csv', 'wb') as outputfile:
-            datawriter = csv.writer(outputfile, delimiter=';', quotechar='|')
-            datawriter.writerow(['Data extracted from : '+ input_file])
-            datawriter.writerow(header_input)
-
-    line_idx=0
-    for row in datareader:
-        with open('output/'+ output_folder +'/cluster_'+str(int(clusters[line_idx,0]))+'.csv', 'a') as outputfile:
-            datawriter = csv.writer(outputfile, delimiter=';', quotechar='|',
-                                    lineterminator='\n')
-            datawriter.writerow(row)
+line_idx=0
+#for row in datareader:
+for j in range(datafile.shape[1]):
+    print('- line : '+str(line_idx))
+    row=[]
+    for l in range(datafile.shape[0]):
+        row+=[datafile[l,j]]
+    with open('output/'+ output_folder +'/cluster_'+str(int(clusters[line_idx,0]))+'.csv', 'a') as outputfile:
+        datawriter = csv.writer(outputfile, delimiter=';', quotechar='|',
+                                lineterminator='\n')
+        datawriter.writerow(row)
 
 
 
-        line_idx+=1
-    print(line_idx)
-    print(len(clusters[:,0]))
-    Similarity_analysis.var_similarity(output_folder,len(name_clusters),len(header_input),header_input)'''  # No separation
+    line_idx+=1
+print(line_idx)
+print(len(clusters[:,0]))
+    #Similarity_analysis.var_similarity(output_folder,len(name_clusters),len(header_input),header_input)  # No separation
 if v_test:
     print('V-test Analysis')
     # Vtest analysis
