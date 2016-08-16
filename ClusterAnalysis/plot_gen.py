@@ -15,7 +15,7 @@ var_to_analyze = [('naf17', 17), ('tranchre', 14), ('statut', 10), ('typemploi',
 
 inputfile = 'output/' + output_folder + '/numpy-v-test.csv'
 
-mode = 1
+mode = 3
 # 1 : matrices of v-tests for some vars
 # 2 : highest values of v-test per cluster
 # 3 : matrices of distance between objective and subjective clusters
@@ -117,17 +117,21 @@ if mode == 1:
         elif name_var == 'sexe':
             var_names = ['Homme', 'Femme']
 
-        '''elif name_var == 'who':
+        elif name_var == 'who':
             for n in range(n_clusters):
                 print('cluster : ' + str(n))
 
                 n_cluster_data = numpy.loadtxt('output/' + output_folder + '/cluster_' + str(n) + '.csv', delimiter=';')
 
-                v_test_matrix[:, n] = numpy.mean(n_cluster_data[:, idx])'''
+                v_test_matrix[:, n] = numpy.mean(n_cluster_data[:, idx])
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        draw = ax.matshow(v_test_matrix)  # , vmin=-15, vmax=15)
+        if name_var!='who':
+            draw = ax.matshow(v_test_matrix , vmin=-15, vmax=15)
+        else:
+            draw = ax.matshow(v_test_matrix)
+
         # PCM = ax.get_children()[2]
 
         # fig, ax1 = plt.subplots()
@@ -181,14 +185,14 @@ if mode == 1:
     ax = fig.add_subplot(111)
     draw = ax.matshow(autonomy_matrix.transpose())  # , vmin=-15, vmax=15)
 
-    plt.title('v-test : Autonomy', y=1.08)
+    plt.title('v-test : Autonomy', y=1.10)
     plt.xlabel('Clusters')
     plt.ylabel('Autonomy score')
 
     fig.subplots_adjust(right=1, top=0.88, left=0.15)
     cbar_ax = fig.add_axes()
     fig.colorbar(draw, cax=cbar_ax)
-
+    plt.show()
 
 
 elif mode == 2:
@@ -239,8 +243,8 @@ elif mode == 3:
     # 2 is objective
     # 1 is subjective
 
-    clustering2 = 'cluster_predictions_c8_n500_r12-subj.csv'
-    clustering1 = 'cluster_predictions_c7_n500_r5-subj.csv'
+    clustering2 = 'cluster_predictions_c8_n500_r12-obj.csv'
+    clustering1 = 'cluster_predictions_c8_n500_r12-subj.csv'
 
     result_folder = 'output/subj8Xsubj6/'
 
@@ -276,20 +280,22 @@ elif mode == 3:
                                                  / min(sum(count_matrix[row, :]), sum(count_matrix[:, col]))
 
     plt.matshow(inters_union_matrix, )
-    # plt.title('Matrice de croisement des clusters subjectifs sur les clusters objectifs')
-    # plt.xlabel('Clusters objectifs')
-    # plt.ylabel('Clusters subjectifs')
+    plt.title('Matrice de croisement des clusters subjectifs sur les clusters objectifs')
+    plt.xlabel('Clusters objectifs')
+    plt.ylabel('Clusters subjectifs')
 
     plt.colorbar()
-    plt.savefig(result_folder + '/comp_m_union.pdf')
+    plt.show()
+    # plt.savefig(result_folder + '/comp_m_union.pdf')
     plt.clf()
 
     plt.matshow(inters_min_card_c_matrix)
-    # plt.title('Matrice de croisement des clusters subjectifs sur les clusters objectifs')
-    # plt.xlabel('Clusters objectifs')
-    # plt.ylabel('Clusters subjectifs')
+    plt.title('Matrice de croisement des clusters subjectifs sur les clusters objectifs')
+    plt.xlabel('Clusters objectifs')
+    plt.ylabel('Clusters subjectifs')
 
     plt.colorbar()
-    plt.savefig(result_folder + '/comp_m_min.pdf')
+    plt.show()
+    #plt.savefig(result_folder + '/comp_m_min.pdf')
 
 print('Done !')

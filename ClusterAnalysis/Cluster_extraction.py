@@ -8,8 +8,8 @@ import numpy, csv,os
 from matplotlib import pyplot as plt
 import Similarity_analysis
 
-input_file = 'cluster_predictions_c8_n500_r12-subj.csv'
-output_folder = 'Cluster_8_subj'
+input_file = 'cluster_predictions_c8_n500_r12-obj.csv'
+output_folder = 'Cluster_8_obj'
 v_test=False
 ####Preparing data analysis for V-test
 
