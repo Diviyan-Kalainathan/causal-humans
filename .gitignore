@@ -1,0 +1,20 @@
+#Ignore all
+*.pyc
+*.csv
+*.pdf
+*.xml
+*.png
+*/*.csv~
+*.csv~
+*.csv#
+*.iml
+*.ods
+Data_analysis/
+#Except python files
+!.gitignore
+!*/*.py
+!*.py
+
+*/output
+*/input
+Data_analysis
