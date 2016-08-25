@@ -9,6 +9,7 @@
 *.csv#
 *.iml
 *.ods
+Cause-effect/ext
 Data_analysis/
 #Except python files
 !.gitignore

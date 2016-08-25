@@ -310,7 +310,7 @@ with open('output/nc_filtered_data.csv', 'rb') as datafile:
                         # Special rules, individual cases
                         valid_value = False
                         min_var_val = 1
-                        if row[num_col + 1] != '' and row[num_col + 1] != 'NA':
+                        if (row[num_col + 1] != '' and row[num_col + 1] != 'NA') or name_var[num_col]=='tranchre':
 
                             var_val = -1
                             # if name_var[num_col] == 'ageq': ##useful?
@@ -565,6 +565,33 @@ with open('output/nc_filtered_data.csv', 'rb') as datafile:
                                 if not re.search('[a-zA-Z]', row[num_col + 1]):
                                     if int(row[num_col + 1]) < 10 and (row[num_col + 1]) >= 0 :
                                         var_val = int(row[num_col + 1])
+
+
+                            elif (name_var[num_col]) == 'activfin':
+                                list_miss_values=[4,34,40,44,48,54,57,67,76,83,89]
+                                activfin_val= int(row[num_col+1])
+                                if activfin_val==0:
+                                    var_val=-1
+                                else:
+                                    inc=0
+                                    for missed_val in list_miss_values:
+                                        if activfin_val>missed_val:
+                                            inc+=1
+
+                                    var_val=activfin_val-inc
+
+
+                            elif (name_var[num_col]) == 'tranchre':
+                                for idx in [idx for idx, x in enumerate(name_var) if x == 'revmen']:
+                                    if row[idx + 1] != '' and row[idx + 1] != 'NA':
+                                        revmen=int(row[idx+1])
+                                        list_tranchre = [400, 600, 800, 1000, 1200, 1500, 1800, 2000, 2500, 3000, 4000,
+                                                         6000, 10000]
+                                        var_val=1
+                                        for tranch in list_tranchre:
+                                            if revmen>tranch:
+                                                var_val+=1
+
 
                             for i in range(0, int(num_bool[num_col])):
                                 if i == var_val:
