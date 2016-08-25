@@ -10,7 +10,7 @@ import Similarity_analysis
 
 input_file = 'cluster_predictions_c8_n500_r12-obj.csv'
 output_folder = 'Cluster_8_obj'
-v_test=False
+v_test=True
 ####Preparing data analysis for V-test
 
 with open('input/n_prepared_data.csv', 'rb') as datafile:
@@ -109,6 +109,8 @@ if v_test:
     total_std = numpy.zeros((prep_data.shape[0]))
     num_total_items = float(prep_data.shape[1])
     v_test_results = numpy.zeros((prep_data.shape[0], len(name_clusters)))
+    mean_results = numpy.zeros((prep_data.shape[0], len(name_clusters)))
+
 
     for ques in range(prep_data.shape[0]):
         total_mean[ques] = numpy.mean(prep_data[ques, :])
@@ -123,6 +125,8 @@ if v_test:
 
         for n_cluster in range(len(name_clusters)):
             res = 0
+            mean_val= numpy.mean(cluster_values[n_cluster])
+
             if color_type[var] == 'C':
                 try:
 
@@ -153,6 +157,7 @@ if v_test:
                     print('ZDE')
 
             v_test_results[var, n_cluster] = res
+            mean_results[var, n_cluster] = mean_val
 
     with open('output/' + output_folder + '/v-tests.csv', 'wb') as outputfile:
         datawriter = csv.writer(outputfile, delimiter=';', quotechar='|')
@@ -167,6 +172,19 @@ if v_test:
             datawriter.writerow(w_row)
 
     numpy.savetxt('output/'+output_folder+'/numpy-v-test.csv',v_test_results ,delimiter=';')
+
+    with open('output/' + output_folder + '/mean-values.csv', 'wb') as outputfile:
+        datawriter = csv.writer(outputfile, delimiter=';', quotechar='|')
+        datawriter.writerow(['Mean-values'])
+
+        for var in range(row_len):
+            w_row = []
+            w_row += [header[var]]
+            for n_cluster in range(len(name_clusters)):
+                w_row += [str(mean_results[var, n_cluster])]
+
+            datawriter.writerow(w_row)
+
 
 c=0
 hist_data=numpy.zeros((len(name_clusters)))

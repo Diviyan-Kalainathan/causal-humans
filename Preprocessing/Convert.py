@@ -654,11 +654,11 @@ with open('output/nc_filtered_data.csv', 'rb') as datafile:
                             output_header += [name_var[num_col] + '_flag']
 
         if num_row == 0:
-            with open('output/converted_data.csv', 'wb') as sortedfile:
+            with open('output/o_converted_data.csv', 'wb') as sortedfile:
                 datawriter = csv.writer(sortedfile, delimiter=';', quotechar='|')
                 datawriter.writerow(output_header)
 
-        with open('output/converted_data.csv', 'a') as sortedfile:
+        with open('output/o_converted_data.csv', 'a') as sortedfile:
             datawriter = csv.writer(sortedfile, delimiter=';', quotechar='|',
                                     lineterminator='\n')
             datawriter.writerow(result_row)

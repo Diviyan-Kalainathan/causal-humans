@@ -7,7 +7,7 @@ import numpy,csv,re
 n_features=2463
 inputdata = numpy.zeros((n_features, 31112))
 
-with open('output/n_prepared_data.csv', 'rb') as datafile:
+with open('output/m_prepared_data.csv', 'rb') as datafile:
     var_reader = csv.reader(datafile, delimiter=';')
     header = next(var_reader)
     num_row = 0
@@ -25,4 +25,4 @@ with open('output/n_prepared_data.csv', 'rb') as datafile:
         elif num_row % 50 == 0:
             print('.'),
 
-numpy.savetxt('output/n_prep_numpyarray.csv',inputdata, delimiter=';')
+numpy.savetxt('output/m_prep_numpyarray.csv',inputdata, delimiter=';')
