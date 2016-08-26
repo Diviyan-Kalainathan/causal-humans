@@ -293,17 +293,17 @@ elif mode == 3:
     plt.matshow(norm_obj,vmax=0.35 )
     plt.title('Matrice de croisement des clusters '
               '\nsubjectifs sur les clusters objectifs '
-              '\n normalises sur les clusters subjectifs')
+              '\n normalises sur les clusters objectifs')
     plt.xlabel('Clusters objectifs (somme=1)')
     plt.ylabel('Clusters subjectifs')
     plt.xticks(range(len(n_clusters_2)),xticks)
     plt.yticks(range(len(n_clusters_1)),yticks)
-    numpy.savetxt(result_folder + '/interses_union_m.csv',norm_obj)
+    numpy.savetxt(result_folder + '/mx_norm_obj.csv',norm_obj)
 
     plt.colorbar()
     plt.show()
     # plt.savefig(result_folder + '/comp_m_union.pdf')
-    plt.clf()
+
 
 
 
@@ -315,7 +315,7 @@ elif mode == 3:
     plt.ylabel('Clusters subjectifs(somme=1)')
     plt.xticks(range(len(n_clusters_2)),xticks)
     plt.yticks(range(len(n_clusters_1)),yticks)
-    numpy.savetxt(result_folder + '/interses_min_card.csv',norm_subj)
+    numpy.savetxt(result_folder + '/mx_norm_subj.csv',norm_subj)
     plt.colorbar()
     plt.show()
     #plt.savefig(result_folder + '/comp_m_min.pdf')
