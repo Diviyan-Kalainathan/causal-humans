@@ -263,8 +263,8 @@ elif mode == 3:
     count_matrix = numpy.zeros((len(n_clusters_1), len(n_clusters_2)))
     # 1st result is intersect/union
     # 2nd is intersect/min(card(Cluster_i),card(Cluster_j))
-    inters_union_matrix = numpy.zeros((len(n_clusters_1), len(n_clusters_2)))
-    inters_min_card_c_matrix = numpy.zeros((len(n_clusters_1), len(n_clusters_2)))
+    norm_obj = numpy.zeros((len(n_clusters_1), len(n_clusters_2)))
+    norm_subj = numpy.zeros((len(n_clusters_1), len(n_clusters_2)))
 
     # Counting values
     for ppl in range(len(clusters_1[:, 0])):
@@ -272,12 +272,11 @@ elif mode == 3:
 
     for row in range(len(n_clusters_1)):
         for col in range(len(n_clusters_2)):
-            inters_union_matrix[row, col] = float(count_matrix[row, col]) \
-                                            / (sum(count_matrix[row, :]) + sum(count_matrix[:, col]) - count_matrix[
-                row, col])
+            norm_obj[row, col] = float(count_matrix[row, col]) \
+                                            / (sum(count_matrix[:, col]) )
 
-            inters_min_card_c_matrix[row, col] = float(count_matrix[row, col]) \
-                                                 / min(sum(count_matrix[row, :]), sum(count_matrix[:, col]))
+            norm_subj[row, col] = float(count_matrix[row, col]) \
+                                                 / sum(count_matrix[row, :])
 
 
     permutation_obj=[0,4,6,2,3,5,1,7]
@@ -285,30 +284,38 @@ elif mode == 3:
     xticks=[str(u) for u in range(1,len(n_clusters_2)+1)]
     yticks=[str(u) for u in range(1,len(n_clusters_1)+1)]
 
+    norm_obj[:,range(len(n_clusters_2))]=norm_obj[:,permutation_obj]
+    norm_obj[range(len(n_clusters_1)),:]=norm_obj[permutation_subj,:]
 
-    plt.matshow(inters_union_matrix,vmax=0.40 )
-    plt.title('Matrice de croisement des clusters subjectifs sur les clusters objectifs')
-    plt.xlabel('Clusters objectifs')
+    norm_subj[:,range(len(n_clusters_2))]=norm_subj[:,permutation_obj]
+    norm_subj[range(len(n_clusters_1)),:]=norm_subj[permutation_subj,:]
+
+    plt.matshow(norm_obj,vmax=0.35 )
+    plt.title('Matrice de croisement des clusters '
+              '\nsubjectifs sur les clusters objectifs '
+              '\n normalises sur les clusters subjectifs')
+    plt.xlabel('Clusters objectifs (somme=1)')
     plt.ylabel('Clusters subjectifs')
     plt.xticks(range(len(n_clusters_2)),xticks)
     plt.yticks(range(len(n_clusters_1)),yticks)
-    numpy.savetxt(result_folder + '/interses_union_m.csv',inters_union_matrix)
+    numpy.savetxt(result_folder + '/interses_union_m.csv',norm_obj)
 
     plt.colorbar()
     plt.show()
     # plt.savefig(result_folder + '/comp_m_union.pdf')
     plt.clf()
 
-    inters_min_card_c_matrix[:,range(len(n_clusters_2))]=inters_min_card_c_matrix[:,permutation_obj]
-    inters_min_card_c_matrix[range(len(n_clusters_1)),:]=inters_min_card_c_matrix[permutation_subj,:]
 
-    plt.matshow(inters_min_card_c_matrix,vmax=0.35)
-    plt.title('Matrice de croisement des clusters subjectifs sur les clusters objectifs')
+
+    plt.matshow(norm_subj,vmax=0.35)
+    plt.title('Matrice de croisement des clusters'
+              ' \nsubjectifs sur les clusters objectifs '
+              '\n normalises sur les clusters subjectifs')
     plt.xlabel('Clusters objectifs')
-    plt.ylabel('Clusters subjectifs')
+    plt.ylabel('Clusters subjectifs(somme=1)')
     plt.xticks(range(len(n_clusters_2)),xticks)
     plt.yticks(range(len(n_clusters_1)),yticks)
-    numpy.savetxt(result_folder + '/interses_min_card.csv',inters_min_card_c_matrix)
+    numpy.savetxt(result_folder + '/interses_min_card.csv',norm_subj)
     plt.colorbar()
     plt.show()
     #plt.savefig(result_folder + '/comp_m_min.pdf')
