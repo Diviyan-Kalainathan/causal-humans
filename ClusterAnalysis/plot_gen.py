@@ -1,8 +1,11 @@
+# -*- coding: utf-8 -*-
 '''
 Plotting results / V-test analysis
 Author : Diviyan Kalainathan
 Date : 4/08/2016
 '''
+
+
 import csv, numpy, heapq, os
 from matplotlib import pyplot as plt
 
@@ -15,11 +18,11 @@ var_to_analyze = [('naf17', 17), ('tranchre', 14), ('statut', 10), ('typemploi',
 
 inputfile = 'output/' + output_folder + '/numpy-v-test.csv'
 
-mode = 3
+mode = 4
 # 1 : matrices of v-tests for some vars
 # 2 : highest values of v-test per cluster
 # 3 : matrices of distance between objective and subjective clusters
-
+# 4 : parallel coordinates of cluster centers
 if mode == 1:
     inputdata = numpy.loadtxt(inputfile, delimiter=';')
     n_clusters = inputdata.shape[1]
@@ -319,5 +322,72 @@ elif mode == 3:
     plt.colorbar()
     plt.show()
     #plt.savefig(result_folder + '/comp_m_min.pdf')
+
+elif mode==4:
+    #Parallel coordinates
+    clusters_centers_data=numpy.loadtxt('input/cluster_centers_n6_r12.csv',delimiter=';')
+    objective=True
+
+
+    objective_axis_names= ['Taille d\'entreprise',
+                           'Niveau de \n qualification du travail',
+                           'Temps de travail\n et securité',
+                           'Secteur Privé /\n public',
+                           'Lien à \n l\'immigration',
+                           "Accidents du travail",
+                           "Ancienneté et taille \n du foyer",
+                           "Situation \n familiale"]
+    subjective_axis_names=["Problèmes psychosociaux",
+                           "Satisfaction"
+                           "Changement du \nmilieu de travail",
+                           "Indépendance",
+                           "Bonne vie de \n groupe"]
+
+
+
+
+
+    if objective:
+
+        permutation_clusters=[0,4,6,2,3,5,1,7]
+        permutation_axis=[0,1,2,3,4,5,6,7]
+        inversion_axis=[]
+
+        #creating ticks
+        xticks=[]
+        for tick in range(len(objective_axis_names)):
+            xticks=['Axe '+str(tick+1)+'\n'+objective_axis_names[tick]]
+    else:
+        permutation_clusters=[2,3,0,5,1,4]
+        permutation_axis = [0,2,3,1,4]
+        inversion_axis = []
+
+        #creating ticks
+        xticks = []
+        for tick in range(len(subjective_axis_names)):
+            xticks = ['Axe ' + str(tick + 1) + '\n' + subjective_axis_names[tick]]
+
+    #applying permutations:
+
+    clusters_centers_data[range(clusters_centers_data.shape[0]),:]=clusters_centers_data[permutation_clusters,:]
+    clusters_centers_data[:,range(clusters_centers_data.shape[1])]=clusters_centers_data[:,permutation_axis]
+
+    for line in range(clusters_centers_data.shape[0]):
+        if line <7:
+            plt.plot(range(clusters_centers_data.shape[1]),clusters_centers_data[line])
+        else:
+            plt.plot(range(clusters_centers_data.shape[1]),clusters_centers_data[line],'--')
+
+    plt.xlabel('Axes')
+    plt.xticks(range(len(xticks)),xticks)
+    if objective:
+        plt.title('Représentation en coordonnées parallèles \n des centres des clusters objectifs')
+    else:
+        plt.title('Représentation en coordonnées parallèles \n des centres des clusters subjectifs')
+
+    plt.grid()
+    plt.show()
+
+
 
 print('Done !')
