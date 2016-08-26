@@ -244,9 +244,9 @@ elif mode == 3:
     # 1 is subjective
 
     clustering2 = 'cluster_predictions_c8_n500_r12-obj.csv'
-    clustering1 = 'cluster_predictions_c8_n500_r12-subj.csv'
+    clustering1 = 'cluster_predictions_c6_n500_r12-subj.csv'
 
-    result_folder = 'output/subj8Xsubj6/'
+    result_folder = 'output/obj8Xsubj6/'
 
     if not os.path.exists(result_folder):
         os.makedirs(result_folder)
@@ -279,21 +279,36 @@ elif mode == 3:
             inters_min_card_c_matrix[row, col] = float(count_matrix[row, col]) \
                                                  / min(sum(count_matrix[row, :]), sum(count_matrix[:, col]))
 
-    plt.matshow(inters_union_matrix, )
+
+    permutation_obj=[0,4,6,2,3,5,1,7]
+    permutation_subj=[2,3,0,5,1,4]
+    xticks=[str(u) for u in range(1,len(n_clusters_2)+1)]
+    yticks=[str(u) for u in range(1,len(n_clusters_1)+1)]
+
+
+    plt.matshow(inters_union_matrix,vmax=0.40 )
     plt.title('Matrice de croisement des clusters subjectifs sur les clusters objectifs')
     plt.xlabel('Clusters objectifs')
     plt.ylabel('Clusters subjectifs')
+    plt.xticks(range(len(n_clusters_2)),xticks)
+    plt.yticks(range(len(n_clusters_1)),yticks)
+    numpy.savetxt(result_folder + '/interses_union_m.csv',inters_union_matrix)
 
     plt.colorbar()
     plt.show()
     # plt.savefig(result_folder + '/comp_m_union.pdf')
     plt.clf()
 
-    plt.matshow(inters_min_card_c_matrix)
+    inters_min_card_c_matrix[:,range(len(n_clusters_2))]=inters_min_card_c_matrix[:,permutation_obj]
+    inters_min_card_c_matrix[range(len(n_clusters_1)),:]=inters_min_card_c_matrix[permutation_subj,:]
+
+    plt.matshow(inters_min_card_c_matrix,vmax=0.35)
     plt.title('Matrice de croisement des clusters subjectifs sur les clusters objectifs')
     plt.xlabel('Clusters objectifs')
     plt.ylabel('Clusters subjectifs')
-
+    plt.xticks(range(len(n_clusters_2)),xticks)
+    plt.yticks(range(len(n_clusters_1)),yticks)
+    numpy.savetxt(result_folder + '/interses_min_card.csv',inters_min_card_c_matrix)
     plt.colorbar()
     plt.show()
     #plt.savefig(result_folder + '/comp_m_min.pdf')
