@@ -325,24 +325,26 @@ elif mode == 3:
 
 elif mode==4:
     #Parallel coordinates
-    clusters_centers_data=numpy.loadtxt('input/cluster_centers_n6_r12.csv',delimiter=';')
+    clusters_centers_data=numpy.loadtxt('input/cluster_centers_c8_n500_r12-obj.csv',delimiter=';')
     objective=True
 
 
-    objective_axis_names= ['Taille d\'entreprise',
-                           'Niveau de \n qualification du travail',
-                           'Temps de travail\n et securité',
-                           'Secteur Privé /\n public',
-                           'Lien à \n l\'immigration',
-                           "Accidents du travail",
-                           "Ancienneté et taille \n du foyer",
-                           "Situation \n familiale"]
-    subjective_axis_names=["Problèmes psychosociaux",
-                           "Satisfaction"
-                           "Changement du \nmilieu de travail",
-                           "Indépendance",
-                           "Bonne vie de \n groupe"]
+    objective_axis_names= [u'Taille d\'entreprise',
+                           u'Niveau de \n qualification du travail',
+                           u'Temps de travail\n et securité',
+                           u'Secteur Privé /\n public',
+                           u'Lien à \n l\'immigration',
+                           u"Accidents du travail",
+                           u"Ancienneté et taille \n du foyer",
+                           u"Situation \n familiale"]
+    subjective_axis_names=[u"Problèmes psychosociaux",
+                           u"Satisfaction",
+                           u"Changement du \nmilieu de travail",
+                           u"Indépendance",
+                           u"Bonne vie de \n groupe"]
 
+    print(len(objective_axis_names))
+    print(objective_axis_names[2])
 
 
 
@@ -351,40 +353,56 @@ elif mode==4:
 
         permutation_clusters=[0,4,6,2,3,5,1,7]
         permutation_axis=[0,1,2,3,4,5,6,7]
-        inversion_axis=[]
+        inversion_axis=[1,-1,1,1,-1,-1,-1,1]
+        legend=['Indep.',u'Santé','Ouvriers',u'CSP+Privé','ServPart','CSP+Public','Immigr.','Accid.']
 
         #creating ticks
         xticks=[]
         for tick in range(len(objective_axis_names)):
-            xticks=['Axe '+str(tick+1)+'\n'+objective_axis_names[tick]]
+            xticks.append('Axe '+str(tick+1)+'\n'+objective_axis_names[tick])
     else:
         permutation_clusters=[2,3,0,5,1,4]
         permutation_axis = [0,2,3,1,4]
-        inversion_axis = []
+        inversion_axis = [1,-1,1,1,1]
+        legend=['RAS','Stress','Indep.','Heur.','Malh.','Chgts']
 
         #creating ticks
         xticks = []
         for tick in range(len(subjective_axis_names)):
-            xticks = ['Axe ' + str(tick + 1) + '\n' + subjective_axis_names[tick]]
+            xticks.append('Axe ' + str(tick + 1) + '\n' + subjective_axis_names[tick])
+
+    #applying inversions
+
+    clusters_centers_data=clusters_centers_data*inversion_axis
+    for factor in range(len(inversion_axis)):
+        if inversion_axis[factor]==-1:
+            xticks[factor]='- '+xticks[factor]
+
 
     #applying permutations:
 
     clusters_centers_data[range(clusters_centers_data.shape[0]),:]=clusters_centers_data[permutation_clusters,:]
     clusters_centers_data[:,range(clusters_centers_data.shape[1])]=clusters_centers_data[:,permutation_axis]
 
+
+
+    xticks = [xticks[elt] for elt in permutation_axis]
+    legend= [legend[elt] for elt in permutation_clusters]
+
     for line in range(clusters_centers_data.shape[0]):
         if line <7:
-            plt.plot(range(clusters_centers_data.shape[1]),clusters_centers_data[line])
+            plt.plot(range(clusters_centers_data.shape[1]),clusters_centers_data[line],linewidth=2.5)
         else:
-            plt.plot(range(clusters_centers_data.shape[1]),clusters_centers_data[line],'--')
+            plt.plot(range(clusters_centers_data.shape[1]),clusters_centers_data[line],'--',linewidth=2.5)
 
     plt.xlabel('Axes')
-    plt.xticks(range(len(xticks)),xticks)
+    plt.xticks(xrange(clusters_centers_data.shape[1]),xticks)
+    print(xticks)
     if objective:
-        plt.title('Représentation en coordonnées parallèles \n des centres des clusters objectifs')
+        plt.title(u'Représentation en coordonnées parallèles \n des centres des clusters objectifs')
     else:
-        plt.title('Représentation en coordonnées parallèles \n des centres des clusters subjectifs')
-
+        plt.title(u'Représentation en coordonnées parallèles \n des centres des clusters subjectifs')
+    plt.legend(legend,loc=4)
     plt.grid()
     plt.show()
 
