@@ -22,7 +22,7 @@ obj_subj=[]
 nb_dimensions=6
 
 IDF = False
-file_name = 'wa_sd_~6'
+file_name = 'ws_~6'
 
 with open('input/Variables_info_modif.csv', 'rb') as datafile:
     var_reader = csv.reader(datafile, delimiter=',')
@@ -87,7 +87,7 @@ n_features = row_len
 print('--Load dataset--')
 inputdata = numpy.zeros((n_features, 31112))
 
-with open('output/prepared_data.csv', 'rb') as datafile:
+with open('output/n_prepared_data.csv', 'rb') as datafile:
     var_reader = csv.reader(datafile, delimiter=';')
     header = next(var_reader)
     num_row = 0
@@ -182,7 +182,7 @@ for i in range(0, len(eigvalues)):
 for i in range(0, len(eigvalues)):
     plt.plot(i, func[i], 'go')
 
-#plt.show()
+plt.show()
 plt.clf()
 
 func2 = []
@@ -192,7 +192,7 @@ for i in range(0, len(eigvalues)):
 for i in range(0, len(eigvalues)):
     plt.plot(i, func2[i], 'go')
 
-#plt.show()
+plt.show()
 plt.clf()
 
 s_eigvalues = sorted(eigvalues, reverse=True)

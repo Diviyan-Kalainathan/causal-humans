@@ -5,11 +5,10 @@ Author : Diviyan Kalainathan
 Date : 4/08/2016
 '''
 
-
 import csv, numpy, heapq, os
 from matplotlib import pyplot as plt
 
-output_folder = 'Cluster_8_subj'
+output_folder = 'Cluster_8_obj'
 
 var_to_analyze = [('naf17', 17), ('tranchre', 14), ('statut', 10), ('typemploi', 7), ('csei', 18), ('diplome', 9),
                   ('public', 2), ('public1', 4), ('public2', 4), ('tension1', 2), ('tension2', 2), ('tension3', 2),
@@ -17,6 +16,19 @@ var_to_analyze = [('naf17', 17), ('tranchre', 14), ('statut', 10), ('typemploi',
                   ('who', 1), ('nbsal', 5), ('sexe', 2)]
 
 inputfile = 'output/' + output_folder + '/numpy-v-test.csv'
+
+permutation_obj = [0, 4, 6, 2, 3, 5, 1, 7]
+permutation_subj = [2, 3, 0, 5, 1, 4]
+if output_folder[-4:] == 'subj':
+    objective = False
+    permutation_clusters = permutation_subj
+    legend = ['RAS', 'Stress', 'Indep.', 'Heur.', 'Malh.', 'Chgts']
+else:
+    objective = True
+    permutation_clusters = permutation_obj
+    legend = ['Indep.', u'Santé', 'Ouvriers', u'CSP+Privé', 'ServPart', 'CSP+Public', 'Immigr.', 'Accid.']
+
+legend = [legend[elt] for elt in permutation_clusters]
 
 mode = 4
 # 1 : matrices of v-tests for some vars
@@ -40,8 +52,8 @@ if mode == 1:
         row = 0
         for i in [i for i, x in enumerate(header) if (
                             x[0:len(name_var)] == name_var and (
-                            x[0:len(name_var) + 1] == name_var + '_' or num_var == 1) and x[
-                                                                                          -4:] != 'flag')]:
+                                    x[0:len(name_var) + 1] == name_var + '_' or num_var == 1) and x[
+                                                                                                  -4:] != 'flag')]:
             v_test_matrix[row, :] = inputdata[i, :]
             var_names += [header[i]]
             idx = i
@@ -130,8 +142,11 @@ if mode == 1:
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        if name_var!='who':
-            draw = ax.matshow(v_test_matrix , vmin=-15, vmax=15)
+
+        # Applying permutations
+        v_test_matrix[:, range(v_test_matrix.shape[1])] = v_test_matrix[:, permutation_clusters]
+        if name_var != 'who':
+            draw = ax.matshow(v_test_matrix, vmin=-15, vmax=15)
         else:
             draw = ax.matshow(v_test_matrix)
 
@@ -139,18 +154,17 @@ if mode == 1:
 
         # fig, ax1 = plt.subplots()
         # fig=plt.pcolor(v_test_matrix, vmin=-20, vmax=20,linestyle=':')
-
         plt.title('v-test : ' + name_var, y=1.08)
-        plt.xlabel('Clusters')
         plt.ylabel(name_var)
         plt.yticks(xrange(len(var_names)), var_names, rotation='0')
         # x0, x1 = ax1.get_xlim()
         # y0, y1 = ax1.get_ylim()
         # ax1.set_aspect(abs(x1 - x0) / abs(y1 - y0))
-        fig.subplots_adjust(right=1, top=0.88, left=0.15)
+        fig.subplots_adjust(right=1, top=0.88, left=0.15, bottom=0.18)
         cbar_ax = fig.add_axes()
-        fig.colorbar(draw, cax=cbar_ax)
-
+        plt.colorbar(draw, cax=cbar_ax)
+        plt.xticks(range(len(legend)), legend, rotation=80)
+        ax.xaxis.set_ticks_position('bottom')
         # fig.colorbar(ax)
         # plt.tight_layout()
         plt.show()
@@ -159,11 +173,12 @@ if mode == 1:
     # Computing autonomy & motivation values
     idx = []
     autonomynames = []
-    autonomyvars = ['comment_2', 'stark_2','stark_3','stark_4', 'incident_1', 'incident_2', 'repete_2','comment_flag','stark_flag', 'incident_flag','repete_flag']
-    a_weights=[3,1,2,3,3,1,2]
-    autonomy_matrix=numpy.zeros((n_clusters,1))
+    autonomyvars = ['comment_2', 'stark_2', 'stark_3', 'stark_4', 'incident_1', 'incident_2', 'repete_2',
+                    'comment_flag', 'stark_flag', 'incident_flag', 'repete_flag']
+    a_weights = [3, 1, 2, 3, 3, 1, 2]
+    autonomy_matrix = numpy.zeros((n_clusters, 1))
     for a_var in autonomyvars:
-        for h in [h for h, x in enumerate(header) if x == a_var ]:
+        for h in [h for h, x in enumerate(header) if x == a_var]:
             idx += [h]
 
     for n in range(n_clusters):
@@ -171,16 +186,20 @@ if mode == 1:
 
         n_cluster_data = numpy.loadtxt('output/' + output_folder + '/cluster_' + str(n) + '.csv', delimiter=';')
 
-        extracted_data=n_cluster_data[:,idx]
+        extracted_data = n_cluster_data[:, idx]
 
-        num_valid_values=0
+        num_valid_values = 0
         for pop_cluster in range(extracted_data.shape[0]):
-            if sum(extracted_data[pop_cluster,7:11])==4:
-                num_valid_values+=1
+            if sum(extracted_data[pop_cluster, 7:11]) == 4:
+                num_valid_values += 1
 
         print(num_valid_values)
-        autonomy_matrix[n] = sum(sum((numpy.transpose(extracted_data[:,0:7]*a_weights))*
-                   (extracted_data[:,7]*extracted_data[:,8]*extracted_data[:,9]*extracted_data[:,10])))/(num_valid_values)
+        autonomy_matrix[n] = sum(sum((numpy.transpose(extracted_data[:, 0:7] * a_weights)) *
+                                     (extracted_data[:, 7] * extracted_data[:, 8] * extracted_data[:,
+                                                                                    9] * extracted_data[:, 10]))) / (
+                             num_valid_values)
+
+    autonomy_matrix[range(autonomy_matrix.shape[0]), :] = autonomy_matrix[permutation_clusters, :]
 
     print(autonomy_matrix)
 
@@ -188,13 +207,15 @@ if mode == 1:
     ax = fig.add_subplot(111)
     draw = ax.matshow(autonomy_matrix.transpose())  # , vmin=-15, vmax=15)
 
-    plt.title('v-test : Autonomy', y=1.10)
-    plt.xlabel('Clusters')
-    plt.ylabel('Autonomy score')
+    plt.title('Niveau d\'autonomie', y=1.10)
+    plt.ylabel('Score d\'autonomie')
+    plt.xticks(range(len(legend)), legend, rotation=70)
 
     fig.subplots_adjust(right=1, top=0.88, left=0.15)
     cbar_ax = fig.add_axes()
     fig.colorbar(draw, cax=cbar_ax)
+    ax.xaxis.set_ticks_position('bottom')
+
     plt.show()
 
 
@@ -276,136 +297,139 @@ elif mode == 3:
     for row in range(len(n_clusters_1)):
         for col in range(len(n_clusters_2)):
             norm_obj[row, col] = float(count_matrix[row, col]) \
-                                            / (sum(count_matrix[:, col]) )
+                                 / (sum(count_matrix[:, col]))
 
             norm_subj[row, col] = float(count_matrix[row, col]) \
-                                                 / sum(count_matrix[row, :])
+                                  / sum(count_matrix[row, :])
+
+    #xticks = [str(u) for u in range(1, len(n_clusters_2) + 1)]
+    #yticks = [str(u) for u in range(1, len(n_clusters_1) + 1)]
+
+    xticks=['Indep.', u'Santé', 'Ouvriers', u'CSP+Privé', 'ServPart', 'CSP+Public', 'Immigr.', 'Accid.']
+    yticks=['RAS', 'Stress', 'Indep.', 'Heur.', 'Malh.', 'Chgts']
+    xticks = [xticks[elt] for elt in permutation_obj]
+    yticks=[yticks[elt] for elt in permutation_subj]
 
 
-    permutation_obj=[0,4,6,2,3,5,1,7]
-    permutation_subj=[2,3,0,5,1,4]
-    xticks=[str(u) for u in range(1,len(n_clusters_2)+1)]
-    yticks=[str(u) for u in range(1,len(n_clusters_1)+1)]
+    norm_obj[:, range(len(n_clusters_2))] = norm_obj[:, permutation_obj]
+    norm_obj[range(len(n_clusters_1)), :] = norm_obj[permutation_subj, :]
 
-    norm_obj[:,range(len(n_clusters_2))]=norm_obj[:,permutation_obj]
-    norm_obj[range(len(n_clusters_1)),:]=norm_obj[permutation_subj,:]
+    norm_subj[:, range(len(n_clusters_2))] = norm_subj[:, permutation_obj]
+    norm_subj[range(len(n_clusters_1)), :] = norm_subj[permutation_subj, :]
 
-    norm_subj[:,range(len(n_clusters_2))]=norm_subj[:,permutation_obj]
-    norm_subj[range(len(n_clusters_1)),:]=norm_subj[permutation_subj,:]
-
-    plt.matshow(norm_obj,vmax=0.35 )
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    draw = ax.matshow(norm_obj, vmax=0.35)
     plt.title('Matrice de croisement des clusters '
               '\nsubjectifs sur les clusters objectifs '
               '\n normalises sur les clusters objectifs')
     plt.xlabel('Clusters objectifs (somme=1)')
     plt.ylabel('Clusters subjectifs')
-    plt.xticks(range(len(n_clusters_2)),xticks)
-    plt.yticks(range(len(n_clusters_1)),yticks)
-    numpy.savetxt(result_folder + '/mx_norm_obj.csv',norm_obj)
+    plt.xticks(range(len(n_clusters_2)), xticks,rotation=60)
+    plt.yticks(range(len(n_clusters_1)), yticks)
+    ax.xaxis.set_ticks_position('bottom')
 
-    plt.colorbar()
+    numpy.savetxt(result_folder + '/mx_norm_obj.csv', norm_obj)
+
+    cbar_ax = fig.add_axes()
+    plt.colorbar(draw, cax=cbar_ax)
     plt.show()
     # plt.savefig(result_folder + '/comp_m_union.pdf')
 
 
 
-
-    plt.matshow(norm_subj,vmax=0.35)
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    draw = ax.matshow(norm_subj, vmax=0.35)
     plt.title('Matrice de croisement des clusters'
               ' \nsubjectifs sur les clusters objectifs '
               '\n normalises sur les clusters subjectifs')
     plt.xlabel('Clusters objectifs')
     plt.ylabel('Clusters subjectifs(somme=1)')
-    plt.xticks(range(len(n_clusters_2)),xticks)
-    plt.yticks(range(len(n_clusters_1)),yticks)
-    numpy.savetxt(result_folder + '/mx_norm_subj.csv',norm_subj)
-    plt.colorbar()
+    plt.xticks(range(len(n_clusters_2)), xticks,rotation=60)
+    plt.yticks(range(len(n_clusters_1)), yticks)
+    ax.xaxis.set_ticks_position('bottom')
+
+    numpy.savetxt(result_folder + '/mx_norm_subj.csv', norm_subj)
+    cbar_ax = fig.add_axes()
+    plt.colorbar(draw, cax=cbar_ax)
     plt.show()
-    #plt.savefig(result_folder + '/comp_m_min.pdf')
+    # plt.savefig(result_folder + '/comp_m_min.pdf')
 
-elif mode==4:
-    #Parallel coordinates
-    clusters_centers_data=numpy.loadtxt('input/cluster_centers_c8_n500_r12-obj.csv',delimiter=';')
-    objective=True
+elif mode == 4:
+    # Parallel coordinates
+    clusters_centers_data = numpy.loadtxt('input/cluster_centers_c6_n500_r12-subj.csv', delimiter=';')
+    objective = False
 
-
-    objective_axis_names= [u'Taille d\'entreprise',
-                           u'Niveau de \n qualification du travail',
-                           u'Temps de travail\n et securité',
-                           u'Secteur Privé /\n public',
-                           u'Lien à \n l\'immigration',
-                           u"Accidents du travail",
-                           u"Ancienneté et taille \n du foyer",
-                           u"Situation \n familiale"]
-    subjective_axis_names=[u"Problèmes psychosociaux",
-                           u"Satisfaction",
-                           u"Changement du \nmilieu de travail",
-                           u"Indépendance",
-                           u"Bonne vie de \n groupe"]
+    objective_axis_names = [u'Taille d\'entreprise',
+                            u'Niveau de \n qualification du travail',
+                            u'Temps de travail\n et securité',
+                            u'Secteur Privé /\n public',
+                            u'Lien à \n l\'immigration',
+                            u"Accidents du travail",
+                            u"Ancienneté et taille \n du foyer",
+                            u"Situation \n familiale"]
+    subjective_axis_names = [u"Risques \npsychosociaux",
+                             u"Indépendance",
+                             u"Bon management",
+                             u"Changement du \nmilieu de travail",
+                             u"Satisfaction du \n travail en équipe"]
 
     print(len(objective_axis_names))
     print(objective_axis_names[2])
 
-
-
-
     if objective:
 
-        permutation_clusters=[0,4,6,2,3,5,1,7]
-        permutation_axis=[0,1,2,3,4,5,6,7]
-        inversion_axis=[1,-1,1,1,-1,-1,-1,1]
-        legend=['Indep.',u'Santé','Ouvriers',u'CSP+Privé','ServPart','CSP+Public','Immigr.','Accid.']
+        permutation_clusters = permutation_obj  # [0,4,6,2,3,5,1,7]
+        permutation_axis = [0, 1, 2, 3, 4, 5, 6, 7]
+        inversion_axis = [1, -1, 1, 1, -1, -1, -1, 1]
+        legend = ['Indep.', u'Santé', 'Ouvriers', u'CSP+Privé', 'ServPart', 'CSP+Public', 'Immigr.', 'Accid.']
 
-        #creating ticks
-        xticks=[]
+        # creating ticks
+        xticks = []
         for tick in range(len(objective_axis_names)):
-            xticks.append('Axe '+str(tick+1)+'\n'+objective_axis_names[tick])
+            xticks.append('Axe ' + str(tick + 1) + '\n' + objective_axis_names[tick])
     else:
-        permutation_clusters=[2,3,0,5,1,4]
-        permutation_axis = [0,2,3,1,4]
-        inversion_axis = [1,-1,1,1,1]
-        legend=['RAS','Stress','Indep.','Heur.','Malh.','Chgts']
+        permutation_clusters = permutation_subj
+        permutation_axis = [0, 1, 3, 2, 4]
+        inversion_axis = [1, -1, 1, 1, 1]
+        legend = ['RAS', 'Stress', 'Indep.', 'Heur.', 'Malh.', 'Chgts']
 
-        #creating ticks
+        # creating ticks
         xticks = []
         for tick in range(len(subjective_axis_names)):
             xticks.append('Axe ' + str(tick + 1) + '\n' + subjective_axis_names[tick])
 
-    #applying inversions
+    # applying inversions
 
-    clusters_centers_data=clusters_centers_data*inversion_axis
+    clusters_centers_data = clusters_centers_data * inversion_axis
     for factor in range(len(inversion_axis)):
-        if inversion_axis[factor]==-1:
-            xticks[factor]='- '+xticks[factor]
+        if inversion_axis[factor] == -1:
+            xticks[factor] = '- ' + xticks[factor]
 
+    # applying permutations:
 
-    #applying permutations:
-
-    clusters_centers_data[range(clusters_centers_data.shape[0]),:]=clusters_centers_data[permutation_clusters,:]
-    clusters_centers_data[:,range(clusters_centers_data.shape[1])]=clusters_centers_data[:,permutation_axis]
-
-
+    clusters_centers_data[range(clusters_centers_data.shape[0]), :] = clusters_centers_data[permutation_clusters, :]
+    clusters_centers_data[:, range(clusters_centers_data.shape[1])] = clusters_centers_data[:, permutation_axis]
 
     xticks = [xticks[elt] for elt in permutation_axis]
-    legend= [legend[elt] for elt in permutation_clusters]
+    legend = [legend[elt] for elt in permutation_clusters]
 
     for line in range(clusters_centers_data.shape[0]):
-        if line <7:
-            plt.plot(range(clusters_centers_data.shape[1]),clusters_centers_data[line],linewidth=2.5)
+        if line < 7:
+            plt.plot(range(clusters_centers_data.shape[1]), clusters_centers_data[line], linewidth=2.5)
         else:
-            plt.plot(range(clusters_centers_data.shape[1]),clusters_centers_data[line],'--',linewidth=2.5)
+            plt.plot(range(clusters_centers_data.shape[1]), clusters_centers_data[line], '--', linewidth=2.5)
 
     plt.xlabel('Axes')
-    plt.xticks(xrange(clusters_centers_data.shape[1]),xticks)
+    plt.xticks(xrange(clusters_centers_data.shape[1]), xticks)
     print(xticks)
     if objective:
         plt.title(u'Représentation en coordonnées parallèles \n des centres des clusters objectifs')
     else:
         plt.title(u'Représentation en coordonnées parallèles \n des centres des clusters subjectifs')
-    plt.legend(legend,loc=4)
+    plt.legend(legend, loc=1)
     plt.grid()
     plt.show()
-
-
 
 print('Done !')
