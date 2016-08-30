@@ -24,7 +24,7 @@ $ sudo pip install matplotlib
 $ sudo pip install -U scikit-learn
 ```
 
-This project requires no installation, just running the different *.py* files. Please note that many of the files were made specifically for the used dataset, which I'm not allowed to upload. The consequences are that most of the tests aren't runnable without modifiying some parameters in the code. The inputs and outputs are often *.csv* files, in order to read them easily with a office suite. However, the panda library isn't used to read those files : it is either the more simple *numpy.loadtxt()* or the archaic *csv.reader/writer()*, to process the lines one by one.
+This project requires no installation, just running the different *.py* files. Please note that many of the files were made specifically for the used dataset, which I'm not allowed to upload. The consequences are that most of the tests aren't runnable without modifiying some parameters in the code. The inputs and outputs are often *.csv* files, in order to read them easily with a office suite. However, the python-pandas library isn't used to read those files : it is either the more simple *numpy.loadtxt()* or the archaic *csv.reader/writer()*, to process the lines one by one.
 
 ## How-to run the project files
 
