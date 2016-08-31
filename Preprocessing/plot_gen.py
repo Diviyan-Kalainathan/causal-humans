@@ -16,8 +16,9 @@ obj_subj=[]
 category_type = []
 obj_subj_type =[]
 
+flags=False
 
-with open('input/Variables_info2.csv', 'rb') as datafile:
+with open('input/Variables_info.csv', 'rb') as datafile:
     var_reader = csv.reader(datafile, delimiter=',')
     header_var = next(var_reader)
     for var_row in var_reader:
@@ -30,6 +31,7 @@ with open('input/Variables_info2.csv', 'rb') as datafile:
 row_len=0
 
 percent_obj=numpy.zeros((8))
+percent_subj=numpy.zeros((8))
 
 for num_col in range(0, 541):
     if spec_note[num_col] != 'I':
@@ -53,19 +55,24 @@ for num_col in range(0, 541):
             category_type += [category[num_col]]
             obj_subj_type += [obj_subj[num_col]]
 
-
+total = len(category_type)
 for i in range(8):
-    total = category_type.count(i)
+
     sum_obj=0
+    sum_subj=0
     for j  in [j for j, x in enumerate(category_type) if x == i]:
         if obj_subj_type[j]=='O':
             sum_obj+=1
-
+        elif obj_subj_type[j]=='S':
+            sum_subj+=1
     percent_obj[i]= (float(sum_obj)/total)*100
+    percent_subj[i]=(float(sum_subj)/total)*100
 
-percent_subj=100-percent_obj
+if not flags:
+    percent_obj=percent_obj[1:]
+    percent_subj=percent_subj[1:]
 
-N=8
+N=7
 ind = numpy.arange(N)  # the x locations for the groups
 width = 0.35       # the width of the bars
 
@@ -76,12 +83,12 @@ rects1 = ax.bar(ind, percent_obj, width, color='b')
 rects2 = ax.bar(ind + width, percent_subj, width, color='r')
 
 # add some text for labels, title and axes ticks
-ax.set_ylabel('Proportion des types de questions')
+ax.set_ylabel('Proportion des types de questions (%)')
 ax.set_title('Proportion des types de questions en fonction des categories')
 ax.set_xticks(ind + width)
-ax.set_xticklabels(['Drapeaux', 'Activite\n professionnelle', 'Organisation du \ntemps de travail'
+ax.set_xticklabels(['Activite\n professionnelle/ \n statut', 'Organisation du \ntemps de travail'
         , 'Contraintes \nphysiques, \nprevention et accidents', 'Organisation du travail'
-        , 'Sante', 'Parcours familial \net professionnel', 'Risques \n pyschosociaux'])
+        , 'Sante', 'Parcours familial \net professionnel', 'Risques \n pyschosociaux'])#'Drapeaux',
 
 ax.legend((rects1[0], rects2[0]), ('Objectives', 'Subjectives'))
 
@@ -94,7 +101,7 @@ def autolabel(rects):
                 '%d' % int(height),
                 ha='center', va='bottom')
 
-autolabel(rects1)
-autolabel(rects2)
+#autolabel(rects1)
+#autolabel(rects2)
 
 plt.show()

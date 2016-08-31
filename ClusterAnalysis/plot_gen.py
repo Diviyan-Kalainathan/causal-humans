@@ -197,7 +197,7 @@ if mode == 1:
         autonomy_matrix[n] = sum(sum((numpy.transpose(extracted_data[:, 0:7] * a_weights)) *
                                      (extracted_data[:, 7] * extracted_data[:, 8] * extracted_data[:,
                                                                                     9] * extracted_data[:, 10]))) / (
-                             num_valid_values)
+                                 num_valid_values)
 
     autonomy_matrix[range(autonomy_matrix.shape[0]), :] = autonomy_matrix[permutation_clusters, :]
 
@@ -302,14 +302,13 @@ elif mode == 3:
             norm_subj[row, col] = float(count_matrix[row, col]) \
                                   / sum(count_matrix[row, :])
 
-    #xticks = [str(u) for u in range(1, len(n_clusters_2) + 1)]
-    #yticks = [str(u) for u in range(1, len(n_clusters_1) + 1)]
+    # xticks = [str(u) for u in range(1, len(n_clusters_2) + 1)]
+    # yticks = [str(u) for u in range(1, len(n_clusters_1) + 1)]
 
-    xticks=['Indep.', u'Santé', 'Ouvriers', u'CSP+Privé', 'ServPart', 'CSP+Public', 'Immigr.', 'Accid.']
-    yticks=['RAS', 'Stress', 'Indep.', 'Heur.', 'Malh.', 'Chgts']
+    xticks = ['Indep.', u'Santé', 'Ouvriers', u'CSP+Privé', 'ServPart', 'CSP+Public', 'Immigr.', 'Accid.']
+    yticks = ['RAS', 'Stress', 'Indep.', 'Heur.', 'Malh.', 'Chgts']
     xticks = [xticks[elt] for elt in permutation_obj]
-    yticks=[yticks[elt] for elt in permutation_subj]
-
+    yticks = [yticks[elt] for elt in permutation_subj]
 
     norm_obj[:, range(len(n_clusters_2))] = norm_obj[:, permutation_obj]
     norm_obj[range(len(n_clusters_1)), :] = norm_obj[permutation_subj, :]
@@ -325,7 +324,7 @@ elif mode == 3:
               '\n normalises sur les clusters objectifs')
     plt.xlabel('Clusters objectifs (somme=1)')
     plt.ylabel('Clusters subjectifs')
-    plt.xticks(range(len(n_clusters_2)), xticks,rotation=60)
+    plt.xticks(range(len(n_clusters_2)), xticks, rotation=60)
     plt.yticks(range(len(n_clusters_1)), yticks)
     ax.xaxis.set_ticks_position('bottom')
 
@@ -346,7 +345,7 @@ elif mode == 3:
               '\n normalises sur les clusters subjectifs')
     plt.xlabel('Clusters objectifs')
     plt.ylabel('Clusters subjectifs(somme=1)')
-    plt.xticks(range(len(n_clusters_2)), xticks,rotation=60)
+    plt.xticks(range(len(n_clusters_2)), xticks, rotation=60)
     plt.yticks(range(len(n_clusters_1)), yticks)
     ax.xaxis.set_ticks_position('bottom')
 
