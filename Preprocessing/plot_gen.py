@@ -55,7 +55,12 @@ for num_col in range(0, 541):
             category_type += [category[num_col]]
             obj_subj_type += [obj_subj[num_col]]
 
+total = len(category)
+print 'Objectives :' , obj_subj.count('O')
+print 'Subjectives :' , obj_subj.count('S')
+'''
 total = len(category_type)
+
 for i in range(8):
 
     sum_obj=0
@@ -64,6 +69,22 @@ for i in range(8):
         if obj_subj_type[j]=='O':
             sum_obj+=1
         elif obj_subj_type[j]=='S':
+            sum_subj+=1
+    percent_obj[i]= (float(sum_obj)/total)*100
+    percent_subj[i]=(float(sum_subj)/total)*100
+
+if not flags:
+    percent_obj=percent_obj[1:]
+    percent_subj=percent_subj[1:]
+'''
+for i in range(8):
+
+    sum_obj=0
+    sum_subj=0
+    for j  in [j for j, x in enumerate(category) if x == i]:
+        if obj_subj[j]=='O':
+            sum_obj+=1
+        elif obj_subj[j]=='S':
             sum_subj+=1
     percent_obj[i]= (float(sum_obj)/total)*100
     percent_subj[i]=(float(sum_subj)/total)*100

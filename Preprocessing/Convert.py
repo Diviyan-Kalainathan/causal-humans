@@ -5,7 +5,7 @@ Author : Diviyan Kalainathan
 
 '''
 
-import csv, numpy,re
+import csv, numpy, re
 
 # init of lists
 name_var = []
@@ -51,7 +51,7 @@ with open('output/nc_filtered_data.csv', 'rb') as datafile:
     datareader = csv.reader(datafile, delimiter=';', quotechar='"')
     num_row = 0
 
-#Reading variables to convert according to type
+    # Reading variables to convert according to type
 
     header = next(datareader)
     output_header = []
@@ -77,7 +77,7 @@ with open('output/nc_filtered_data.csv', 'rb') as datafile:
 
             if spec_note[num_col] != 'I':  # if is not an ignored value
 
-                if type_var[num_col] == 'C' and spec_note[num_col] == 'T': #T : Time var
+                if type_var[num_col] == 'C' and spec_note[num_col] == 'T':  # T : Time var
 
                     valid_value = False
                     if row[num_col + 1] != '' and row[num_col + 1] != 'NA':  # If there is valid data
@@ -123,7 +123,7 @@ with open('output/nc_filtered_data.csv', 'rb') as datafile:
                                 else:
                                     valid_value = False
 
-                    if valid_value: # if the value is valid, the flag is put to 1
+                    if valid_value:  # if the value is valid, the flag is put to 1
                         if flag_vector[num_col] >= 0:
                             flag_vector[num_col] = 1
                             result_row += [str(1)]
@@ -143,7 +143,7 @@ with open('output/nc_filtered_data.csv', 'rb') as datafile:
                         output_header += [(name_var[num_col])[:-1]]
                         output_header += [(name_var[num_col])[:-1] + '_flag']
 
-                elif type_var[num_col] == 'C': #The var is non-discrete
+                elif type_var[num_col] == 'C':  # The var is non-discrete
                     # Copy the value
                     if row[num_col + 1] != '' and row[num_col + 1] != 'NA':
                         if name_var[num_col] == 'coeffuc' or name_var[num_col] == 'jourtr':
@@ -196,7 +196,7 @@ with open('output/nc_filtered_data.csv', 'rb') as datafile:
                                             result_row[j] = str(1)
 
 
-                    elif spec_note[num_col] == 'T': #If the var is time var
+                    elif spec_note[num_col] == 'T':  # If the var is time var
 
                         valid_value = False
                         if row[num_col + 1] != '' and row[num_col + 1] != 'NA':
@@ -310,7 +310,7 @@ with open('output/nc_filtered_data.csv', 'rb') as datafile:
                         # Special rules, individual cases
                         valid_value = False
                         min_var_val = 1
-                        if (row[num_col + 1] != '' and row[num_col + 1] != 'NA') or name_var[num_col]=='tranchre':
+                        if (row[num_col + 1] != '' and row[num_col + 1] != 'NA') or name_var[num_col] == 'tranchre':
 
                             var_val = -1
                             # if name_var[num_col] == 'ageq': ##useful?
@@ -397,7 +397,7 @@ with open('output/nc_filtered_data.csv', 'rb') as datafile:
 
 
                             elif (name_var)[num_col] == 'csei':
-                                if row[num_col + 1] != ' 'and not re.search('[a-zA-Z]', row[num_col + 1]) :
+                                if row[num_col + 1] != ' ' and not re.search('[a-zA-Z]', row[num_col + 1]):
                                     if int(row[num_col + 1]) == 10:
                                         var_val = 0
                                     elif int(row[num_col + 1]) == 21:
@@ -437,7 +437,9 @@ with open('output/nc_filtered_data.csv', 'rb') as datafile:
 
 
                             elif (name_var[num_col])[0:4] == 'cser':
-                                if row[num_col + 1] != ' ' and row[num_col + 1] != '0' and not re.search('[a-zA-Z]', row[num_col + 1]):
+                                if row[num_col + 1] != ' ' and row[num_col + 1] != '0' and not re.search('[a-zA-Z]',
+                                                                                                         row[
+                                                                                                                     num_col + 1]):
                                     if int(row[num_col + 1]) < 10 and (row[num_col + 1]) > 0:
                                         var_val = int(row[num_col + 1])
 
@@ -563,35 +565,34 @@ with open('output/nc_filtered_data.csv', 'rb') as datafile:
 
                             elif (name_var[num_col]) == 'peun10':
                                 if not re.search('[a-zA-Z]', row[num_col + 1]):
-                                    if int(row[num_col + 1]) < 10 and (row[num_col + 1]) >= 0 :
+                                    if int(row[num_col + 1]) < 10 and (row[num_col + 1]) >= 0:
                                         var_val = int(row[num_col + 1])
 
 
                             elif (name_var[num_col]) == 'activfin':
-                                list_miss_values=[4,34,40,44,48,54,57,67,76,83,89]
-                                activfin_val= int(row[num_col+1])
-                                if activfin_val==0:
-                                    var_val=-1
+                                list_miss_values = [4, 34, 40, 44, 48, 54, 57, 67, 76, 83, 89]
+                                activfin_val = int(row[num_col + 1])
+                                if activfin_val == 0:
+                                    var_val = -1
                                 else:
-                                    inc=0
+                                    inc = 0
                                     for missed_val in list_miss_values:
-                                        if activfin_val>missed_val:
-                                            inc+=1
+                                        if activfin_val > missed_val:
+                                            inc += 1
 
-                                    var_val=activfin_val-inc
+                                    var_val = activfin_val - inc
 
 
                             elif (name_var[num_col]) == 'tranchre':
                                 for idx in [idx for idx, x in enumerate(name_var) if x == 'revmen']:
                                     if row[idx + 1] != '' and row[idx + 1] != 'NA':
-                                        revmen=int(row[idx+1])
+                                        revmen = int(row[idx + 1])
                                         list_tranchre = [400, 600, 800, 1000, 1200, 1500, 1800, 2000, 2500, 3000, 4000,
                                                          6000, 10000]
-                                        var_val=1
+                                        var_val = 1
                                         for tranch in list_tranchre:
-                                            if revmen>tranch:
-                                                var_val+=1
-
+                                            if revmen > tranch:
+                                                var_val += 1
 
                             for i in range(0, int(num_bool[num_col])):
                                 if i == var_val:
@@ -684,5 +685,5 @@ S = flag_vector.todense()
 print('Done.')
 print('--Saving data--')
 numpy.savetxt("output/flag_vector.csv", S, fmt='%i', delimiter=',')
-print('Done.')''' #No sparse matrix conversion
+print('Done.')'''  # No sparse matrix conversion
 print ('End of program')

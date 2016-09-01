@@ -267,8 +267,10 @@ elif mode == 3:
     # 2 is objective
     # 1 is subjective
 
+    autonomy=False
     clustering2 = 'cluster_predictions_c8_n500_r12-obj.csv'
     clustering1 = 'cluster_predictions_c6_n500_r12-subj.csv'
+
 
     result_folder = 'output/obj8Xsubj6/'
 
@@ -284,41 +286,79 @@ elif mode == 3:
     n_clusters_1 = (set((clusters_1[:, 0])))
     n_clusters_2 = (set((clusters_2[:, 0])))
 
-    count_matrix = numpy.zeros((len(n_clusters_1), len(n_clusters_2)))
-    # 1st result is intersect/union
-    # 2nd is intersect/min(card(Cluster_i),card(Cluster_j))
-    norm_obj = numpy.zeros((len(n_clusters_1), len(n_clusters_2)))
-    norm_subj = numpy.zeros((len(n_clusters_1), len(n_clusters_2)))
+    if not autonomy:
 
-    # Counting values
-    for ppl in range(len(clusters_1[:, 0])):
-        count_matrix[clusters_1[ppl, 0], clusters_2[ppl, 0]] += 1
+        count_matrix = numpy.zeros((len(n_clusters_1), len(n_clusters_2)))
+        # 1st result is intersect/union
+        # 2nd is intersect/min(card(Cluster_i),card(Cluster_j))
+        norm_obj = numpy.zeros((len(n_clusters_1), len(n_clusters_2)))
+        norm_subj = numpy.zeros((len(n_clusters_1), len(n_clusters_2)))
 
-    for row in range(len(n_clusters_1)):
-        for col in range(len(n_clusters_2)):
-            norm_obj[row, col] = float(count_matrix[row, col]) \
-                                 / (sum(count_matrix[:, col]))
+        # Counting values
+        for ppl in range(len(clusters_1[:, 0])):
+            count_matrix[clusters_1[ppl, 0], clusters_2[ppl, 0]] += 1
 
-            norm_subj[row, col] = float(count_matrix[row, col]) \
-                                  / sum(count_matrix[row, :])
+        for row in range(len(n_clusters_1)):
+            for col in range(len(n_clusters_2)):
+                norm_obj[row, col] = float(count_matrix[row, col]) \
+                                     / (sum(count_matrix[:, col]))
 
-    # xticks = [str(u) for u in range(1, len(n_clusters_2) + 1)]
-    # yticks = [str(u) for u in range(1, len(n_clusters_1) + 1)]
+                norm_subj[row, col] = float(count_matrix[row, col]) \
+                                      / sum(count_matrix[row, :])
+
+        # xticks = [str(u) for u in range(1, len(n_clusters_2) + 1)]
+        # yticks = [str(u) for u in range(1, len(n_clusters_1) + 1)]
+
+
+
+        norm_obj[:, range(len(n_clusters_2))] = norm_obj[:, permutation_obj]
+        norm_obj[range(len(n_clusters_1)), :] = norm_obj[permutation_subj, :]
+
+        norm_subj[:, range(len(n_clusters_2))] = norm_subj[:, permutation_obj]
+        norm_subj[range(len(n_clusters_1)), :] = norm_subj[permutation_subj, :]
+
+        numpy.savetxt(result_folder + '/mx_norm_obj.csv', norm_obj)
+        res1=norm_obj
+        res2=norm_subj
+    else:
+        autonomy_values=[[[] for i in range(len(n_clusters_2))]for j in range(len(n_clusters_1))]
+        clustering_input_1=clustering_input_1[clustering_input_1[:,1].argsort()]
+        clustering_input_2=clustering_input_2[clustering_input_2[:,1].argsort()]
+        ##Calc autonomy score
+
+        #Prepare autonomy computation
+
+        with open('input/m_prepared_data.csv', 'rb') as datafile:
+            reader = csv.reader(datafile, delimiter=';')
+            header = next(reader)
+        idx = []
+        autonomynames = []
+        autonomyvars = ['comment_2', 'stark_2', 'stark_3', 'stark_4', 'incident_1', 'incident_2', 'repete_2',
+                        'comment_flag', 'stark_flag', 'incident_flag', 'repete_flag']
+        a_weights = [3, 1, 2, 3, 3, 1, 2]
+        for a_var in autonomyvars:
+            for h in [h for h, x in enumerate(header) if x == a_var]:
+                idx += [h]
+
+        raw_data= numpy.loadtxt('input/m_prep_numpyarray.csv',delimiter=';')
+        selected_data=numpy.zeros((raw_data.shape[1],len(autonomyvars)))
+
+        ######ToDO ### Import data, calc autonomy & put in autonomy_values and mean.
+
+
+
+
+
+
 
     xticks = ['Indep.', u'Santé', 'Ouvriers', u'CSP+Privé', 'ServPart', 'CSP+Public', 'Immigr.', 'Accid.']
     yticks = ['RAS', 'Stress', 'Indep.', 'Heur.', 'Malh.', 'Chgts']
     xticks = [xticks[elt] for elt in permutation_obj]
     yticks = [yticks[elt] for elt in permutation_subj]
 
-    norm_obj[:, range(len(n_clusters_2))] = norm_obj[:, permutation_obj]
-    norm_obj[range(len(n_clusters_1)), :] = norm_obj[permutation_subj, :]
-
-    norm_subj[:, range(len(n_clusters_2))] = norm_subj[:, permutation_obj]
-    norm_subj[range(len(n_clusters_1)), :] = norm_subj[permutation_subj, :]
-
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    draw = ax.matshow(norm_obj, vmax=0.35)
+    draw = ax.matshow(res1, vmax=0.35)
     plt.title('Matrice de croisement des clusters '
               '\nsubjectifs sur les clusters objectifs '
               '\n normalises sur les clusters objectifs')
@@ -328,7 +368,6 @@ elif mode == 3:
     plt.yticks(range(len(n_clusters_1)), yticks)
     ax.xaxis.set_ticks_position('bottom')
 
-    numpy.savetxt(result_folder + '/mx_norm_obj.csv', norm_obj)
 
     cbar_ax = fig.add_axes()
     plt.colorbar(draw, cax=cbar_ax)
@@ -339,7 +378,7 @@ elif mode == 3:
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    draw = ax.matshow(norm_subj, vmax=0.35)
+    draw = ax.matshow(res2, vmax=0.35)
     plt.title('Matrice de croisement des clusters'
               ' \nsubjectifs sur les clusters objectifs '
               '\n normalises sur les clusters subjectifs')
@@ -349,7 +388,6 @@ elif mode == 3:
     plt.yticks(range(len(n_clusters_1)), yticks)
     ax.xaxis.set_ticks_position('bottom')
 
-    numpy.savetxt(result_folder + '/mx_norm_subj.csv', norm_subj)
     cbar_ax = fig.add_axes()
     plt.colorbar(draw, cax=cbar_ax)
     plt.show()
