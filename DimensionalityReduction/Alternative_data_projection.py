@@ -21,7 +21,7 @@ mode = ''  # O for objective, S for subjective and '' to deactivate
 obj_subj=[]
 nb_dimensions=6
 
-IDF = False
+IDF = True
 file_name = 'ws_~6'
 
 with open('input/Variables_info_modif.csv', 'rb') as datafile:
@@ -191,7 +191,9 @@ for i in range(0, len(eigvalues)):
 
 for i in range(0, len(eigvalues)):
     plt.plot(i, func2[i], 'go')
-
+plt.title('Valeurs propres')
+plt.xlabel('Numero de valeur propre')
+plt.ylabel('Valeur')
 plt.show()
 plt.clf()
 

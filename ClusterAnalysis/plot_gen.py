@@ -7,6 +7,9 @@ Date : 4/08/2016
 
 import csv, numpy, heapq, os
 from matplotlib import pyplot as plt
+from matplotlib.font_manager import FontProperties
+
+
 
 output_folder = 'Cluster_8_obj'
 
@@ -30,7 +33,7 @@ else:
 
 legend = [legend[elt] for elt in permutation_clusters]
 
-mode = 4
+mode = 3
 # 1 : matrices of v-tests for some vars
 # 2 : highest values of v-test per cluster
 # 3 : matrices of distance between objective and subjective clusters
@@ -267,10 +270,9 @@ elif mode == 3:
     # 2 is objective
     # 1 is subjective
 
-    autonomy=False
+    autonomy = True
     clustering2 = 'cluster_predictions_c8_n500_r12-obj.csv'
     clustering1 = 'cluster_predictions_c6_n500_r12-subj.csv'
-
 
     result_folder = 'output/obj8Xsubj6/'
 
@@ -318,37 +320,70 @@ elif mode == 3:
         norm_subj[range(len(n_clusters_1)), :] = norm_subj[permutation_subj, :]
 
         numpy.savetxt(result_folder + '/mx_norm_obj.csv', norm_obj)
-        res1=norm_obj
-        res2=norm_subj
+        res1 = norm_obj
+        res2 = norm_subj
     else:
-        autonomy_values=[[[] for i in range(len(n_clusters_2))]for j in range(len(n_clusters_1))]
-        clustering_input_1=clustering_input_1[clustering_input_1[:,1].argsort()]
-        clustering_input_2=clustering_input_2[clustering_input_2[:,1].argsort()]
+        autonomy_values = [[[] for i in range(len(n_clusters_2))] for j in range(len(n_clusters_1))]
+
         ##Calc autonomy score
 
-        #Prepare autonomy computation
+        # Prepare autonomy computation
 
         with open('input/m_prepared_data.csv', 'rb') as datafile:
             reader = csv.reader(datafile, delimiter=';')
             header = next(reader)
         idx = []
-        autonomynames = []
+
         autonomyvars = ['comment_2', 'stark_2', 'stark_3', 'stark_4', 'incident_1', 'incident_2', 'repete_2',
                         'comment_flag', 'stark_flag', 'incident_flag', 'repete_flag']
         a_weights = [3, 1, 2, 3, 3, 1, 2]
         for a_var in autonomyvars:
             for h in [h for h, x in enumerate(header) if x == a_var]:
                 idx += [h]
+                print a_var , h
 
-        raw_data= numpy.loadtxt('input/m_prep_numpyarray.csv',delimiter=';')
-        selected_data=numpy.zeros((raw_data.shape[1],len(autonomyvars)))
+        with open('input/m_prepared_data.csv', 'rb') as datafile:
+            reader = csv.reader(datafile, delimiter=';')
+            col_count = len(next(reader))
 
-        ######ToDO ### Import data, calc autonomy & put in autonomy_values and mean.
+        raw_data = numpy.loadtxt('input/m_prep_t_numpyarray.csv', delimiter=';',usecols=idx)
+        selected_data = raw_data.transpose()#numpy.zeros((len(autonomyvars), col_count))
+        print 'selected_data : ' , selected_data.shape
+        print 'idx_len :', len(idx)
+        # import data
+        #selected_data=raw_data[idx,:]
 
 
+        selected_data[:len(a_weights)] = selected_data[:len(a_weights)] * (numpy.array(a_weights)[:, numpy.newaxis])
+        numpy.savetxt('output/data_tmp.csv',selected_data,delimiter=';')
+        print 'selected_data : ' , selected_data.shape
+        autonomy_temp_result = sum(selected_data[:len(a_weights)])
 
+        # Checking flags
+        for flag in range(len(a_weights), len(autonomyvars)):
+            autonomy_temp_result = autonomy_temp_result * selected_data[flag]
 
+        print(autonomy_temp_result)
 
+        for at_val in range(autonomy_temp_result.shape[0]):
+            if autonomy_temp_result[at_val]!=0:
+                autonomy_values[int(clusters_1[at_val, 0])][int(clusters_2[at_val, 0])].append(autonomy_temp_result[at_val])
+                print at_val, autonomy_temp_result[at_val],int(clusters_1[at_val, 0]),int(clusters_2[at_val, 0])
+
+        print(autonomy_values)
+        res1 = numpy.zeros((len(n_clusters_1), len(n_clusters_2)))
+
+        for row in range(len(n_clusters_1)):
+            for col in range(len(n_clusters_2)):
+                if len(autonomy_values[row][col])>40:
+                    res1[row, col] = numpy.average(autonomy_values[row][col])
+                else:
+                    res1[row, col] = numpy.nan
+
+                print(autonomy_values[row][col])
+        print(res1)
+        res1[:, range(len(n_clusters_2))] = res1[:, permutation_obj]
+        res1[range(len(n_clusters_1)), :] = res1[permutation_subj, :]
 
 
     xticks = ['Indep.', u'Santé', 'Ouvriers', u'CSP+Privé', 'ServPart', 'CSP+Public', 'Immigr.', 'Accid.']
@@ -358,16 +393,29 @@ elif mode == 3:
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    draw = ax.matshow(res1, vmax=0.35)
-    plt.title('Matrice de croisement des clusters '
-              '\nsubjectifs sur les clusters objectifs '
-              '\n normalises sur les clusters objectifs')
-    plt.xlabel('Clusters objectifs (somme=1)')
+    if not autonomy:
+        draw = ax.matshow(res1, vmax=0.35)
+        plt.xlabel('Clusters objectifs (somme=1)')
+        plt.title('Matrice de croisement des clusters '
+                  '\nsubjectifs sur les clusters objectifs '
+                  '\n normalises sur les clusters objectifs')
+
+    else:
+        '''masked_array = numpy.ma.array(res1, mask=numpy.isnan(res1))
+        cmap = mcm.jet
+        cmap.set_bad('white', 1.)
+        ax.imshow(masked_array, interpolation='nearest', cmap=cmap)'''
+        draw = ax.matshow(res1)
+
+        plt.xlabel('Clusters objectifs')
+        plt.title('Matrice de croisement des clusters '
+                  '\n sur le score d\'autonomie')
+
+
     plt.ylabel('Clusters subjectifs')
     plt.xticks(range(len(n_clusters_2)), xticks, rotation=60)
     plt.yticks(range(len(n_clusters_1)), yticks)
     ax.xaxis.set_ticks_position('bottom')
-
 
     cbar_ax = fig.add_axes()
     plt.colorbar(draw, cax=cbar_ax)
@@ -375,23 +423,45 @@ elif mode == 3:
     # plt.savefig(result_folder + '/comp_m_union.pdf')
 
 
+    if not autonomy:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        draw = ax.matshow(res2, vmax=0.35)
+        plt.title('Matrice de croisement des clusters'
+                  ' \nsubjectifs sur les clusters objectifs '
+                  '\n normalises sur les clusters subjectifs')
+        plt.xlabel('Clusters objectifs')
+        plt.ylabel('Clusters subjectifs(somme=1)')
+        plt.xticks(range(len(n_clusters_2)), xticks, rotation=60)
+        plt.yticks(range(len(n_clusters_1)), yticks)
+        ax.xaxis.set_ticks_position('bottom')
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    draw = ax.matshow(res2, vmax=0.35)
-    plt.title('Matrice de croisement des clusters'
-              ' \nsubjectifs sur les clusters objectifs '
-              '\n normalises sur les clusters subjectifs')
-    plt.xlabel('Clusters objectifs')
-    plt.ylabel('Clusters subjectifs(somme=1)')
-    plt.xticks(range(len(n_clusters_2)), xticks, rotation=60)
-    plt.yticks(range(len(n_clusters_1)), yticks)
-    ax.xaxis.set_ticks_position('bottom')
+        cbar_ax = fig.add_axes()
+        plt.colorbar(draw, cax=cbar_ax)
+        plt.show()
+        # plt.savefig(result_folder + '/comp_m_min.pdf')
 
-    cbar_ax = fig.add_axes()
-    plt.colorbar(draw, cax=cbar_ax)
+    for i in range(1, res1.shape[1]):
+        if i<7:
+            plt.plot(range(res1.shape[0]-1),res1[1:,i],linewidth=2.5)
+        else:
+            plt.plot(range(res1.shape[0]-1), res1[1:, i],'--', linewidth=2.5)
+
+    plt.title(u'Représentation en coordonnées parallèles \n de l\'autonomie en fonction des clusters')
+    plt.xlabel('Clusters subjectifs')
+    plt.ylabel("Score d'autonomie")
+    xticks=['RAS', 'Stress', 'Indep.', 'Heur.', 'Malh.', 'Chgts']
+    legend = ['Indep.', u'Santé', 'Ouvriers', u'CSP+Privé', 'ServPart', 'CSP+Public', 'Immigr.', 'Accid.']
+    xticks = [xticks[elt] for elt in permutation_subj]
+    legend = [legend[elt] for elt in permutation_obj]
+    xticks.remove('Indep.')
+    legend.remove('Indep.')
+    plt.xticks(xrange(len(xticks)), xticks)
+    fontP = FontProperties()
+    fontP.set_size('small')
+    plt.legend(legend, prop=fontP,loc='best')
+
     plt.show()
-    # plt.savefig(result_folder + '/comp_m_min.pdf')
 
 elif mode == 4:
     # Parallel coordinates
