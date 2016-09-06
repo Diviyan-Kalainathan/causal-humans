@@ -10,9 +10,9 @@ import csv, numpy, re, os
 inputfile = "input/nc_filtered_data.csv"
 inputcluster = 'cluster_predictions_c8_n500_r12-obj.csv'
 inputclusterpath = 'input/' + inputcluster
-converteddatapath='input/c-e_converted_data.csv'
-conversion=False
-outputfolder='output/obj8/'
+converteddatapath = 'input/c-e_converted_data.csv'
+conversion = False
+outputfolder = 'output/obj8/'
 
 # init of lists
 name_var = []
@@ -40,7 +40,7 @@ if conversion:
         print('Lines to process : ' + repr(input_length))
         row_len = 0
         for num_col in range(0, 541):
-            if spec_note[num_col] != 'I' and spec_note[num_col]!="-1":
+            if spec_note[num_col] != 'I' and spec_note[num_col] != "-1":
                 if type_var[num_col] == 'C' or (type_var[num_col] == 'D' and spec_note[num_col] == 'T'):
                     row_len += 2  #
                 elif type_var[num_col] == 'D' and spec_note[num_col] != '-2' and spec_note[num_col] != 'T':
@@ -151,7 +151,8 @@ if conversion:
                             output_header += [(name_var[num_col])[:-1]]
                             output_header += [(name_var[num_col])[:-1] + '_flag']
 
-                    elif type_var[num_col] == 'C' and spec_note[num_col] != '-1':  # The var is non-discrete and not ignored
+                    elif type_var[num_col] == 'C' and spec_note[
+                        num_col] != '-1':  # The var is non-discrete and not ignored
                         # Copy the value
                         if row[num_col + 1] != '' and row[num_col + 1] != 'NA':
                             if name_var[num_col] == 'coeffuc' or name_var[num_col] == 'jourtr':
@@ -180,6 +181,8 @@ if conversion:
                         if num_row == 0:
                             output_header += [name_var[num_col]]
                             output_header += [name_var[num_col] + '_flag']
+
+                    # ToDo : Special case for booleans : modify var_info and recode values in 0/1
 
                     elif type_var[num_col] == 'D' and spec_note[num_col] != '-1':  # var is discrete (D) and not ignored
                         # Warning : first var must not be a flag
@@ -570,12 +573,10 @@ if conversion:
                                 elif (name_var[num_col]) == 'peun':
                                     var_val = -1
 
-
                                 elif (name_var[num_col]) == 'peun10':
                                     if not re.search('[a-zA-Z]', row[num_col + 1]):
                                         if int(row[num_col + 1]) < 10 and (row[num_col + 1]) >= 0:
                                             var_val = int(row[num_col + 1])
-
 
                                 elif (name_var[num_col]) == 'activfin':
                                     list_miss_values = [4, 34, 40, 44, 48, 54, 57, 67, 76, 83, 89]
@@ -590,12 +591,12 @@ if conversion:
 
                                         var_val = activfin_val - inc
 
-
                                 elif (name_var[num_col]) == 'tranchre':
                                     for idx in [idx for idx, x in enumerate(name_var) if x == 'revmen']:
                                         if row[idx + 1] != '' and row[idx + 1] != 'NA':
                                             revmen = int(row[idx + 1])
-                                            list_tranchre = [400, 600, 800, 1000, 1200, 1500, 1800, 2000, 2500, 3000, 4000,
+                                            list_tranchre = [400, 600, 800, 1000, 1200, 1500, 1800, 2000, 2500, 3000,
+                                                             4000,
                                                              6000, 10000]
                                             var_val = 1
                                             for tranch in list_tranchre:
@@ -692,33 +693,34 @@ print('Done.')'''  # No sparse matrix conversion
 
 print 'Separating into multiple files according to clustering : ', inputcluster
 
-cluster_index= numpy.loadtxt(inputclusterpath,delimiter=';')
+cluster_index = numpy.loadtxt(inputclusterpath, delimiter=';')
 cluster_index = numpy.asarray(sorted(cluster_index, key=lambda x: x[1]))
-clusters=list(set((cluster_index[:, 0])))
-clusters=[int(clu) for clu in clusters]
-with open(converteddatapath,'rb') as inputfile:
-    datareader=csv.reader(inputfile,delimiter=';',quotechar='|')
-    c_header=next(datareader)
+clusters = list(set((cluster_index[:, 0])))
+clusters = [int(clu) for clu in clusters]
+with open(converteddatapath, 'rb') as inputfile:
+    datareader = csv.reader(inputfile, delimiter=';', quotechar='|')
+    c_header = next(datareader)
 
-    #Create files/folders
+    # Create files/folders
     for num_c in range(len(clusters)):
-        if not os.path.exists(outputfolder+'cluster_'+str(clusters[num_c])):
-            os.makedirs(outputfolder+'cluster_'+str(clusters[num_c]))
+        if not os.path.exists(outputfolder + 'cluster_' + str(clusters[num_c])):
+            os.makedirs(outputfolder + 'cluster_' + str(clusters[num_c]))
 
-        with open(outputfolder+'cluster_'+str(clusters[num_c])+'/data_c_'+str(clusters[num_c])+'.csv', 'wb') as sortedfile:
+        with open(outputfolder + 'cluster_' + str(clusters[num_c]) + '/data_c_' + str(clusters[num_c]) + '.csv',
+                  'wb') as sortedfile:
             datawriter = csv.writer(sortedfile, delimiter=';', quotechar='|')
             datawriter.writerow(c_header)
 
-
-    #Separate into files
-    line= 0
+    # Separate into files
+    line = 0
     for row in datareader:
-        with open(outputfolder+'cluster_'+str(int(cluster_index[line,0]))+'/data_c_'+str(int(cluster_index[line,0]))+'.csv', 'a') as sortedfile:
+        with open(outputfolder + 'cluster_' + str(int(cluster_index[line, 0])) + '/data_c_' + str(
+                int(cluster_index[line, 0])) + '.csv', 'a') as sortedfile:
             datawriter = csv.writer(sortedfile, delimiter=';', quotechar='|',
                                     lineterminator='\n')
             datawriter.writerow(row)
 
         print '-- line : ', line
-        line+=1
+        line += 1
 
 print ('End of program')
