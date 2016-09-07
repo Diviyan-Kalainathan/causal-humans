@@ -8,11 +8,11 @@ import csv, numpy, re, os
 # Input : filtered data only : no conversion yet
 
 inputfile = "input/nc_filtered_data.csv"
-inputcluster = 'cluster_predictions_c8_n500_r12-obj.csv'
+inputcluster = 'cluster_predictions_c6_n500_r12-subj.csv'
 inputclusterpath = 'input/' + inputcluster
 converteddatapath = 'input/c-e_converted_data.csv'
 conversion = False
-outputfolder = 'output/obj8/'
+outputfolder = 'output/subj6/'
 
 # init of lists
 name_var = []
@@ -193,7 +193,6 @@ if conversion:
                                 if row[num_col + 1] != '' and row[num_col + 1] != 'NA':
                                     if row[num_col + 1] < 1:
                                         flag_vector[i] = -1
-
                                     else:
                                         flag_vector[i] = 1
 
