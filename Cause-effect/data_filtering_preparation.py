@@ -184,6 +184,7 @@ class data_formatter(threading.Thread):
         self.pool.makeInactive(self.name)
 
 
+
 # Loading data info
 print('--Loading data & parameters--')
 with open('input/Variables_info.csv', 'rb') as datafile:
@@ -193,9 +194,10 @@ with open('input/Variables_info.csv', 'rb') as datafile:
     type_var = []
     num_bool = []
     spec_note = []
-    ignored = []
+
+    ignored=[]
     for var_row in var_reader:  # Taking flags into account
-        if not (var_row[0][-4:] == 'drap' or var_row[4] == '-1' or var_row[4] == 'I'):
+        if not(var_row[0][-4:]=='drap' or var_row[4]=='-1' or var_row[4]=='I'):
             name_var += [var_row[0], var_row[0] + '_flag']
             type_var += [var_row[1], 'B']
             num_bool += [var_row[3], str(2)]
@@ -247,6 +249,17 @@ while os.path.exists(inputfolder + 'cluster_' + str(cluster_n)):
     for var_1 in range(len(c_data_header) - 1):
         job_assigned = False
         '''for var_2 in range(var_1 + 1, len(c_data_header)):
+=======
+    #Load cluster data
+    cluster_data= numpy.loadtxt(cluster_path, skiprows=1,delimiter=';')
+    if verbose : print(cluster_data.shape)
+
+    # Browse through vars
+    for var_1 in range(len(c_data_header) - 1):
+        print(' ')
+        print('Var : ',c_data_header[var_1], '  -'),
+        for var_2 in range(var_1 + 1, len(c_data_header)):
+>>>>>>> c32f3b1832d068bd6330a3772457fadb3326fac8
             print('.'),
             if not (var_1 + 1 == var_2 and c_data_header[var_2][-4:] == 'flag'):  # Useless to consider
                 # the case of a var and its flag
@@ -298,8 +311,13 @@ while os.path.exists(inputfolder + 'cluster_' + str(cluster_n)):
                     A_values = ''
                     B_values = ''
                     for val in range(len(data_A)):
+<<<<<<< HEAD
                         A_values = A_values + str(data_A[val]) + ' '
                         B_values = B_values + str(data_B[val]) + ' '
+=======
+                        A_values = A_values + ' ' + str(data_A[val])
+                        B_values = B_values + ' ' + str(data_B[val])
+>>>>>>> c32f3b1832d068bd6330a3772457fadb3326fac8
 
                     #Type of A & B
                     if type_var[var_1] == 'C':
