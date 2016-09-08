@@ -14,7 +14,7 @@ import sys
 inputfolder = 'output/'+sys.argv[1]+'/'
 var_info = 'input/Variables_info.csv'
 verbose = False
-max_threads = sys.argv[2]#30
+max_threads = int(sys.argv[2])#30
 
 
 lock_data = threading.Lock()
@@ -371,8 +371,8 @@ while os.path.exists(inputfolder + 'cluster_' + str(cluster_n)):
                     #var_1, c_data_header, cluster_data, inputfolder, cluster_n, Threadpools)))
                 jobs[len(jobs)-1].start()
                 job_assigned = True
-
-            time.sleep(3)
+            else:
+                time.sleep(0.5)
 
     cluster_n += 1  # Increment for the loop
 
