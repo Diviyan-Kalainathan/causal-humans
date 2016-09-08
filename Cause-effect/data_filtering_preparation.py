@@ -11,10 +11,10 @@ import threading
 import time
 import sys
 
-inputfolder = 'output/subj6/'
+inputfolder = 'output/'+sys.argv[1]+'/'
 var_info = 'input/Variables_info.csv'
 verbose = False
-max_threads = 7
+max_threads = sys.argv[2]#30
 
 
 lock_data = threading.Lock()
