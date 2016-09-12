@@ -8,6 +8,7 @@ import csv
 import os
 import sys
 import threading
+import time
 
 # Parameters
 num_lines = 5000
@@ -31,12 +32,12 @@ def splitfiles_cluster(inputfolder, cluster_n):
                             datawriter = csv.writer(splitfile, delimiter=';', quotechar='|', lineterminator='\n')
                             for line in rows_towrite:
                                 datawriter.writerow(line)
-                        sys.stdout.write('--Cluster ' + str(cluster_n) + ' -- file ' + str(n_file))
+                        sys.stdout.write('--Cluster ' + str(cluster_n) + ' -- file ' + str(n_file)+'\n')
                         sys.stdout.flush()
                     # Switch files
                     n_file += 1
                     rows_towrite = []
-                    splitfilepath = inputfolder + 'split_data/' + str(cluster_n) + '/' + filetype + str(
+                    splitfilepath = inputfolder + 'split_data/cluster_' + str(cluster_n) + '/' + filetype + str(
                         cluster_n) + '_p' + str(n_file) + '.csv'
                     with open(splitfilepath, 'wb') as splitfile:
                         datawriter = csv.writer(splitfile, delimiter=';', quotechar='|')
@@ -69,11 +70,14 @@ def split(inputfolder):
 
     jobs = []
     while os.path.exists(inputfolder + 'cluster_' + str(cluster_n)):
-        if not os.path.exists(inputfolder + 'split_data/' + str(cluster_n)):
-            os.makedirs(inputfolder + 'split_data' + str(cluster_n))
+        if not os.path.exists(inputfolder + 'split_data/cluster_' +str(cluster_n)):
+            os.makedirs(inputfolder + 'split_data/cluster_' + str(cluster_n))
 
         jobs.append(file_splitter(inputfolder, cluster_n))
+        jobs[len(jobs) - 1].start()
         cluster_n += 1
+        time.sleep(0.5)
 
+    time.sleep(5)
     for thread in jobs:
         thread.join()
