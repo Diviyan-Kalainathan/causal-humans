@@ -11,6 +11,10 @@
 *.ods
 Cause-effect/ext
 Data_analysis/
+Cause-effect/lib_lopez_paz/data
+Cause-effect/lib_lopez_paz/*.csv
+Cause-effect/lib_lopez_paz/*.p
+Cause-effect/lib_lopez_paz/pickles
 #Except python files
 !.gitignore
 !*/*.py
