@@ -2,13 +2,13 @@
 Code made by David Lopez-Paz
 All credits to Mr. Lopez-Paz
 """
-
+import multiprocessing as mp
 F_X_TR = "data/pairs.csv"
 F_Y_TR = "data/targets.csv"
 
 # F_X_TE = "data/CE_pairs_secafi_correl_pvalue_5percent.csv"
 
-F_X_TE = "data/pairs_c_6_p0.csv"
+#F_X_TE = "data/pairs_c_6_p0.csv"
 
 # F_X_TE = "data/test_pair.csv"
 
@@ -148,27 +148,45 @@ clf1 = CLF(**params).fit(x_ab, y_ab == 1)  # causal or anticausal?
 pickle.dump(clf0, open("clf0.p", "wb"))
 pickle.dump(clf1, open("clf1.p", "wb"))'''#Already trained
 
+def task_pred(inputdata,outputdata,clf0,clf1):
+    # print("featurize test ")
+    x_te = featurizeTest(inputdata)
+    p_te = clf0.predict_proba(x_te)[:, 1] * (2 * clf1.predict_proba(x_te)[:, 1] - 1)
 
+    # print(p_te)
 
-def predict(data,results):
+    df = pd.read_csv(inputdata, index_col="SampleID")
+
+    Results = pd.DataFrame(index=df.index)
+
+    Results['Target'] = p_te
+    Results.to_csv(outputdata, sep=';', encoding='utf-8')
+    sys.stdout.write('Generated output file '+ outputdata)
+
+def predict(data,results,max_proc):
     print("start predict ")
 
     clf0 = pickle.load(open("clf0.p", "rb"))
     clf1 = pickle.load(open("clf1.p", "rb"))
+    pool = mp.Pool(processes=max_proc)
 
     for idx in range(len(data)):
-        #print("featurize test ")
-        x_te = featurizeTest(data[idx])
-        p_te = clf0.predict_proba(x_te)[:, 1] * (2 * clf1.predict_proba(x_te)[:, 1] - 1)
+        print('Data '+str(idx))
+        pool.apply_async(task_pred,args=(data[idx],results[idx],clf0,clf1,))
+    pool.close()
+    pool.join()
 
-        #print(p_te)
+    '''x_te = featurizeTest(data[idx])
+    p_te = clf0.predict_proba(x_te)[:, 1] * (2 * clf1.predict_proba(x_te)[:, 1] - 1)
 
-        df = pd.read_csv(F_X_TE, index_col="SampleID")
+    #print(p_te)
 
-        Results = pd.DataFrame(index=df.index)
+    df = pd.read_csv(data[idx], index_col="SampleID")
 
-        Results['Target'] = p_te
-        Results.to_csv(results[idx], sep=';', encoding='utf-8')
+    Results = pd.DataFrame(index=df.index)
+
+    Results['Target'] = p_te
+    Results.to_csv(results[idx], sep=';', encoding='utf-8')'''
 
 
 # print([score(y_te,p_te),clf0.score(x_te,y_te!=0),clfd.score(x_te,d_te)])

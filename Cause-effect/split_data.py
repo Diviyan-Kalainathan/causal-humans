@@ -57,7 +57,7 @@ def splitfiles_cluster(inputfolder, cluster_n):
 
                 if row: # sort out blank lines
                     sampleID+= row[0] #Replace ID w/ number?
-                    row[0]='valid'+str(idx)
+                    #row[0]='valid'+str(idx)
                     rows_towrite.append(row)
                     idx+=1
 

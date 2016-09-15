@@ -15,6 +15,8 @@ Cause-effect/lib_lopez_paz/data
 Cause-effect/lib_lopez_paz/*.csv
 Cause-effect/lib_lopez_paz/*.p
 Cause-effect/lib_lopez_paz/pickles
+*.p
+Cause-effect/lib_lopez_paz/*.p
 #Except python files
 !.gitignore
 !*/*.py
