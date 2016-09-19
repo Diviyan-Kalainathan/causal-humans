@@ -11,7 +11,7 @@ inputdata = 'obj8'
 lopez_paz = True
 max_proc=int(sys.argv[1])
 # Creating parameters
-cluster_n = 0
+cluster_n = 1
 jobs = []
 while os.path.exists('output/' + inputdata + '/split_data/cluster_' + str(cluster_n)) :
     inputfilespath = []

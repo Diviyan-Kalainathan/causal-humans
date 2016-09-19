@@ -162,6 +162,7 @@ def task_pred(inputdata,outputdata,clf0,clf1):
     Results['Target'] = p_te
     Results.to_csv(outputdata, sep=';', encoding='utf-8')
     sys.stdout.write('Generated output file '+ outputdata)
+    sys.stdout.flush()
 
 def predict(data,results,max_proc):
     print("start predict ")

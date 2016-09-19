@@ -3,7 +3,7 @@ Convert data into the desired form
 Author : Diviyan Kalainathan
 Date : 28/06/2016
 """
-import csv, numpy, re, os
+import csv, numpy, re, os, sys
 
 # Input : filtered data only : no conversion yet
 
@@ -12,7 +12,16 @@ inputcluster = 'cluster_predictions_c6_n500_r12-subj.csv'
 inputclusterpath = 'input/' + inputcluster
 converteddatapath = 'input/c-e_converted_data.csv'
 conversion = False
+if int(sys.argv[1])==1:
+    pca_var=True
+    #path_pca_data='input/computed_data_wo_~8.csv'
+    path_pca_data='input/computed_data_ws_~5.csv'
+else:
+    pca_var=False
+
+subj6=True
 outputfolder = 'output/subj6/'
+
 
 # init of lists
 name_var = []
@@ -35,7 +44,7 @@ with open('input/Variables_info.csv', 'rb') as datafile:
 
 # initialize the sparse matrix of flags
 if conversion:
-    with open('input/nc_filtered_data.csv', 'rb') as datafile:
+    with open(inputfile, 'rb') as datafile:
         input_length = sum(1 for row in datafile) - 1
         print('Lines to process : ' + repr(input_length))
         row_len = 0
@@ -52,8 +61,16 @@ if conversion:
         print 'Row no : ', row_len
 
     print('Done.')
+    if pca_var:
+        if subj6:
+            num_var = row_len+5*2
+            print 'Row no after adding pca data : ',num_var
+        else:
+            num_var= row_len+8*2
+            print 'Row no after adding pca data : ',num_var
+
     print('--Processing data--')
-    with open('input/nc_filtered_data.csv', 'rb') as datafile:
+    with open(inputfile, 'rb') as datafile:
         # Warning: the first var must not be a flag
 
         datareader = csv.reader(datafile, delimiter=';', quotechar='"')
@@ -689,6 +706,34 @@ print('Done.')
 print('--Saving data--')
 numpy.savetxt("output/flag_vector.csv", S, fmt='%i', delimiter=',')
 print('Done.')'''  # No sparse matrix conversion
+
+# Adding pca values :
+if pca_var:
+    outputfolder += 'pca_var/'
+    pca_data = numpy.loadtxt(path_pca_data, delimiter=';')
+    if subj6:
+        outputfilepath = 'input/datafile_pca_subj6.csv'
+    else:
+        outputfilepath = 'input/datafile_pca_obj8.csv'
+
+    with open(outputfilepath, 'wb') as n_datafile:
+        n_writer = csv.writer(n_datafile, delimiter=';', lineterminator='\n')
+        with open(converteddatapath, 'rb') as datafile1:
+            reader1 = csv.reader(datafile1, delimiter=';')
+            header = next(reader1)
+            for i in range(pca_data.shape[0]):
+                header.append('pca_axis_' + str(i + 1))
+                header.append('pca_axis_' + str(i + 1)+'_flag')
+            n_writer.writerow(header)
+            col = 0
+            for row in reader1:
+                for i in range(pca_data.shape[0]):
+                    row.append(str(pca_data[i, col]))
+                    row.append(str(1))
+                col += 1
+                n_writer.writerow(row)
+    # Switching files
+    converteddatapath = outputfilepath
 
 print 'Separating into multiple files according to clustering : ', inputcluster
 

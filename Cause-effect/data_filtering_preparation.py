@@ -17,12 +17,15 @@ inputfolder = 'output/' + sys.argv[1] + '/'
 var_info = 'input/Variables_info.csv'
 verbose = False
 max_threads = int(sys.argv[2])  # 30
-if len(sys.argv)>4:
-    if int(sys.argv[3]) == 1:
+if int(sys.argv[3])==1:
+    pca_data=True
+    inputfolder+='pca_var/'
+if len(sys.argv)>5:
+    if int(sys.argv[4]) == 1:
         prepare=True
     else:
         prepare=False
-    if int(sys.argv[4]) == 1:
+    if int(sys.argv[5]) == 1:
         filesplit = True
     else:
         filesplit=False
@@ -90,7 +93,7 @@ def compare_t_task(var_1, c_data_header, cluster_data, inputfolder, cluster_n, v
                         data_B.append(var_data[ppl, 2])
 
             if verbose: print(len(data_A))
-            if len(data_A) > 25:
+            if len(data_A) > 500:
 
                 # Convert data_A and data_B into the right shape
                 A_values = ''
@@ -388,6 +391,17 @@ if __name__ == '__main__':
                     type_var += [var_row[1], 'B']
                     num_bool += [var_row[3], str(2)]
                     spec_note += [var_row[4], str(-2)]
+
+            if pca_data:
+                if sys.argv[1]=='obj8':
+                    pca_len=8
+                else:
+                    pca_len=5
+                for i in range(pca_len):
+                    name_var += ['pca_axis_'+str(i+1), 'pca_axis_'+str(i+1) + '_flag']
+                    type_var += ['C', 'B']
+                    num_bool += ['', str(2)]
+                    spec_note += ['', str(-2)]
 
         print(len(name_var))
         # Generate files for all clusters
