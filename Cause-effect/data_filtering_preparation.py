@@ -12,6 +12,7 @@ from multiprocessing import Process
 import time
 import sys
 import split_data
+import cPickle as pickle
 
 inputfolder = 'output/' + sys.argv[1] + '/'
 var_info = 'input/Variables_info.csv'
@@ -408,6 +409,7 @@ if __name__ == '__main__':
         print('--Generating input files--')
         cluster_n = 0
         processes=[]
+
 
         while os.path.exists(inputfolder + 'cluster_' + str(cluster_n)):
             '''cluster_path = inputfolder + 'cluster_' + str(cluster_n) + '/data_c_' + str(cluster_n) + '.csv'

@@ -9,9 +9,9 @@ import csv
 
 idxed_files = True  # If the files are indexed
 
-cluster_n = 0
-inputdata = 'obj8'
-threshold = 0.15
+cluster_n = 5
+inputdata = 'obj8/pca_var'
+threshold = 0.12
 
 if inputdata == 'subj6':
     legend = ['RAS', 'Stress', 'Indep', 'Heur', 'Malh', 'Chgts']
@@ -19,6 +19,7 @@ else:
     legend = ['Indep', 'Sante', 'Ouvriers', 'CSP+Prive', 'ServPart', 'CSP+Public', 'Immigr', 'Accid']
 
 while os.path.exists('output/' + inputdata + '/split_data/cluster_' + str(cluster_n)):
+    print cluster_n
     part_number = 0
     # dic=[[],[]]
     # Creating output file
