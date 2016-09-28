@@ -16,6 +16,13 @@ if 'obj8' in inputfolder:
 else:
     obj=False
 
+dependancy_matrix_type=1
+""" Type of skeleton construction
+#1 : Absolute value of Pearson's correlation
+#2 : Regular value of Pearson's correlation
+#3 : Causation coefficient
+"""
+
 mode = 1
 """
 #1 : Constructing graph w/ Michele's method:
@@ -80,39 +87,76 @@ elif mode==2:
 
     #### Pearson's correlation to remove links ####
 
-    with open(inputfolder+'pairs_c_5.csv','rb') as pairs_file:
-        datareader=csv.reader(pairs_file, delimiter=',')
-        header=next(datareader)
-        threshold=0.01
-        var_1=0
-        var_2=0
-        #Idea: go through the vars and unlink the skipped (not in the pairs file) pairs of vars.
-        for row in datareader:
-            pair= row[0].split('-')
+    if dependancy_matrix_type<3:
+        with open(inputfolder+'pairs_c_5.csv','rb') as pairs_file:
+            datareader=csv.reader(pairs_file, delimiter=',')
+            header=next(datareader)
+            threshold=0.1
+            var_1=0
+            var_2=0
+            #Idea: go through the vars and unlink the skipped (not in the pairs file) pairs of vars.
+            for row in datareader:
+                pair= row[0].split('-')
 
-            #Finding the pair var_1 var_2 corresponding to the line
-            # and un-linking skipped values
-            while pair[0]!=ordered_var_names[var_1]:
-                if var_2!=len(ordered_var_names):
-                    link_mat[var_1,var_2+1:]=0
-                var_1+=1
-                var_2 = 0
+                #Finding the pair var_1 var_2 corresponding to the line
+                # and un-linking skipped values
+                while pair[0]!=ordered_var_names[var_1]:
+                    if var_2!=len(ordered_var_names):
+                        link_mat[var_1,var_2+1:]=0
+                    var_1+=1
+                    var_2 = 0
 
-            skipped_value=False #Mustn't erase checked values
-            while pair[1] != ordered_var_names[var_2]:
-                if skipped_value:
-                    link_mat[var_1, var_2] = 0
-                var_2 += 1
-                skipped_value=True
+                skipped_value=False #Mustn't erase checked values
+                while pair[1] != ordered_var_names[var_2]:
+                    if skipped_value:
+                        link_mat[var_1, var_2] = 0
+                    var_2 += 1
+                    skipped_value=True
 
-            #Parsing values of table & removing artifacts
-            var_1_value = [x for x in row[1].split(' ') if x is not '']
-            var_2_value = [x for x in row[2].split(' ') if x is not '']
+                #Parsing values of table & removing artifacts
+                var_1_value = [x for x in row[1].split(' ') if x is not '']
+                var_2_value = [x for x in row[2].split(' ') if x is not '']
 
-            if len(var_1_value)!=len(var_2_value):
-                raise ValueError
+                if len(var_1_value)!=len(var_2_value):
+                    raise ValueError
 
-            link_mat[var_1, var_2]=stats.pearsonr(var_1_value,var_2_value)[0]
+                if  abs(stats.pearsonr(var_1_value,var_2_value)[0])>threshold:
+                    if dependancy_matrix_type==1:
+                        link_mat[var_1, var_2]= abs(stats.pearsonr(var_1_value,var_2_value)[0])
+                    elif dependancy_matrix_type==2:
+                        link_mat[var_1, var_2] = (stats.pearsonr(var_1_value, var_2_value)[0])
+                else: link_mat[var_1, var_2] = 0
+        #ToDo Symmetrize matrix
+    elif dependancy_matrix_type==3:
+
+        with open(inputfolder + 'results_lp.csv', 'rb') as pairs_file:
+            datareader = csv.reader(pairs_file, delimiter=';')
+            header = next(datareader)
+            threshold = 0.12
+            var_1 = 0
+            var_2 = 0
+            # Idea: go through the vars and unlink the skipped (not in the pairs file) pairs of vars.
+            for row in datareader:
+
+                # Finding the pair var_1 var_2 corresponding to the line
+                # and un-linking skipped values
+                while row[0] != ordered_var_names[var_1]:
+                    if var_2 != len(ordered_var_names):
+                        link_mat[var_1, var_2 + 1:] = 0
+                    var_1 += 1
+                    var_2 = 0
+
+                skipped_value = False  # Mustn't erase checked values
+                while row[1] != ordered_var_names[var_2]:
+                    if skipped_value:
+                        link_mat[var_1, var_2] = 0
+                    var_2 += 1
+                    skipped_value = True
+
+                if float(row[2])>threshold:
+                    link_mat[var_1, var_2] = float[row[2]]
+
+        #ToDo Anti-Symmetrize matrix
 
     pkl.dump(link_mat,open(inputfolder+'link_mat_pval.p'))
 
