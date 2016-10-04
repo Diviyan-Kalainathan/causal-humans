@@ -27,7 +27,7 @@
 \usepackage{microtype} % Slightly tweak font spacing for aesthetics
 \usepackage[utf8]{inputenc} % Required for including letters with accents
 \usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
-\usepackage[]{algorithm2e}
+\usepackage[french,onelanguage]{algorithm2e}
 
 \usepackage{eurosym}%pour le symbole €
 \usepackage{subfig}
@@ -61,7 +61,7 @@
 \vspace*{0.5cm}
 {\Huge Diviyan Kalainathan}\\
 {\huge Encadré par M. Sébag, P. Caillou, I. Guyon, P. Tubaro}\par % Author name
-{\Large INRIA - TAO (05/2016 - 11/2016)}\par
+{\Large INRIA - TAO (05/2016 - 11/2016) - Stage PFE-Master}\par
 \endgroup
 
 %----------------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ Ce sujet de projet de fin d'études peut paraître être plus une étude de soci
 
 \section{Présentation des données}
 
-Comme mentionné à la section précédente, nous avons accès aux réponses de 33673 personnes sur un questionnaire de 520 questions. Dans cette ensemble d'enquêtés, on ne considère que les actifs, c'est-à-dire ceux occupant un emploi à la date du questionnaire, ce qui nous laisse 31112 enquêtés. Les questions, portant sur les aspects de la vie de l'enquêté, regroupés en 7 rubriques (Table \ref{tab:cat_questions}). Notons de plus que les données issues du questionnaire sont assez hétérogènes : les enquêtés avaient le choix de refuser de répondre à une question, ou de dire qu'ils ne connaissaient pas la réponse ; mais la principale source d'hétérogénéité est la nature du questionnaire lui-même, qui est un questionnaire à multiples branchements. Par ailleurs, la nature des réponses aux questions peut varier. En effet, on peut demander au questionné soit une réponse numérique (p. ex. \textit{Quel est le montant de votre revenu ?}), soit une réponse parmi un choix de réponses multiples (QCM).\par
+Comme mentionné à la section précédente, nous avons accès aux réponses de 33673 personnes sur un questionnaire de 520 questions. Dans cette ensemble d'enquêtés, on ne considère que les actifs, c'est-à-dire ceux occupant un emploi à la date du questionnaire, ce qui nous laisse 31112 enquêtés. Les questions portant sur les aspects de la vie de l'enquêté, regroupés en 7 rubriques (Table \ref{tab:cat_questions}). Notons de plus que les données issues du questionnaire sont assez hétérogènes : les enquêtés avaient le choix de refuser de répondre à une question, ou de dire qu'ils ne connaissaient pas la réponse ; mais la principale source d'hétérogénéité est la nature du questionnaire lui-même, qui est un questionnaire à multiples branchements. Par ailleurs, la nature des réponses aux questions peut varier. En effet, on peut demander au questionné soit une réponse numérique (p. ex. \textit{Quel est le montant de votre revenu ?}), soit une réponse parmi un choix de réponses multiples (QCM).\par
 
 \begin{table}[!h]
 \centering
@@ -169,7 +169,7 @@ Ensuite, une analyse en composantes principales permet ensuite de remédier à l
 
 Dans l'espace des axes, chaque individu est un vecteur de $\mathbb{R}^d$. On utilise la catégorisation (clustering) pour identifier les sous-groupes de données homogènes ; l'algorithme employé est un K-means++ \cite{arthur2007k}. Avant d'analyser les clusters, on s'assure de leur stabilité selon les critères définis par \cite{meilua2006uniqueness}. \par
 
-Chaque cluster est interprété par ses variables significatives au sens du v-test \cite{lebart2006statistique}~; formellement, une variable est significative pour un cluster lorsque sa valeur moyenne sur ce cluster est significativement distincte de la valeur moyenne sur l'ensemble des données (compte tenu de la taille du cluster). Après avoir établi des clusters sur les variables de  situation et de ressenti (respectivement sur les variables objectives et subjectives), il s'agit d'analyser comment évoluent les groupes à travers des variables choisies, telles que le revenu ou le score de bien-être défini par l'OMS\footnote{\url{http://www.euro.who.int/fr/publications/abstracts/measurement-of-and-target-setting-for-well-being-an-initiative-by-the-who-regional-office-for-europe}} ; mais aussi étudier le croisement des populations entre les clusters de situation et de ressenti est une analyse qui peut s'avérer intéressante.\par
+Chaque cluster est interprété par ses variables significatives au sens du v-test \cite{lebart2006statistique}~; formellement, une variable est significative pour un cluster lorsque sa valeur moyenne sur ce cluster est significativement distincte de la valeur moyenne sur l'ensemble des données (compte tenu de la taille du cluster). Après avoir établi des clusters sur les variables de  situation et de ressenti (respectivement sur les variables objectives et subjectives), il s'agit d'analyser comment évoluent les groupes à travers des variables choisies, telles que le revenu ou le score de bien-être défini par l'OMS\footnote{\href{http://www.euro.who.int/fr/publications/abstracts/measurement-of-and-target-setting-for-well-being-an-initiative-by-the-who-regional-office-for-europe}{cf www.euro.who.int.}} ; mais aussi étudier le croisement des populations entre les clusters de situation et de ressenti est une analyse qui peut s'avérer intéressante.\par
 
 \subsection{Causalité}
 La deuxième partie de l'étude consiste à analyser la causalité au sens de \cite{granger1969causality} ; la causalité incluant plus d'informations qu'une simple corrélation, par la présence d'une hiérarchie entre les variables reliées causalement. En effet, la présence d'une corrélation traduit juste la "ressemblance entre deux courbes", et ne permet pas de conclure sur l'existence d'un réel lien entre les deux variables\footnote{Par exemple, la corrélation entre le nombre de pirates en activité et le réchauffement climatique est assez importante alors que ces deux variables ne sont pas directement liées causalement.}. L'étude de la causalité, se basant sur des techniques complexes et variées, entre prédiction par machine learning et inférence par l'étude des distributions de probabilités permettent de déterminer la présence ou non d'une relation de causalité, mais aussi du sens de cette relation. Ainsi, on aura pour but de construire le graphe le plus complet et le plus fiable des variables et de leurs liens causaux, afin de comprendre les phénomènes moteurs dans le questionnaire et dans l'étude du bien-être au travail. \par % a compléter
@@ -179,14 +179,27 @@ La deuxième partie de l'étude consiste à analyser la causalité au sens de \c
 \chapter{Analyse descriptive des données}
 \section{Analyse en composantes principales}
 \subsection{Principe}
-L'analyse en composantes principales (ACP) est une procédure statistique inventée en 1901 par Karl Pearson qui permet de déterminer des axes
-\begin{definition}[Definition name]
-Given a vector space $E$, a norm on $E$ is an application, denoted $||\cdot||$, $E$ in $\mathbb{R}^+=[0,+\infty[$ such that:
-\begin{align}
-& ||\mathbf{x}||=0\ \Rightarrow\ \mathbf{x}=\mathbf{0}\\
-& ||\lambda \mathbf{x}||=|\lambda|\cdot ||\mathbf{x}||\\
-& ||\mathbf{x}+\mathbf{y}||\leq ||\mathbf{x}||+||\mathbf{y}||
-\end{align}
+L'analyse en composantes principales (ACP) est une procédure statistique inventée en 1901 par Karl Pearson qui permet de déterminer un ensemble de variables décorrélées à partir d'un ensemble de variables possiblement corrélées. De plus, étudier l'inertie des valeurs propres associées à ces nouvelles variables permet de mettre en évidence la dimension intrinsèque des données, et donc de réduire la dimension de nos données initiales, afin de remédier à la redondance des variables et d'obtenir un nombre de variables pour représenter les individus dans un espace intelligible. L'algorithme est le suivant : \vspace{0.2cm}\par
+
+\begin{definition}[ACP\vspace{0.2cm}\\]
+%TODO
+\begin{algorithm}[H]
+ \KwData{Données pré-traitées de taille $m_{variables} \times n_{exemples}$}
+ \KwResult{Données à $p$ dimensions ($p<<m_{variables}$) }
+ \BlankLine
+ \tcp{Normalisation \& centrage des données}\label{cmt} 
+ \For{$i\leftarrow 1$ \KwTo $m_{variables}$}{
+  \BlankLine
+
+ 	$\mathbf{D} \leftarrow \textrm{Données}[i,:]$  \tcp{ Vecteur de données pour la variable $i$}\label{cmt} 
+	$\mathbf{M}[i,:] \leftarrow \frac{\mathbf{D}- \textrm{moyenne}(\mathbf{D})}{\textrm{variance}(\mathbf{D})}$
+ }
+ \BlankLine
+ $\mathbf{M}\leftarrow matrice\_covariance(\mathbf{M})$\\
+ $\mathbf{T}\leftarrow vecteurs\_propres$
+ \KwRet{$\mathbf{R} $} 
+\end{algorithm}
+
 \end{definition}
 \subsection{Obtention des nouveaux axes }
 \paragraph{}
