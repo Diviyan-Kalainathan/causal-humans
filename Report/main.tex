@@ -27,6 +27,7 @@
 \usepackage{microtype} % Slightly tweak font spacing for aesthetics
 \usepackage[utf8]{inputenc} % Required for including letters with accents
 \usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\usepackage[]{algorithm2e}
 
 \usepackage{eurosym}%pour le symbole €
 \usepackage{subfig}
@@ -178,7 +179,15 @@ La deuxième partie de l'étude consiste à analyser la causalité au sens de \c
 \chapter{Analyse descriptive des données}
 \section{Analyse en composantes principales}
 \subsection{Principe}
-L'analyse en composantes principales (ACP) est une technique
+L'analyse en composantes principales (ACP) est une procédure statistique inventée en 1901 par Karl Pearson qui permet de déterminer des axes
+\begin{definition}[Definition name]
+Given a vector space $E$, a norm on $E$ is an application, denoted $||\cdot||$, $E$ in $\mathbb{R}^+=[0,+\infty[$ such that:
+\begin{align}
+& ||\mathbf{x}||=0\ \Rightarrow\ \mathbf{x}=\mathbf{0}\\
+& ||\lambda \mathbf{x}||=|\lambda|\cdot ||\mathbf{x}||\\
+& ||\mathbf{x}+\mathbf{y}||\leq ||\mathbf{x}||+||\mathbf{y}||
+\end{align}
+\end{definition}
 \subsection{Obtention des nouveaux axes }
 \paragraph{}
 Le recodage des questions catégorielles et l'ajout des variables booléennes conduit à un total de 2463 variables (numériques et booléennes). Une phase de réduction linéaire de dimensionnalité par analyse en composantes principales est effectuée. Concrètement, la matrice de covariance des variables est diagonalisée; l'ensemble ordonné de ses valeurs propres est représenté Fig. \ref{fig:spectreobj} et Fig. \ref{fig:spectresubj}. On se restreint à considérer les premiers vecteurs propres de cette matrice. Chacun de ces vecteurs propres (somme pondérée des variables initiales) définit une variable agrégée. 

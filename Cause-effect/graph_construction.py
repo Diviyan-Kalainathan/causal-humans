@@ -71,7 +71,8 @@ elif skeleton_construction_method < 3:
     with open(inputfolder + 'pairs_c_5.csv', 'rb') as pairs_file:
         datareader = csv.reader(pairs_file, delimiter=';')
         header = next(datareader)
-        threshold_pval = 0.01
+        threshold_pval = 0.05
+        threshold_pearsonc=0.5
         var_1 = 0
         var_2 = 0
         # Idea: go through the vars and unlink the skipped (not in the pairs file) pairs of vars.
@@ -106,7 +107,8 @@ elif skeleton_construction_method < 3:
             if len(var_1_value) != len(var_2_value):
                 raise ValueError
 
-            if abs(stats.pearsonr(var_1_value, var_2_value)[1]) < threshold_pval:
+            if abs(stats.pearsonr(var_1_value, var_2_value)[1]) < threshold_pval\
+            and abs(stats.pearsonr(var_1_value, var_2_value)[0]) < threshold_pearsonc :
                 if skeleton_construction_method == 1:
                     link_mat[var_1, var_2] = abs(stats.pearsonr(var_1_value, var_2_value)[0])
                 elif skeleton_construction_method == 2:
