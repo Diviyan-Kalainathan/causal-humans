@@ -34,8 +34,9 @@ else:
 
 deconvolution_method = int(sys.argv[2])
 """Method used for the deconvolution
-#1: Deconvolution according to Soheil Feizi
-#2: Recursive method according to Michele Sebag
+#1 : Deconvolution according to Soheil Feizi
+#2 : Recursive method according to Michele Sebag
+#3 : Deconvolution/global silencing by B. Barzel, A.-L. Barab\'asi
 """
 
 print('Loading data')
@@ -70,7 +71,7 @@ elif skeleton_construction_method < 3:
     with open(inputfolder + 'pairs_c_5.csv', 'rb') as pairs_file:
         datareader = csv.reader(pairs_file, delimiter=';')
         header = next(datareader)
-        threshold = 0.1
+        threshold_pval = 0.01
         var_1 = 0
         var_2 = 0
         # Idea: go through the vars and unlink the skipped (not in the pairs file) pairs of vars.
@@ -105,7 +106,7 @@ elif skeleton_construction_method < 3:
             if len(var_1_value) != len(var_2_value):
                 raise ValueError
 
-            if abs(stats.pearsonr(var_1_value, var_2_value)[0]) > threshold:
+            if abs(stats.pearsonr(var_1_value, var_2_value)[1]) < threshold_pval:
                 if skeleton_construction_method == 1:
                     link_mat[var_1, var_2] = abs(stats.pearsonr(var_1_value, var_2_value)[0])
                 elif skeleton_construction_method == 2:
@@ -220,9 +221,8 @@ if deconvolution_method == 1:
  AUTHORS:
     Algorithm was programmed by Soheil Feizi.
     Paper authors are S. Feizi, D. Marbach,  M. Medard and M. Kellis
-Python implementation: Gideon Rosenthal
 
-REFERENCES:
+ REFERENCES:
    For more details, see the following paper:
     Network Deconvolution as a General Method to Distinguish
     Direct Dependencies over Networks
@@ -239,6 +239,23 @@ elif deconvolution_method == 2:
     # ToDO
     # 1. Generate all lists
     # 2. Generate up to n parents & n children
+
+elif deconvolution_method == 3:
+    """This is a python implementation/translation of network deconvolution
+
+    AUTHORS :
+        B. Barzel, A.-L. Barab\'asi
+
+    REFERENCES :
+        Network link prediction by global silencing of indirect correlations
+        By: Baruch Barzel, Albert-L\'aszl\'o Barab\'asi
+        Nature Biotechnology"""  # Credits, Ref
+    mat_diag= numpy.zeros((len(ordered_var_names),len(ordered_var_names)))
+    D_temp= numpy.dot(link_mat-numpy.identity(len(ordered_var_names)),link_mat)
+    for i in range(len(ordered_var_names)):
+        mat_diag[i,i]=D_temp[i,i]
+    Gdir = numpy.dot((link_mat-numpy.identity(len(ordered_var_names))+mat_diag),numpy.linalg.inv(link_mat))
+
 else:
     raise ValueError
 print('Done.')
@@ -248,7 +265,7 @@ print('Writing output files')
 with open(inputfolder + 'deconv_links' + str(skeleton_construction_method) + str(deconvolution_method) + '.csv',
           'wb') as outputfile:
     writer = csv.writer(outputfile, delimiter=';', lineterminator='\n')
-    writer.writerow(['Source', 'Target', 'Value'])
+    writer.writerow(['Source', 'Target', 'Weight'])
     for var_1 in range(len(ordered_var_names) - 1):
         for var_2 in range(var_1 + 1, len(ordered_var_names)):
             if abs(Gdir[var_1, var_2]) > 0.001: #ignore value if it's near 0

@@ -75,7 +75,7 @@
 
 \noindent \textsc{Stage de fin d'études, ISAE-ENSMA}\\
 
-\noindent \textsc{github.com/Diviyan-Kalainathan/causal-humans}\\ % URL
+\noindent \textsc{\href{https://github.com/Diviyan-Kalainathan/causal-humans}{github.com/Diviyan-Kalainathan/causal-humans}}\\ % URL
 
 
 \noindent Ce travail de recherche a été effectué sous la supervision des chercheurs Michèle Sebag, Phillipe Caillou, Isabelle Guyon et Paola Tubaro, avec la collaboration  d'Olivier Goudet au sein de l'équipe TAO, ainsi qu'avec l'aide de la DARES et le support de l'INRIA pour un stage de 27 semaines, du 17 Mai au 18 Novembre 2016. \\ % License information
@@ -114,7 +114,7 @@
 
 \section{Motivation}
 
-La qualité de vie au travail est un aspect de la vie en société qui est peu quantifiable, mais qui tout de même n'a pas cessé de croître en France au cours de ces dernières décennies, contrairement à d'autres pays qui favorisent la production aux dépends des conditions de travail. Toutefois, les sociologues se sont souvent posé la question du lien entre cette qualité de vie au travail (QVT) et de la satisfaction d'un employé : comment évolue la satisfaction au travail avec la qualité de vie? Sont-ils liés? Comment l'amélioration de la qualité de vie au travail va-t-elle impacter l'environnement de travail de ses employés? C'est à ces question que nous souhaitons répondre au cours de ce projet de fin d'études.\par
+La qualité de vie au travail est un aspect de la vie en société qui est peu quantifiable, mais qui tout de même n'a pas cessé de croître en France au cours de ces dernières décennies, contrairement à d'autres pays qui favorisent la production aux dépends des conditions de travail. Toutefois, les sociologues se sont souvent posé la question du lien entre cette qualité de vie au travail (QVT) et de la satisfaction d'un employé : comment évolue la satisfaction au travail avec la qualité de vie? Sont-ils liés? Comment l'amélioration de la qualité de vie au travail va-t-elle impacter l'environnement de travail de ses employés? C'est à ces questions que nous souhaitons répondre au cours de ce projet de fin d'études.\par
 
 Pour y parvenir, nous disposons d'une quantité importante de données : les réponses de 33673 personnes sur un questionnaire effectué par la DARES\footnote{Direction de l'animation de la recherche, des études et des statistiques du Ministère du travail, de l'emploi, de la formation professionnelle et du dialogue social.} en collaboration avec l'INSEE\footnote{Institut national de la statistique et des études économiques collecte, produit, analyse et diffuse des informations sur l'économie et la société françaises}, portant sur divers aspect de la vie des enquêtés. Nous allons donc étudier ces données sous différents angles afin de pouvoir en tirer des interprétations sur les raisons derrière les différences entre la satisfaction au travail des enquêtés et leur situation.\par
 
@@ -171,12 +171,14 @@ Dans l'espace des axes, chaque individu est un vecteur de $\mathbb{R}^d$. On uti
 Chaque cluster est interprété par ses variables significatives au sens du v-test \cite{lebart2006statistique}~; formellement, une variable est significative pour un cluster lorsque sa valeur moyenne sur ce cluster est significativement distincte de la valeur moyenne sur l'ensemble des données (compte tenu de la taille du cluster). Après avoir établi des clusters sur les variables de  situation et de ressenti (respectivement sur les variables objectives et subjectives), il s'agit d'analyser comment évoluent les groupes à travers des variables choisies, telles que le revenu ou le score de bien-être défini par l'OMS\footnote{\url{http://www.euro.who.int/fr/publications/abstracts/measurement-of-and-target-setting-for-well-being-an-initiative-by-the-who-regional-office-for-europe}} ; mais aussi étudier le croisement des populations entre les clusters de situation et de ressenti est une analyse qui peut s'avérer intéressante.\par
 
 \subsection{Causalité}
-La deuxième partie de l'étude consiste à analyser la causalité au sens de \cite{granger1969causality} ; la causalité incluant plus d'informations qu'une simple corrélation, par la présence d'une hiérarchie entre les variables reliées causalement. Ainsi, on aura pour but de construire le graphe le plus complet et le plus fiable des variables et de leurs liens causaux. \par % a compléter
+La deuxième partie de l'étude consiste à analyser la causalité au sens de \cite{granger1969causality} ; la causalité incluant plus d'informations qu'une simple corrélation, par la présence d'une hiérarchie entre les variables reliées causalement. En effet, la présence d'une corrélation traduit juste la "ressemblance entre deux courbes", et ne permet pas de conclure sur l'existence d'un réel lien entre les deux variables\footnote{Par exemple, la corrélation entre le nombre de pirates en activité et le réchauffement climatique est assez importante alors que ces deux variables ne sont pas directement liées causalement.}. L'étude de la causalité, se basant sur des techniques complexes et variées, entre prédiction par machine learning et inférence par l'étude des distributions de probabilités permettent de déterminer la présence ou non d'une relation de causalité, mais aussi du sens de cette relation. Ainsi, on aura pour but de construire le graphe le plus complet et le plus fiable des variables et de leurs liens causaux, afin de comprendre les phénomènes moteurs dans le questionnaire et dans l'étude du bien-être au travail. \par % a compléter
 %----------------------------------------------------------------------------------------
 %	CHAPTER 2
 %----------------------------------------------------------------------------------------
 \chapter{Analyse descriptive des données}
 \section{Analyse en composantes principales}
+\subsection{Principe}
+L'analyse en composantes principales (ACP) est une technique
 \subsection{Obtention des nouveaux axes }
 \paragraph{}
 Le recodage des questions catégorielles et l'ajout des variables booléennes conduit à un total de 2463 variables (numériques et booléennes). Une phase de réduction linéaire de dimensionnalité par analyse en composantes principales est effectuée. Concrètement, la matrice de covariance des variables est diagonalisée; l'ensemble ordonné de ses valeurs propres est représenté Fig. \ref{fig:spectreobj} et Fig. \ref{fig:spectresubj}. On se restreint à considérer les premiers vecteurs propres de cette matrice. Chacun de ces vecteurs propres (somme pondérée des variables initiales) définit une variable agrégée. 
