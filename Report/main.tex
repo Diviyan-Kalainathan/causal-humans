@@ -187,20 +187,28 @@ L'analyse en composantes principales (ACP) est une procédure statistique invent
  \KwData{Données pré-traitées de taille $m_{variables} \times n_{exemples}$}
  \KwResult{Données à $p$ dimensions ($p<<m_{variables}$) }
  \BlankLine
- \tcp{Normalisation \& centrage des données}\label{cmt} 
+ \tcp{Normalisation \& centrage des données}
  \For{$i\leftarrow 1$ \KwTo $m_{variables}$}{
   \BlankLine
 
- 	$\mathbf{D} \leftarrow \textrm{Données}[i,:]$  \tcp{ Vecteur de données pour la variable $i$}\label{cmt} 
+ 	$\mathbf{D} \leftarrow \textrm{Données}[i,:]$  \tcp{ Vecteur de données pour la variable $i$}
 	$\mathbf{M}[i,:] \leftarrow \frac{\mathbf{D}- \textrm{moyenne}(\mathbf{D})}{\textrm{variance}(\mathbf{D})}$
  }
  \BlankLine
  $\mathbf{M}\leftarrow matrice\_covariance(\mathbf{M})$\\
- $\mathbf{T}\leftarrow vecteurs\_propres$
+ $\mathbf{W}\leftarrow vecteurs\_propres(\mathbf{M})$\\
+ \BlankLine
+
+ $p \leftarrow  \textrm{compromis(inertie,bruit)}$  
+ $\mathbf{W}\leftarrow \mathbf{W}[:p,:]$  \tcp{On tronque les $p$ vecteurs propres qu'on a choisis}
+ $\mathbf{R}\leftarrow \mathbf{M} \times\textrm{Données}^T$\\
  \KwRet{$\mathbf{R} $} 
 \end{algorithm}
 
 \end{definition}
+
+Le choix de $p$ s'effectue avec un compromis entre inertie expliquée et nombre de valeurs propres conservées (bruit). En effet, plus on rajoute des dimensions, moins on perd en information, mais plus on rajoute du bruit avec nouvelles dimensions.
+
 \subsection{Obtention des nouveaux axes }
 \paragraph{}
 Le recodage des questions catégorielles et l'ajout des variables booléennes conduit à un total de 2463 variables (numériques et booléennes). Une phase de réduction linéaire de dimensionnalité par analyse en composantes principales est effectuée. Concrètement, la matrice de covariance des variables est diagonalisée; l'ensemble ordonné de ses valeurs propres est représenté Fig. \ref{fig:spectreobj} et Fig. \ref{fig:spectresubj}. On se restreint à considérer les premiers vecteurs propres de cette matrice. Chacun de ces vecteurs propres (somme pondérée des variables initiales) définit une variable agrégée. 
