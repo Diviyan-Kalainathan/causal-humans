@@ -203,15 +203,20 @@ L'analyse en composantes principales (ACP) est une procédure statistique invent
  $\mathbf{W}\leftarrow \mathbf{W}[:p,:]$  \tcp{On tronque les $p$ vecteurs propres qu'on a choisis}
  $\mathbf{R}\leftarrow \mathbf{M} \times\textrm{Données}^T$\\
  \KwRet{$\mathbf{R} $} 
+\label{alg:ACP}
 \end{algorithm}
 
 \end{definition}
 
-Le choix de $p$ s'effectue avec un compromis entre inertie expliquée et nombre de valeurs propres conservées (bruit). En effet, plus on rajoute des dimensions, moins on perd en information, mais plus on rajoute du bruit avec nouvelles dimensions.
+Le choix de $p$ s'effectue avec un compromis entre inertie expliquée et nombre de valeurs propres conservées (bruit). En effet, plus on rajoute des dimensions, moins on perd en information, mais plus on rajoute du bruit avec nouvelles dimensions.\par
+
+Toutefois, il y a la présence d'un biais assez important lié aux questions catégorielles : en effet, du fait que les variables catégorielles ont été éclatées en $n$ variables booléennes ($n$ étant le nombre de modalités de la question) et par conséquent, ces variables ont une variance très faible, voire nulle, si personne n'a répondu cette modalité à la question. Par conséquent, lors de la normalisation, certaines variables ont tendance à croître de manière très importante et donc fausser la PCA. Pour remédier à ce problème, on applique une normalisation différente aux variables catégorielles : l'\textit{Inverse Document Frequency} (IDF) de \cite{sparckjones1972}, qui revient à effectuer : 
+$$\mathbf{M}[i,:]\leftarrow \mathbf{D} \times ln \left(1+\frac{n_{exemples}}{occurences(\mathbf{D}_i=i)}\right)  $$
+avec les notations de l'algorithme 2.1.1 ; en ayant de plus $occurences(\mathbf{D}_i=i)=somme(\mathbf{D})$ car en éclatant nos questions catégorielles en variables booléennes, une somme de $\mathbf{D}_i$ revient à avoir le nombre d'occurrences de la modalité $i$.
 
 \subsection{Obtention des nouveaux axes }
 \paragraph{}
-Le recodage des questions catégorielles et l'ajout des variables booléennes conduit à un total de 2463 variables (numériques et booléennes). Une phase de réduction linéaire de dimensionnalité par analyse en composantes principales est effectuée. Concrètement, la matrice de covariance des variables est diagonalisée; l'ensemble ordonné de ses valeurs propres est représenté Fig. \ref{fig:spectreobj} et Fig. \ref{fig:spectresubj}. On se restreint à considérer les premiers vecteurs propres de cette matrice. Chacun de ces vecteurs propres (somme pondérée des variables initiales) définit une variable agrégée. 
+Le recodage des questions catégorielles et l'ajout des variables booléennes conduit à un total de 2463 variables (numériques et booléennes) ; et on réduit la dimension de ces données à l'aide de l'ACP. L'ensemble ordonné de ses valeurs propres, utilisé pour choisir la dimension de sortie des données, est représenté Fig. \ref{fig:spectreobj} et Fig. \ref{fig:spectresubj}. On se restreint à considérer les premiers vecteurs propres de cette matrice. Chacun de ces vecteurs propres (somme pondérée des variables initiales) définit une variable agrégée. 
 
 \paragraph{ACP sur les variables objectives\\}
 Le spectre des valeurs propres de la matrice de covariance des variables objectives est représenté Fig. \ref{fig:spectreobj}.  Nous avons choisi de sélectionner les 8 premiers vecteurs propres, comme un compromis entre la taille de la représentation réduite et l'inertie capturée (62\%)~; notons qu'il faut pratiquement doubler le nombre de vp. pour arriver à 70\% d'inertie. 
