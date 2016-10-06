@@ -15,6 +15,7 @@ num_lines = 5000
 #inputfolder = 'output/subj6/'
 listfiles = ['pairs_c_', 'publicinfo_c_', 'predictions_c_']
 heads=[['SampleID','A','B'],['SampleID','A type','B type'],['SampleID','Target']]
+
 def splitfiles_cluster(inputfolder, cluster_n):
     num_head=0
     for filetype in listfiles:

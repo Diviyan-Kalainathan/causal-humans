@@ -24,13 +24,32 @@ from   sklearn.preprocessing import scale
 from   sklearn.ensemble import RandomForestClassifier     as CLF
 from   sklearn.metrics import roc_auc_score
 
+def rp(k, s, d):
+    return np.hstack((np.vstack([si * np.random.randn(k, d) for si in s]),
+                      2 * np.pi * np.random.rand(k * len(s), 1))).T
 
 # from   sklearn.grid_search   import GridSearchCV
 # from   scipy.stats           import skew, kurtosis, rankdata
 
-def rp(k, s, d):
-    return np.hstack((np.vstack([si * np.random.randn(k, d) for si in s]),
-                      2 * np.pi * np.random.rand(k * len(s), 1))).T
+
+np.random.seed(0)
+
+    # K = int(sys.argv[1])
+    # E = int(sys.argv[2])
+    # L = int(sys.argv[3])
+
+K = 333 #Nb of features/3
+
+E = 500 #Nb of trees in random forest
+L = 20 #Nb of min leaves
+
+wx = rp(K, [0.15, 1.5, 15], 1)
+wy = rp(K, [0.15, 1.5, 15], 1)
+wz = rp(K, [0.15, 1.5, 15], 2)
+
+
+
+
 
 
 def f1(x, w):
@@ -81,24 +100,8 @@ def featurizeTest(filename):
     return np.vstack((np.array([featurize_row(row, 1, 2) for row in pairs])))
 
 
-np.random.seed(0)
 
-# K = int(sys.argv[1])
-# E = int(sys.argv[2])
-# L = int(sys.argv[3])
 
-K = 333 #Nb of features/3
-
-E = 500 #Nb of trees in random forest
-L = 20 #Nb of min leaves
-
-wx = rp(K, [0.15, 1.5, 15], 1)
-wy = rp(K, [0.15, 1.5, 15], 1)
-wz = rp(K, [0.15, 1.5, 15], 2)
-
-print("wx " + str(wx.shape))
-print("wy " + str(wy.shape))
-print("wz " + str(wz.shape))
 '''
 print("featurize ")
 
@@ -164,11 +167,12 @@ def task_pred(inputdata,outputdata,clf0,clf1):
     sys.stdout.write('Generated output file '+ outputdata)
     sys.stdout.flush()
 
-def predict(data,results,max_proc):
+def predict(data,results,modelPath, max_proc):
+
     print("start predict ")
 
-    clf0 = pickle.load(open("clf0.p", "rb"))
-    clf1 = pickle.load(open("clf1.p", "rb"))
+    clf0 = pickle.load(open(modelPath + "clf0.p", "rb"))
+    clf1 = pickle.load(open(modelPath + "clf1.p", "rb"))
     pool = mp.Pool(processes=max_proc)
 
     for idx in range(len(data)):
@@ -177,17 +181,4 @@ def predict(data,results,max_proc):
     pool.close()
     pool.join()
 
-    '''x_te = featurizeTest(data[idx])
-    p_te = clf0.predict_proba(x_te)[:, 1] * (2 * clf1.predict_proba(x_te)[:, 1] - 1)
 
-    #print(p_te)
-
-    df = pd.read_csv(data[idx], index_col="SampleID")
-
-    Results = pd.DataFrame(index=df.index)
-
-    Results['Target'] = p_te
-    Results.to_csv(results[idx], sep=';', encoding='utf-8')'''
-
-
-# print([score(y_te,p_te),clf0.score(x_te,y_te!=0),clfd.score(x_te,d_te)])
