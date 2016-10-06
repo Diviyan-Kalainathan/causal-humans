@@ -12,10 +12,11 @@ import sys
 from lib_fonollosa import features
 from sklearn import metrics
 
-types= True# If there is heterogenous data Need publicinfo file
-
+types = True  # If there is heterogenous data Need publicinfo file
 
 inputfolder = 'output/obj8/pca_var/cluster_5/'
+input_publicinfo = inputfolder+'publicinfo_c_5.csv'
+
 causal_results = inputfolder + 'results_lp_CSP+Public_thres0.12.csv'  # csv with 3 cols, Avar, Bvar & target
 if 'obj8' in inputfolder:
     obj = True
@@ -68,7 +69,6 @@ BINARY = "Binary"
 CATEGORICAL = "Categorical"
 NUMERICAL = "Numerical"
 
-
 print('Done.')
 
 #### Pearson's correlation to remove links ####
@@ -86,19 +86,20 @@ elif skeleton_construction_method < 5:
         header = next(datareader)
 
         if types:
-            typesfile=open(inputfolder+'publicinfo.csv','rb')
-            typereader=csv.reader(typesfile,delimiter=';')
-            type_header=next(typereader)
+            typesfile = open(input_publicinfo, 'rb')
+            typereader = csv.reader(typesfile, delimiter=';')
+            type_header = next(typereader)
 
         threshold_pval = 0.05
-        #threshold_pearsonc=0.5 #No threshold on correlation coefficient
+        # threshold_pearsonc=0.5 #No threshold on correlation coefficient
         var_1 = 0
         var_2 = 0
         # Idea: go through the vars and unlink the skipped (not in the pairs file) pairs of vars.
         for row in datareader:
             try:
-                types_row=next(typereader)
-            except NameError: pass
+                types_row = next(typereader)
+            except NameError:
+                pass
             if row == []:  # Skipping blank lines
                 continue
 
@@ -129,7 +130,7 @@ elif skeleton_construction_method < 5:
             if len(var_1_value) != len(var_2_value):
                 raise ValueError
 
-            if skeleton_construction_method<3:
+            if skeleton_construction_method < 3:
                 if abs(stats.pearsonr(var_1_value, var_2_value)[1]) < threshold_pval:
                     if skeleton_construction_method == 1:
                         link_mat[var_1, var_2] = abs(stats.pearsonr(var_1_value, var_2_value)[0])
@@ -139,17 +140,49 @@ elif skeleton_construction_method < 5:
                     link_mat[var_1, var_2] = 0
             else:
                 try:
-                    var_1_type,var_2_type= types_row[1],types_row[2]
+                    var_1_type, var_2_type = types_row[1], types_row[2]
 
                 except NameError:
                     var_1_type, var_2_type, = NUMERICAL, NUMERICAL
 
-                values1,values2 = features.discretized_sequences(var_1_value,var_1_type,var_2_value,var_2_type)
-                if skeleton_construction_method==4:
-                    link_mat[var_1, var_2] = metrics.adjusted_mutual_info_score(values1,values2)
+                values1, values2 = features.discretized_sequences(var_1_value, var_1_type, var_2_value, var_2_type)
+                if skeleton_construction_method == 3:
+                    contingency_table = numpy.zeros((len(set(values1)), len(set(values2))))
+                    for i in range(len(values1)):
+                        contingency_table[list(set(values1)).index(values1[i]),
+                                          list(set(values2)).index(values2[i])] += 1
+
+                    # Checking and sorting out bad columns/rows
+                    max_len, axis_del = max(contingency_table.shape), [contingency_table.shape].index(
+                        max([contingency_table.shape]))
+                    toremove = [[], []]
+
+                    for i in range(contingency_table.shape[0]):
+                        for j in range(contingency_table.shape[1]):
+                            if contingency_table[i, j] < 4:  # Suppress the line
+                                toremove[0].append(i)
+                                toremove[1].append(j)
+                                continue
+
+                    for value in toremove:
+                        contingency_table = numpy.delete(contingency_table, value, axis=axis_del)
+
+                    if contingency_table.size>0 and min(contingency_table.shape)>1:
+                        chi2,pval,dof,expd=stats.chi2_contingency(contingency_table)
+                        if pval<threshold_pval: #there is a link
+                            link_mat[var_1, var_2] = 1
+                        else:
+                            link_mat[var_1, var_2] = 0
+
+                    else:
+                        link_mat[var_1, var_2] = 0
+
+                elif skeleton_construction_method == 4:
+                    link_mat[var_1, var_2] = metrics.adjusted_mutual_info_score(values1, values2)
     try:
         typesfile.close()
-    except NameError: pass
+    except NameError:
+        pass
 
     # Symmetrize matrix
     for col in range(0, (len(ordered_var_names) - 1)):
@@ -287,11 +320,11 @@ elif deconvolution_method == 3:
         Network link prediction by global silencing of indirect correlations
         By: Baruch Barzel, Albert-L\'aszl\'o Barab\'asi
         Nature Biotechnology"""  # Credits, Ref
-    mat_diag= numpy.zeros((len(ordered_var_names),len(ordered_var_names)))
-    D_temp= numpy.dot(link_mat-numpy.identity(len(ordered_var_names)),link_mat)
+    mat_diag = numpy.zeros((len(ordered_var_names), len(ordered_var_names)))
+    D_temp = numpy.dot(link_mat - numpy.identity(len(ordered_var_names)), link_mat)
     for i in range(len(ordered_var_names)):
-        mat_diag[i,i]=D_temp[i,i]
-    Gdir = numpy.dot((link_mat-numpy.identity(len(ordered_var_names))+mat_diag),numpy.linalg.inv(link_mat))
+        mat_diag[i, i] = D_temp[i, i]
+    Gdir = numpy.dot((link_mat - numpy.identity(len(ordered_var_names)) + mat_diag), numpy.linalg.inv(link_mat))
 
 else:
     raise ValueError
@@ -305,15 +338,14 @@ with open(inputfolder + 'deconv_links' + str(skeleton_construction_method) + str
     writer.writerow(['Source', 'Target', 'Weight'])
     for var_1 in range(len(ordered_var_names) - 1):
         for var_2 in range(var_1 + 1, len(ordered_var_names)):
-            if abs(Gdir[var_1, var_2]) > 0.001: #ignore value if it's near 0
+            if abs(Gdir[var_1, var_2]) > 0.001:  # ignore value if it's near 0
                 # Find the causal direction
                 if list_var.index(ordered_var_names[var_2]) in \
                         causality_links[list_var.index(ordered_var_names[var_1])][1]:
                     # var_2 is the child
                     writer.writerow([ordered_var_names[var_1], ordered_var_names[var_2], abs(Gdir[var_1, var_2])])
                 elif list_var.index(ordered_var_names[var_2]) in \
-                        causality_links[list_var.index(ordered_var_names[var_1])][
-                            0]:
+                        causality_links[list_var.index(ordered_var_names[var_1])][0]:
                     # Var_2 is the parent
                     writer.writerow([ordered_var_names[var_2], ordered_var_names[var_1], abs(Gdir[var_1, var_2])])
 
