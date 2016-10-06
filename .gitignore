@@ -2,6 +2,7 @@
 *.pyc
 *.csv
 *.pdf
+*.zip
 *.xml
 *.png
 */*.csv~
@@ -15,8 +16,13 @@ Cause-effect/lib_lopez_paz/data
 Cause-effect/lib_lopez_paz/*.csv
 Cause-effect/lib_lopez_paz/*.p
 Cause-effect/lib_lopez_paz/pickles
+Cause-effect/lib_fonollosa/data
+Cause-effect/lib_fonollosa/*.csv
+Cause-effect/lib_fonollosa/*.p
+Cause-effect/lib_fonollosa/pickles
 *.p
 Cause-effect/lib_lopez_paz/*.p
+Cause-effect/datacauseeffect/
 *.ps
 *.xlsx
 *.jpg
@@ -33,6 +39,7 @@ Cause-effect/lib_lopez_paz/*.p
 *.toc
 *.ist
 *.lst
+*.pkl
 
 #Except python files
 !.gitignore
