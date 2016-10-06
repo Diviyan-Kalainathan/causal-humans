@@ -24,7 +24,9 @@ skeleton_construction_method = int(sys.argv[1])
 #0 : Skip and load computed data
 #1 : Absolute value of Pearson's correlation
 #2 : Regular value of Pearson's correlation
-#3 : Causation coefficient
+#3 : Chi2 test
+#4 : Mutual information
+#5 : Causation coefficient
 """
 
 if sys.argv[1][0] == '0':  # Choose which data to load w/ arg of type "01"
@@ -67,12 +69,12 @@ if load_skeleton:
     with open(inputfolder + 'link_mat_pval_' + str(skeleton_construction_method) + '.p', 'rb') as link_mat_file:
         link_mat = pkl.load(link_mat_file)
 
-elif skeleton_construction_method < 3:
+elif skeleton_construction_method < 5:
     with open(inputfolder + 'pairs_c_5.csv', 'rb') as pairs_file:
         datareader = csv.reader(pairs_file, delimiter=';')
         header = next(datareader)
         threshold_pval = 0.05
-        threshold_pearsonc=0.5
+        #threshold_pearsonc=0.5 #No threshold on correlation coefficient
         var_1 = 0
         var_2 = 0
         # Idea: go through the vars and unlink the skipped (not in the pairs file) pairs of vars.
@@ -107,15 +109,19 @@ elif skeleton_construction_method < 3:
             if len(var_1_value) != len(var_2_value):
                 raise ValueError
 
-            if abs(stats.pearsonr(var_1_value, var_2_value)[1]) < threshold_pval\
-            and abs(stats.pearsonr(var_1_value, var_2_value)[0]) < threshold_pearsonc :
-                if skeleton_construction_method == 1:
-                    link_mat[var_1, var_2] = abs(stats.pearsonr(var_1_value, var_2_value)[0])
-                elif skeleton_construction_method == 2:
-                    link_mat[var_1, var_2] = (stats.pearsonr(var_1_value, var_2_value)[0])
-            else:
-                link_mat[var_1, var_2] = 0
+            if skeleton_construction_method<3:
+                if abs(stats.pearsonr(var_1_value, var_2_value)[1]) < threshold_pval:
+                    if skeleton_construction_method == 1:
+                        link_mat[var_1, var_2] = abs(stats.pearsonr(var_1_value, var_2_value)[0])
+                    elif skeleton_construction_method == 2:
+                        link_mat[var_1, var_2] = (stats.pearsonr(var_1_value, var_2_value)[0])
+                else:
+                    link_mat[var_1, var_2] = 0
+            elif skeleton_construction_method<4:
+                #toDo Chi2 test
 
+            else:
+                #ToDO Mutual info
     # Symmetrize matrix
     for col in range(0, (len(ordered_var_names) - 1)):
         for line in range(col + 1, (len(ordered_var_names))):

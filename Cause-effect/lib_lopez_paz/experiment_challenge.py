@@ -32,6 +32,28 @@ def rp(k, s, d):
     return np.hstack((np.vstack([si * np.random.randn(k, d) for si in s]),
                       2 * np.pi * np.random.rand(k * len(s), 1))).T
 
+try:
+    param_defined
+except NameError:
+    param_defined=True
+    np.random.seed(0)
+
+    # K = int(sys.argv[1])
+    # E = int(sys.argv[2])
+    # L = int(sys.argv[3])
+
+    K = 333 #Nb of features/3
+
+    E = 500 #Nb of trees in random forest
+    L = 20 #Nb of min leaves
+
+    wx = rp(K, [0.15, 1.5, 15], 1)
+    wy = rp(K, [0.15, 1.5, 15], 1)
+    wz = rp(K, [0.15, 1.5, 15], 2)
+
+    print("wx " + str(wx.shape))
+    print("wy " + str(wy.shape))
+    print("wz " + str(wz.shape))
 
 def f1(x, w):
     return np.cos(np.dot(np.hstack((x, np.ones((x.shape[0], 1)))), w))
@@ -81,24 +103,7 @@ def featurizeTest(filename):
     return np.vstack((np.array([featurize_row(row, 1, 2) for row in pairs])))
 
 
-np.random.seed(0)
 
-# K = int(sys.argv[1])
-# E = int(sys.argv[2])
-# L = int(sys.argv[3])
-
-K = 333 #Nb of features/3
-
-E = 500 #Nb of trees in random forest
-L = 20 #Nb of min leaves
-
-wx = rp(K, [0.15, 1.5, 15], 1)
-wy = rp(K, [0.15, 1.5, 15], 1)
-wz = rp(K, [0.15, 1.5, 15], 2)
-
-print("wx " + str(wx.shape))
-print("wy " + str(wy.shape))
-print("wz " + str(wz.shape))
 '''
 print("featurize ")
 
