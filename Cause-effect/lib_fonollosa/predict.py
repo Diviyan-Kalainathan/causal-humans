@@ -13,8 +13,16 @@ import numpy as np
 import pandas as pd
 import cPickle as pickle
 from   sklearn.metrics       import roc_auc_score
+import sys
+import estimator
+import features
 
 def load_model(model_path, verbose=True):
+
+
+    sys.modules['estimator'] = estimator
+    sys.modules['features'] = features
+
     m = pickle.load(open(model_path))
     return m
 
@@ -56,6 +64,9 @@ def predict(pairs_path, info_path, result_path, model_path):
     test = read_data(pairs_path, info_path)
 
     print "Loading the classifier"
+
+    print(model_path + "model.pkl")
+
     model = load_model(model_path + "model.pkl")
     print "model.weights", model.weights
 

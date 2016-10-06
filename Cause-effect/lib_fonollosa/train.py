@@ -8,13 +8,12 @@ Cause-effect model training
 # License: Apache, Version 2.0
 
 import sys
-import data_io
+
 import numpy as np
-import estimator as ce
-import features as f
 import pandas as pd
-from scipy.optimize import fmin
-import cPickle as pickle
+
+import data_io
+import estimator as ce
 import util
 
 MODEL = ce.CauseEffectSystemCombination
