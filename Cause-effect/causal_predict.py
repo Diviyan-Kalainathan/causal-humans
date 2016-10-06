@@ -51,7 +51,7 @@ if __name__=="__main__":
         infopath = []
         outputfilespath = []
 
-
+        
         # Benchmark test on Kaggle challenge data
         # SUP3 Test coming from Tuebingen pairs
         inputfilespath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_pairs.csv")

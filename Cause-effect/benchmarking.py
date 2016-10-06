@@ -11,19 +11,55 @@ def score(y,p):
 
 def evalScore(benchmarkpath,benchmarkname, algo,targetpath,privateinfopath ):
 
-    ROCscore = []
-
-    resultsGlobal =
 
 
+    dfresultsGlobal = pd.read_csv(algo + "_" + benchmarkname[0], index_col="SampleID")
+    dftargetGlobal = pd.read_csv(targetpath[0], index_col="SampleID")
+    dfprivateinfoGlobal = pd.read_csv(privateinfopath[0], index_col="SampleID")
 
-    for i in range(len(benchmarkname)):
+
+
+    for i in range(1,len(benchmarkname)):
 
         dfresults = pd.read_csv(algo + "_" + benchmarkname[i], index_col="SampleID")
         dftarget = pd.read_csv(targetpath[i], index_col="SampleID")
         dfprivateinfo = pd.read_csv(privateinfopath[i], index_col="SampleID")
 
-        ROCscore.append(score(dfresults["Target"], dftarget["Target"]))
+        dfresultsGlobal.append(dfresults)
+        dftargetGlobal.append(dftarget)
+        dfprivateinfoGlobal.append(dfprivateinfo)
+
+
+    dfresultsGlobal["Final target"] = dftargetGlobal["Target"]
+    dfresultsGlobal["Source"] = dftargetGlobal["Source"]
+    dfresultsGlobal["A type"] = dftargetGlobal["A type"]
+    dfresultsGlobal["B type"] = dftargetGlobal["A type"]
+    dfresultsGlobal["sample num"] = dftargetGlobal["sample num"]
+    dfresultsGlobal["RealData [yes=1]"] = dftargetGlobal["RealData [yes=1]"]
+
+    listdf = []
+    listdf.append(dfresultsGlobal[dfresultsGlobal["RealData [yes=1]"] == 1])
+    listdf.append(dfresultsGlobal[dfresultsGlobal["RealData [yes=1]"] == 0])
+
+    listdf.append(dfresultsGlobal[dfresultsGlobal["A type"] == "Numerical" and dfresultsGlobal["B type"] == "Numerical"])
+    listdf.append(dfresultsGlobal[dfresultsGlobal["A type"] == "Categorical" and dfresultsGlobal["B type"] == "Categorical"])
+    listdf.append(dfresultsGlobal[dfresultsGlobal["A type"] == "Binary" and dfresultsGlobal["B type"] == "Binary"])
+
+    listdf.append(dfresultsGlobal[(dfresultsGlobal["A type"] == "Numerical" and dfresultsGlobal["B type"] == "Categorical") or (dfresultsGlobal["B type"] == "Numerical" and dfresultsGlobal["A type"] == "Categorical")])
+
+    listdf.append(dfresultsGlobal[(dfresultsGlobal["A type"] == "Numerical" and dfresultsGlobal["B type"] == "Binary")
+                                  or ( dfresultsGlobal["B type"] == "Numerical" and dfresultsGlobal["A type"] == "Binary")])
+
+    listdf.append(dfresultsGlobal[(dfresultsGlobal["A type"] == "Categorical" and dfresultsGlobal["B type"] == "Binary")
+                                  or ( dfresultsGlobal["B type"] == "Categorical" and dfresultsGlobal["A type"] == "Binary")])
+
+
+    listNumSample = [100,200,300,400,500,600,700,800,900,1000,1500,2000,3000]
+
+
+    for df in listdf:
+        ROCscore = score(df["Target"], df["Final target"])
+        numPair = df["Target"].count
 
 
 
