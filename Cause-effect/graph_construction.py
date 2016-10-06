@@ -9,6 +9,11 @@ import cPickle as pkl
 import numpy
 import scipy.stats as stats
 import sys
+from lib_fonollosa import features
+from sklearn import metrics
+
+types= True# If there is heterogenous data Need publicinfo file
+
 
 inputfolder = 'output/obj8/pca_var/cluster_5/'
 causal_results = inputfolder + 'results_lp_CSP+Public_thres0.12.csv'  # csv with 3 cols, Avar, Bvar & target
@@ -21,7 +26,7 @@ flags = False  # Taking account of flags
 
 skeleton_construction_method = int(sys.argv[1])
 """ Type of skeleton construction
-#0 : Skip and load computed data
+#0X : Skip and load computed data made by method X
 #1 : Absolute value of Pearson's correlation
 #2 : Regular value of Pearson's correlation
 #3 : Chi2 test
@@ -43,6 +48,7 @@ deconvolution_method = int(sys.argv[2])
 
 print('Loading data')
 ordered_var_names = pkl.load(open('input/header.p'))
+
 if not flags:  # remove flag vars
     ordered_var_names = [x for x in ordered_var_names if 'flag' not in x]
 
@@ -58,6 +64,10 @@ for axis in range(num_axis):
 
 link_mat = numpy.ones((len(ordered_var_names), len(ordered_var_names)))  # Matrix of links, fully connected
 # 1 is linked and 0 unlinked,
+BINARY = "Binary"
+CATEGORICAL = "Categorical"
+NUMERICAL = "Numerical"
+
 
 print('Done.')
 
@@ -70,15 +80,25 @@ if load_skeleton:
         link_mat = pkl.load(link_mat_file)
 
 elif skeleton_construction_method < 5:
+
     with open(inputfolder + 'pairs_c_5.csv', 'rb') as pairs_file:
         datareader = csv.reader(pairs_file, delimiter=';')
         header = next(datareader)
+
+        if types:
+            typesfile=open(inputfolder+'publicinfo.csv','rb')
+            typereader=csv.reader(typesfile,delimiter=';')
+            type_header=next(typereader)
+
         threshold_pval = 0.05
         #threshold_pearsonc=0.5 #No threshold on correlation coefficient
         var_1 = 0
         var_2 = 0
         # Idea: go through the vars and unlink the skipped (not in the pairs file) pairs of vars.
         for row in datareader:
+            try:
+                types_row=next(typereader)
+            except NameError: pass
             if row == []:  # Skipping blank lines
                 continue
 
@@ -117,11 +137,20 @@ elif skeleton_construction_method < 5:
                         link_mat[var_1, var_2] = (stats.pearsonr(var_1_value, var_2_value)[0])
                 else:
                     link_mat[var_1, var_2] = 0
-            elif skeleton_construction_method<4:
-                #toDo Chi2 test
-
             else:
-                #ToDO Mutual info
+                try:
+                    var_1_type,var_2_type= types_row[1],types_row[2]
+
+                except NameError:
+                    var_1_type, var_2_type, = NUMERICAL, NUMERICAL
+
+                values1,values2 = features.discretized_sequences(var_1_value,var_1_type,var_2_value,var_2_type)
+                if skeleton_construction_method==4:
+                    link_mat[var_1, var_2] = metrics.adjusted_mutual_info_score(values1,values2)
+    try:
+        typesfile.close()
+    except NameError: pass
+
     # Symmetrize matrix
     for col in range(0, (len(ordered_var_names) - 1)):
         for line in range(col + 1, (len(ordered_var_names))):
@@ -133,7 +162,7 @@ elif skeleton_construction_method < 5:
 
 #### Causality score to remove links ####
 
-elif skeleton_construction_method == 3:
+elif skeleton_construction_method == 5:
 
     with open(causal_results, 'rb') as pairs_file:
         datareader = csv.reader(pairs_file, delimiter=';')
