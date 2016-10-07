@@ -6,53 +6,53 @@ inputfilespath = []
 privateinfopath = []
 
 # Benchmark test on Kaggle challenge data
-# SUP3 Test coming from Tuebingen pairs
-inputfilespath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_pairs.csv")
-privateinfopath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_privateinfo.csv")
+inputfilespath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_pairs")
+privateinfopath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_privateinfo")
+
+inputfilespath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_pairs")
+privateinfopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_privateinfo")
 
 ratiosubsamples = [2,3,5,10]
-
-
 
 def transformData(x):
 
     tansformedData = ""
     for values in x:
-        tansformedData += " " + str(float(values))
+        tansformedData += " " + str(int(values))
 
     return tansformedData
 
 
-for idx in len(inputfilespath):
+for idx in range(len(inputfilespath)):
 
-    dfpair = pd.read_csv(inputfilespath)
-    dfprivateinfo = pd.read_csv(privateinfopath)
-
+    dfpair = pd.read_csv(inputfilespath[idx] + ".csv", index_col="SampleID")
+    dfprivateinfo = pd.read_csv(privateinfopath[idx] + ".csv", index_col="SampleID")
 
     for ratio in ratiosubsamples:
 
-        newdfpair = pd.copy(dfpair)
-        newdfprivateinfo = pd.copy(dfprivateinfo)
+        newdfpair = dfpair.copy()
+        newdfprivateinfo = dfprivateinfo.copy()
 
-        for i in range(0, df.shape[0]):
+        for i in range(0, newdfpair.shape[0]):
 
-            r = row.split(",", 2)
-
-            x = np.array(r[1].split(), dtype=np.float)[:, np.newaxis]
-            y = np.array(r[2].split(), dtype=np.float)[:, np.newaxis]
+            x = np.array(newdfpair["A"].iloc[i].split(), dtype=np.float)[:, np.newaxis]
+            y = np.array(newdfpair["B"].iloc[i].split(), dtype=np.float)[:, np.newaxis]
 
             n_samples = x.shape[0]
             indices = np.arange(n_samples)
             np.random.shuffle(indices)
             n_subset = n_samples/ratio
-            print(n_subset)
+
             x = x[indices[0:n_subset]]
             y = y[indices[0:n_subset]]
 
             xValuesParse = transformData(x)
             yValuesParse = transformData(y)
 
-            newLignPairs = pd.DataFrame([[nameDistrib, xValuesParse, yValuesParse]], columns=["SampleID", "A", "B"])
+            newdfpair["A"].iat[i] = xValuesParse
+            newdfpair["B"].iat[i] = yValuesParse
 
-            newLignPublicInfo = pd.DataFrame([[nameDistrib, "Numerical", "Numerical"]],columns=["SampleID", "A type", "B type"])
+            newdfprivateinfo["sample num"].iat[i] = n_subset
 
+        newdfpair.to_csv(inputfilespath[idx] + str(ratio) + ".csv", encoding="utf-8")
+        newdfprivateinfo.to_csv(privateinfopath[idx] + str(ratio) + ".csv", encoding="utf-8")
