@@ -18,7 +18,7 @@ def transformData(x):
 
     tansformedData = ""
     for values in x:
-        tansformedData += " " + str(int(values))
+        tansformedData += " " + str(float(values))
 
     return tansformedData
 
