@@ -16,8 +16,9 @@ types = True  # If there is heterogenous data Need publicinfo file
 
 inputfolder = 'output/obj8/pca_var/cluster_5/'
 input_publicinfo = inputfolder+'publicinfo_c_5.csv'
-
 causal_results = inputfolder + 'results_lp_CSP+Public_thres0.12.csv'  # csv with 3 cols, Avar, Bvar & target
+epsilon_diag = 0.01
+
 if 'obj8' in inputfolder:
     obj = True
 else:
@@ -33,6 +34,7 @@ skeleton_construction_method = int(sys.argv[1])
 #3 : Chi2 test
 #4 : Mutual information
 #5 : Causation coefficient
+(#6 : HSIC?)
 """
 
 if sys.argv[1][0] == '0':  # Choose which data to load w/ arg of type "01"
@@ -43,7 +45,8 @@ else:
 deconvolution_method = int(sys.argv[2])
 """Method used for the deconvolution
 #1 : Deconvolution according to Soheil Feizi
-#2 : Recursive method according to Michele Sebag
+#2 : Recursive method according to Michele Sebag for causation coefficients
+     #Issue about the meaning of the value of the causation coefficient
 #3 : Deconvolution/global silencing by B. Barzel, A.-L. Barab\'asi
 """
 
@@ -191,7 +194,7 @@ elif skeleton_construction_method < 5:
 
     # Diagonal elts
     for diag in range(0, (len(ordered_var_names))):
-        link_mat[diag, diag] = 0
+        link_mat[diag, diag] = epsilon_diag #To guarantee non-singularity
 
 #### Causality score to remove links ####
 
