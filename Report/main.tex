@@ -673,9 +673,9 @@ La nécessité de retirer les liens indirects ne semble pas être évidente au p
 
 \begin{figure}[!h]
   \centering
-  \subfloat[Graphe sans relation indirectes]{\includegraphics[width=6cm]{Pictures/graph_direct.pdf}}
+%  \subfloat[Graphe sans relation indirectes]{\includegraphics[width=6cm]{Pictures/graph_direct.pdf}}
   \hspace{2pt}
-  \subfloat[Graphe avec relation indirectes]{\includegraphics[width=6cm]{Pictures/graph_indirect.pdf}}
+ % \subfloat[Graphe avec relation indirectes]{\includegraphics[width=6cm]{Pictures/graph_indirect.pdf}}
   \caption{Graphe causal simple sans et avec la relation indirecte}
   \label{fig:graph-in-direct}
 \end{figure}
@@ -684,14 +684,14 @@ Ainsi, on pourrait penser que notre étude se limiterait à étudier les coeffic
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width=14cm]{Pictures/graph-id-lptot.pdf}
+% \includegraphics[width=14cm]{Pictures/graph-id-lptot.pdf}
 \caption{Graphe de causalité en se basant uniquement sur les résultats inférés par les paires deux à deux}
 \label{fig:graph-ind-lp}
 
 \end{figure}
 
 \subsection{Coefficient de causalité}
-
+Afin de pouvoir orienter nos graphes de causalité, on souhaite inférer la relation de causalité entre les variables deux à deux à la dernière étape de notre méthodologie. Pour cela, on fait appel aux résultats des compétitions \textit{Kaggle}\footnote{\href{https://www.kaggle.com/c/cause-effect-pairs}{kaggle.com/c/cause-effect-pairs}} et \textit{Codalab}\footnote{\href{https://competitions.codalab.org/competitions/1381}{competitions.codalab.org/competitions/1381}} sur la causalité, notamment les algorithmes ayant obtenu de bon résultats : \cite{follonosa2016causalityvar} et \cite{lopez-paz2015learningcausality}.
 
 %------------------------------------------------
 
