@@ -80,25 +80,8 @@ def skel_const(mode, pairsfile, link_mat, ordered_var_names, input_publicinfo=''
 
                     values1, values2 = features.discretized_sequences(var_1_value, var_1_type, var_2_value, var_2_type)
                     if mode == 3:
-                        contingency_table = numpy.zeros((len(set(values1)), len(set(values2))))
-                        for i in range(len(values1)):
-                            contingency_table[list(set(values1)).index(values1[i]),
-                                              list(set(values2)).index(values2[i])] += 1
 
-                        # Checking and sorting out bad columns/rows
-                        max_len, axis_del = max(contingency_table.shape), [contingency_table.shape].index(
-                            max([contingency_table.shape]))
-                        toremove = [[], []]
-
-                        for i in range(contingency_table.shape[0]):
-                            for j in range(contingency_table.shape[1]):
-                                if contingency_table[i, j] < 4:  # Suppress the line
-                                    toremove[0].append(i)
-                                    toremove[1].append(j)
-                                    continue
-
-                        for value in toremove:
-                            contingency_table = numpy.delete(contingency_table, value, axis=axis_del)
+                        contingency_table=confusion_mat(values1,values2)
 
                         if contingency_table.size > 0 and min(contingency_table.shape) > 1:
                             chi2, pval, dof, expd = stats.chi2_contingency(contingency_table)
@@ -113,8 +96,16 @@ def skel_const(mode, pairsfile, link_mat, ordered_var_names, input_publicinfo=''
                     elif mode == 4:
                         link_mat[var_1, var_2] = metrics.adjusted_mutual_info_score(values1, values2)
                     elif mode == 5:
-                        confusion_matrix = pd.crosstab(values1, values2)
-                        link_mat[var_1, var_2] = cramers_corrected_stat(confusion_matrix)
+                        contingency_table=confusion_mat(values1,values2)
+                        if contingency_table.size > 0 and min(contingency_table.shape) > 1:
+
+                            '''df= pd.DataFrame({'val1':values1,'val2':values2})
+                            print df
+                            confusion_matrix = pd.crosstab(df['val1'], df['val2'])
+                            print confusion_matrix'''
+                            link_mat[var_1, var_2] = cramers_corrected_stat(contingency_table)
+                        else:
+                            link_mat[var_1, var_2] = 0
         try:
             typesfile.close()
         except NameError:
@@ -182,6 +173,7 @@ def cramers_corrected_stat(confusion_matrix):
         uses correction from Bergsma and Wicher,
         Journal of the Korean Statistical Society 42 (2013): 323-328
     """
+
     chi2 = stats.chi2_contingency(confusion_matrix)[0]
     n = confusion_matrix.sum()
     phi2 = chi2 / n
@@ -190,3 +182,29 @@ def cramers_corrected_stat(confusion_matrix):
     rcorr = r - ((r - 1) ** 2) / (n - 1)
     kcorr = k - ((k - 1) ** 2) / (n - 1)
     return numpy.sqrt(phi2corr / min((kcorr - 1), (rcorr - 1)))
+
+def confusion_mat(val1,val2):
+    '''
+    contingency_table = numpy.zeros((len(set(val1)), len(set(val2))))
+    for i in range(len(val1)):
+        contingency_table[list(set(val1)).index(val1[i]),
+                          list(set(val2)).index(val2[i])] += 1'''
+
+
+    contingency_table= numpy.asarray(pd.crosstab(numpy.asarray(val1,dtype='object'),numpy.asarray( val2, dtype='object')))
+    # Checking and sorting out bad columns/rows
+    max_len, axis_del = max(contingency_table.shape), [contingency_table.shape].index(
+        max([contingency_table.shape]))
+    toremove = [[], []]
+
+    for i in range(contingency_table.shape[0]):
+        for j in range(contingency_table.shape[1]):
+            if contingency_table[i, j] < 4:  # Suppress the line
+                toremove[0].append(i)
+                toremove[1].append(j)
+                continue
+
+    for value in toremove:
+        contingency_table = numpy.delete(contingency_table, value, axis=axis_del)
+
+    return contingency_table

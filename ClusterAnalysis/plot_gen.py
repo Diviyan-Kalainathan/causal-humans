@@ -409,8 +409,8 @@ elif mode == 3:
         plt.xlabel('Clusters objectifs ')
         plt.title('Matrice de croisement des clusters '
                   '\nsubjectifs sur les clusters objectifs '
-                  u'\n normalisés sur les clusters objectifs'
-                  '\n (Somme des colonnes =100%)')
+                  u'\nnormalisés sur les clusters objectifs'
+                  '\n(Somme des lignes = 100%)')
         print(res1)
 
     else:
@@ -442,8 +442,8 @@ elif mode == 3:
         draw = ax.matshow(res2, vmax=0.35)
         plt.title('Matrice de croisement des clusters'
                   ' \nsubjectifs sur les clusters objectifs '
-                  u'\n normalises sur les clusters subjectifs'
-                  ' \n (Somme des lignes =100%)')
+                  u'\nnormalises sur les clusters subjectifs'
+                  ' \n(Somme des colonnes = 100%)')
         plt.xlabel('Clusters objectifs')
         plt.ylabel('Clusters subjectifs')
         plt.xticks(range(len(n_clusters_2)), xticks, rotation=60)
