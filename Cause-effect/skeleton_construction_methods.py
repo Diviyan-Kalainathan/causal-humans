@@ -13,7 +13,7 @@ threshold_pval = 0.05
 
 def skel_const(mode, pairsfile, link_mat, ordered_var_names, input_publicinfo='', types=False, causal_results='',
                flags=False, epsilon_diag=0.01):
-    if mode < 5:
+    if mode < 6:
         with open(pairsfile, 'rb') as pairs_file:
             datareader = csv.reader(pairs_file, delimiter=';')
             header = next(datareader)
