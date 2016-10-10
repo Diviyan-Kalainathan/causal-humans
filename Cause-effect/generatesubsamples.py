@@ -7,6 +7,9 @@ inputfilespath = []
 privateinfopath = []
 
 # Benchmark test on Kaggle challenge data
+inputfilespath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_pairs")
+privateinfopath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_privateinfo")
+
 inputfilespath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_pairs")
 privateinfopath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_privateinfo")
 

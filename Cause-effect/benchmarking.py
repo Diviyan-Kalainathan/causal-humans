@@ -9,17 +9,17 @@ from sklearn.metrics import roc_auc_score
 def score(y,p):
 
   try:
-      ROCscore = (roc_auc_score(y==1,p)+roc_auc_score(y==-1,-p))/2
-  except:
-      ROCscore = 0.5
+    ROCscore = (roc_auc_score(y==1,p)+roc_auc_score(y==-1,-p))/2
+  except(ValueError):
+    ROCscore = np.nan
 
   return ROCscore
 
 def scoreAcauseB(y,p):
   try:
       ROCscore =  roc_auc_score(y==1,p)
-  except:
-      ROCscore = 0.5
+  except(ValueError):
+      ROCscore = np.nan
 
   return ROCscore
 
@@ -27,18 +27,19 @@ def scoreBcauseA(y,p):
 
   try:
       ROCscore =  roc_auc_score(y==-1,-p)
-  except:
-      ROCscore = 0.5
+  except(ValueError):
+      ROCscore = np.nan
 
   return ROCscore
 
 
-def evalScore(benchmarkpath,benchmarkname, algo,targetpath,privateinfopath ):
+def evalScore(benchmarkpath,benchmarkname, algo,targetpath,privateinfopath, outputROCscorepath, outputcausalitythresholdpath ):
 
-    try:
-        dfresultsGlobal = pd.read_csv(benchmarkpath + algo + "_" + benchmarkname[0] + ".csv", index_col="SampleID", sep = ";")
-    except:
-        dfresultsGlobal = pd.read_csv(benchmarkpath + algo + "_" + benchmarkname[0] + ".csv", index_col="SampleID", sep=",")
+    # try:
+    dfresultsGlobal = pd.read_csv(benchmarkpath + algo + "_" + benchmarkname[0] + ".csv", index_col="SampleID", sep =',|;')
+    # except:
+    #     dfresultsGlobal = pd.read_csv(benchmarkpath + algo + "_" + benchmarkname[0] + ".csv", index_col="SampleID", sep=",")
+
     dftargetGlobal = pd.read_csv(targetpath[0], index_col="SampleID")
     dfprivateinfoGlobal = pd.read_csv(privateinfopath[0], index_col="SampleID")
 
@@ -149,12 +150,12 @@ def evalScore(benchmarkpath,benchmarkname, algo,targetpath,privateinfopath ):
     if(len(benchmarkname) == 1):
         namebenchmark = benchmarkname[0]
 
-    dfbenchmark.to_csv("results_benchmark_" + namebenchmark + "_" + algo + '.csv', index=False, encoding='utf-8')
+    dfbenchmark.to_csv(outputROCscorepath + "ROCscore_" + namebenchmark + "_" + algo + '.csv', index=False, encoding='utf-8')
 
 
-    listCausalThreshold = [0, 0.05,1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.50,0.55,0.60,0.65,0.7,0.75,0.80,0.85,0.90,0.95,1]
+    listCausalThreshold = np.linspace(-1, 1, num=41)
 
-    dfthreshold = pd.DataFrame(columns=["name subset", "value threshold", "pr True A cause B", "pr Error A cause B", "pr True B cause A", "pr Error B cause A", "pr True causality", "pr Error causality", "pr true indep", "pr error indep" ])
+    dfthreshold = pd.DataFrame(columns=["name subset", "value threshold", "pr False A cause B","pr True A cause B", "pr Error A cause B parmis detectes", "pr False B cause A","pr True B cause A", "pr Error B cause A parmis detectes", "pr False causality", "pr True causality", "pr Error causality",  "pr fasle indep", "pr true indep", "pr error indep" ])
 
     for i in range(len(listdf_type)):
 
@@ -164,6 +165,8 @@ def evalScore(benchmarkpath,benchmarkname, algo,targetpath,privateinfopath ):
             for threshold in listCausalThreshold:
 
                 prTrueAcauseB = df[(df["Target"] >= threshold) & (df["Final target"] == 1)].shape[0] / (float)(df[(df["Final target"] == 1)].shape[0])
+                prFalseAcauseB = df[(df["Target"] >= threshold) & (df["Final target"] != 1)].shape[0] / (float)(df[(df["Final target"] != 1)].shape[0])
+
 
                 if(df[(df["Target"] >= threshold)].shape[0] > 0):
                     prErrorAcauseB = df[(df["Target"] >= threshold) & (df["Final target"] != 1)].shape[0] / (float)(df[(df["Target"] >= threshold)].shape[0])
@@ -171,6 +174,7 @@ def evalScore(benchmarkpath,benchmarkname, algo,targetpath,privateinfopath ):
                     prErrorAcauseB = 0
 
                 prTrueBcauseA = df[(df["Target"] <= -threshold) & (df["Final target"] == -1)].shape[0] / (float)(df[(df["Final target"] == -1)].shape[0])
+                prFalseBcauseA = df[(df["Target"] <= -threshold) & (df["Final target"] != -1)].shape[0] / (float)(df[(df["Final target"] != -1)].shape[0])
 
                 if(df[(df["Target"] <= -threshold)].shape[0] > 0):
                     prErrorBcauseA = df[(df["Target"] <= -threshold) & (df["Final target"] != -1)].shape[0] / (float)(df[(df["Target"] <= -threshold)].shape[0])
@@ -180,66 +184,73 @@ def evalScore(benchmarkpath,benchmarkname, algo,targetpath,privateinfopath ):
                 prTruecausality = (df[(df["Target"] >= threshold) & (df["Final target"] == 1)].shape[0]
                                  + df[(df["Target"] <= -threshold) & (df["Final target"] == -1)].shape[0])/ (float)(df[(df["Final target"] == 1) | (df["Final target"] == -1)].shape[0])
 
+                prFalsecausality = (df[(df["Target"] >= threshold) & (df["Final target"] != 1)].shape[0] + df[(df["Target"] <= -threshold) & (df["Final target"] != -1)].shape[0]) / (float)(
+                    df[(df["Final target"] != 1) | (df["Final target"] != -1)].shape[0])
+
+
                 if(df[(df["Target"] >= threshold) | (df["Target"] <= -threshold)].shape[0] > 0):
                     prErrorcausality = (df[(df["Target"] >= threshold) & (df["Final target"] != 1)].shape[0] + df[(df["Target"] <= -threshold) & (df["Final target"] != -1)].shape[0]) / (float)(df[(df["Target"] >= threshold) | (df["Target"] <= -threshold)].shape[0])
                 else:
                     prErrorcausality = 0
 
                 prTrueAindepB = df[(df["Target"] > -threshold) & (df["Target"] < threshold) & (df["Final target"] == 0)].shape[0] / (float)(df[(df["Final target"] == 0)].shape[0])
+                prFalseAindepB = df[(df["Target"] > -threshold) & (df["Target"] < threshold) & (df["Final target"] != 0)].shape[0] / (float)(df[(df["Final target"] != 0)].shape[0])
 
                 if(df[(df["Target"] > -threshold) & (df["Target"] < threshold)].shape[0] > 0):
                     prErrorAindepB = df[(df["Target"] > -threshold) & (df["Target"] < threshold) & (df["Final target"] != 0)].shape[0] /(float)(df[(df["Target"] > -threshold) & (df["Target"] < threshold)].shape[0])
                 else:
                     prErrorAindepB = 0
 
-                newlignthreshold = pd.DataFrame([[typename, threshold, prTrueAcauseB, prErrorAcauseB, prTrueBcauseA,prErrorBcauseA,prTruecausality, prErrorcausality , prTrueAindepB, prErrorAindepB]], columns=["name subset","value threshold", "pr True A cause B", "pr Error A cause B", "pr True B cause A", "pr Error B cause A", "pr True causality", "pr Error causality", "pr true indep", "pr error indep" ])
+                newlignthreshold = pd.DataFrame([[typename, threshold, prFalseAcauseB,prTrueAcauseB, prErrorAcauseB, prFalseBcauseA, prTrueBcauseA, prErrorBcauseA,prFalsecausality,prTruecausality, prErrorcausality , prFalseAindepB,prTrueAindepB, prErrorAindepB]], columns=["name subset", "value threshold", "pr False A cause B","pr True A cause B", "pr Error A cause B parmis detectes", "pr False B cause A","pr True B cause A", "pr Error B cause A parmis detectes", "pr False causality", "pr True causality", "pr Error causality",  "pr fasle indep", "pr true indep", "pr error indep" ])
                 dfthreshold = dfthreshold.append(newlignthreshold)
 
-    dfthreshold.to_csv("results_causal_threshold_" + namebenchmark + "_" + algo + '.csv', index=False, encoding='utf-8')
+    dfthreshold.to_csv(outputcausalitythresholdpath + "results_causality_threshold_" + namebenchmark + "_" + algo + '.csv', index=False, encoding='utf-8')
 
 
 if __name__=="__main__":
 
-    benchmarkpath = "output/benchmark/"
+    resultpredictpath = "output/resultpredict/"
+    outputROCscorepath = "output/benchmark/ROCscore/"
+    outputcausalitythresholdpath = "output/benchmark/causalitythreshold/"
 
     targetpath = []
     privateinfopath = []
-    benchmarkname = []
+    testname = []
 
-    # benchmarkname.append("SUP3")
+    # testname.append("SUP3")
     # targetpath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_target.csv")
-    # privateinfopath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_privateinfo.csv")
+    # privateinfopath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_privateinfo1.csv")
 
-    benchmarkname.append("SUP4")
+    testname.append("SUP4")
     targetpath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_target.csv")
     privateinfopath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_privateinfo1.csv")
 
-    # benchmarkname.append("validationset")
+    # testname.append("validationset")
     # targetpath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_target.csv")
-    # privateinfopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_privateinfo.csv")
+    # privateinfopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_privateinfo1.csv")
 
-    # benchmarkname.append("validationset2")
+    # testname.append("validationset2")
     # targetpath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_target.csv")
-    # privateinfopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_privateinfo.csv")
+    # privateinfopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_privateinfo1.csv")
     #
-    # benchmarkname.append("validationset3")
+    # testname.append("validationset3")
     # targetpath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_target.csv")
-    # privateinfopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_privateinfo.csv")
+    # privateinfopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_privateinfo1.csv")
     #
-    # benchmarkname.append("validationset5")
+    # testname.append("validationset5")
     # targetpath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_target.csv")
-    # privateinfopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_privateinfo.csv")
+    # privateinfopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_privateinfo1.csv")
     #
-    # benchmarkname.append("validationset10")
+    # testname.append("validationset10")
     # targetpath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_target.csv")
-    # privateinfopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_privateinfo.csv")
+    # privateinfopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_privateinfo1.csv")
 
     listalgo = ["Fonollosa", "LopezKernel"]
     # listalgo = ["LopezKernel"]
     # listalgo = ["LopezKernel"]
 
     for algo in listalgo:
-        evalScore(benchmarkpath,benchmarkname, algo,targetpath,privateinfopath )
+        evalScore(resultpredictpath,testname, algo,targetpath,privateinfopath, outputROCscorepath, outputcausalitythresholdpath )
 
 
 

@@ -60,68 +60,68 @@ if __name__=="__main__":
         # inputfilespath.append("datacauseeffect/CEpairs/CEdata/CEfinal_test_pairs.csv")
         # infopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_test_publicinfo.csv")
         # if (causal_predict_method == 1):
-        #     outputfilespath.append("output/benchmark/Fonollosa_testset.csv")
+        #     outputfilespath.append("output/resultpredict/Fonollosa_testset.csv")
         # elif (causal_predict_method == 2):
-        #     outputfilespath.append("output/benchmark/LopezKernel_testset.csv")
+        #     outputfilespath.append("output/resultpredict/LopezKernel_testset.csv")
         #
         #
         # # SUP3 dataset (real data)
         # inputfilespath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_pairs.csv")
         # infopath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_publicinfo.csv")
         # if (causal_predict_method == 1):
-        #     outputfilespath.append("output/benchmark/Fonollosa_SUP3.csv")
+        #     outputfilespath.append("output/resultpredict/Fonollosa_SUP3.csv")
         # elif (causal_predict_method == 2):
-        #     outputfilespath.append("output/benchmark/LopezKernel_SUP3.csv")
+        #     outputfilespath.append("output/resultpredict/LopezKernel_SUP3.csv")
         # elif (causal_predict_method == 4):
-        #     outputfilespath.append("output/benchmark/testalgo_SUP3_")
+        #     outputfilespath.append("output/resultpredict/testalgo_SUP3_")
 
 
         # Validation dataset (real and artificial data)
         inputfilespath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_pairs.csv")
         infopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_publicinfo.csv")
         if (causal_predict_method == 1):
-            outputfilespath.append("output/benchmark/Fonollosa_validationset.csv")
+            outputfilespath.append("output/resultpredict/Fonollosa_validationset.csv")
         elif (causal_predict_method == 2):
-            outputfilespath.append("output/benchmark/LopezKernel_validationset.csv")
+            outputfilespath.append("output/resultpredict/LopezKernel_validationset.csv")
         elif (causal_predict_method == 4):
-            outputfilespath.append("output/benchmark/testalgo_validationset_variante")
+            outputfilespath.append("output/resultpredict/testalgo_validationset_variante")
 
 
         # inputfilespath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_pairs1.csv")
         # infopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_publicinfo.csv")
         # if (causal_predict_method == 1):
-        #     outputfilespath.append("output/benchmark/Fonollosa_validationset_1.csv")
+        #     outputfilespath.append("output/resultpredict/Fonollosa_validationset_1.csv")
         # elif (causal_predict_method == 2):
-        #     outputfilespath.append("output/benchmark/LopezKernel_validationset_1.csv")
+        #     outputfilespath.append("output/resultpredict/LopezKernel_validationset_1.csv")
         #
         #
         # inputfilespath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_pairs2.csv")
         # infopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_publicinfo.csv")
         # if (causal_predict_method == 1):
-        #     outputfilespath.append("output/benchmark/Fonollosa_validationset_2.csv")
+        #     outputfilespath.append("output/resultpredict/Fonollosa_validationset_2.csv")
         # elif (causal_predict_method == 2):
-        #     outputfilespath.append("output/benchmark/LopezKernel_validationset_2.csv")
+        #     outputfilespath.append("output/resultpredict/LopezKernel_validationset_2.csv")
         #
         # inputfilespath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_pairs3.csv")
         # infopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_publicinfo.csv")
         # if (causal_predict_method == 1):
-        #     outputfilespath.append("output/benchmark/Fonollosa_validationset_3.csv")
+        #     outputfilespath.append("output/resultpredict/Fonollosa_validationset_3.csv")
         # elif (causal_predict_method == 2):
-        #     outputfilespath.append("output/benchmark/LopezKernel_validationset_3.csv")
+        #     outputfilespath.append("output/resultpredict/LopezKernel_validationset_3.csv")
         #
         # inputfilespath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_pairs5.csv")
         # infopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_publicinfo.csv")
         # if (causal_predict_method == 1):
-        #     outputfilespath.append("output/benchmark/Fonollosa_validationset_5.csv")
+        #     outputfilespath.append("output/resultpredict/Fonollosa_validationset_5.csv")
         # elif (causal_predict_method == 2):
-        #     outputfilespath.append("output/benchmark/LopezKernel_validationset_5.csv")
+        #     outputfilespath.append("output/resultpredict/LopezKernel_validationset_5.csv")
         #
         # inputfilespath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_pairs10.csv")
         # infopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_publicinfo.csv")
         # if (causal_predict_method == 1):
-        #     outputfilespath.append("output/benchmark/Fonollosa_validationset_10.csv")
+        #     outputfilespath.append("output/resultpredict/Fonollosa_validationset_10.csv")
         # elif (causal_predict_method == 2):
-        #     outputfilespath.append("output/benchmark/LopezKernel_validationset_10.csv")
+        #     outputfilespath.append("output/resultpredict/LopezKernel_validationset_10.csv")
         #
         #
         #
@@ -130,37 +130,37 @@ if __name__=="__main__":
         # inputfilespath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_pairs.csv")
         # infopath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_publicinfo.csv")
         # if (causal_predict_method == 1):
-        #     outputfilespath.append("output/benchmark/Fonollosa_SUP4.csv")
+        #     outputfilespath.append("output/resultpredict/Fonollosa_SUP4.csv")
         # elif (causal_predict_method == 2):
-        #     outputfilespath.append("output/benchmark/LopezKernel_SUP4.csv")
+        #     outputfilespath.append("output/resultpredict/LopezKernel_SUP4.csv")
         #
         # inputfilespath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_pairs2.csv")
         # infopath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_publicinfo.csv")
         # if (causal_predict_method == 1):
-        #     outputfilespath.append("output/benchmark/Fonollosa_SUP4_2.csv")
+        #     outputfilespath.append("output/resultpredict/Fonollosa_SUP4_2.csv")
         # elif (causal_predict_method == 2):
-        #     outputfilespath.append("output/benchmark/LopezKernel_SUP4_2.csv")
+        #     outputfilespath.append("output/resultpredict/LopezKernel_SUP4_2.csv")
         #
         # inputfilespath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_pairs3.csv")
         # infopath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_publicinfo.csv")
         # if (causal_predict_method == 1):
-        #     outputfilespath.append("output/benchmark/Fonollosa_SUP4_3.csv")
+        #     outputfilespath.append("output/resultpredict/Fonollosa_SUP4_3.csv")
         # elif (causal_predict_method == 2):
-        #     outputfilespath.append("output/benchmark/LopezKernel_SUP4_3.csv")
+        #     outputfilespath.append("output/resultpredict/LopezKernel_SUP4_3.csv")
         #
         # inputfilespath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_pairs5.csv")
         # infopath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_publicinfo.csv")
         # if (causal_predict_method == 1):
-        #     outputfilespath.append("output/benchmark/Fonollosa_SUP4_5.csv")
+        #     outputfilespath.append("output/resultpredict/Fonollosa_SUP4_5.csv")
         # elif (causal_predict_method == 2):
-        #     outputfilespath.append("output/benchmark/LopezKernel_SUP4_5.csv")
+        #     outputfilespath.append("output/resultpredict/LopezKernel_SUP4_5.csv")
         #
         # inputfilespath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_pairs10.csv")
         # infopath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_publicinfo.csv")
         # if (causal_predict_method == 1):
-        #     outputfilespath.append("output/benchmark/Fonollosa_SUP4_10.csv")
+        #     outputfilespath.append("output/resultpredict/Fonollosa_SUP4_10.csv")
         # elif (causal_predict_method == 2):
-        #     outputfilespath.append("output/benchmark/LopezKernel_SUP4_10.csv")
+        #     outputfilespath.append("output/resultpredict/LopezKernel_SUP4_10.csv")
     ########
 
         if(causal_predict_method == 1):
