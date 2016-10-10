@@ -6,10 +6,21 @@ Date : 4/08/2016
 '''
 
 import csv, numpy, heapq, os
+import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.font_manager import FontProperties
+from matplotlib.ticker import FuncFormatter
 
+def to_percent(y, position):
+    # Ignore the passed in position. This has the effect of scaling the default
+    # tick locations.
+    s = str(100 * y)
 
+    # The percent symbol needs escaping in latex
+    if matplotlib.rcParams['text.usetex'] is True:
+        return s + r'$\%$'
+    else:
+        return s + '%'
 
 output_folder = 'Cluster_8_obj'
 
@@ -270,7 +281,7 @@ elif mode == 3:
     # 2 is objective
     # 1 is subjective
 
-    autonomy = True
+    autonomy = False
     clustering2 = 'cluster_predictions_c8_n500_r12-obj.csv'
     clustering1 = 'cluster_predictions_c6_n500_r12-subj.csv'
 
@@ -395,10 +406,12 @@ elif mode == 3:
     ax = fig.add_subplot(111)
     if not autonomy:
         draw = ax.matshow(res1, vmax=0.35)
-        plt.xlabel('Clusters objectifs (somme=1)')
+        plt.xlabel('Clusters objectifs ')
         plt.title('Matrice de croisement des clusters '
                   '\nsubjectifs sur les clusters objectifs '
-                  '\n normalises sur les clusters objectifs')
+                  u'\n normalisés sur les clusters objectifs'
+                  '\n (Somme des colonnes =100%)')
+        print(res1)
 
     else:
         '''masked_array = numpy.ma.array(res1, mask=numpy.isnan(res1))
@@ -418,7 +431,7 @@ elif mode == 3:
     ax.xaxis.set_ticks_position('bottom')
 
     cbar_ax = fig.add_axes()
-    plt.colorbar(draw, cax=cbar_ax)
+    plt.colorbar(draw, cax=cbar_ax,format=FuncFormatter(to_percent))
     plt.show()
     # plt.savefig(result_folder + '/comp_m_union.pdf')
 
@@ -429,15 +442,17 @@ elif mode == 3:
         draw = ax.matshow(res2, vmax=0.35)
         plt.title('Matrice de croisement des clusters'
                   ' \nsubjectifs sur les clusters objectifs '
-                  '\n normalises sur les clusters subjectifs')
+                  u'\n normalises sur les clusters subjectifs'
+                  ' \n (Somme des lignes =100%)')
         plt.xlabel('Clusters objectifs')
-        plt.ylabel('Clusters subjectifs(somme=1)')
+        plt.ylabel('Clusters subjectifs')
         plt.xticks(range(len(n_clusters_2)), xticks, rotation=60)
         plt.yticks(range(len(n_clusters_1)), yticks)
+
         ax.xaxis.set_ticks_position('bottom')
 
         cbar_ax = fig.add_axes()
-        plt.colorbar(draw, cax=cbar_ax)
+        plt.colorbar(draw, cax=cbar_ax, format=FuncFormatter(to_percent))
         plt.show()
         # plt.savefig(result_folder + '/comp_m_min.pdf')
 

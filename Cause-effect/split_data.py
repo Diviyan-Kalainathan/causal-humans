@@ -43,7 +43,7 @@ def splitfiles_cluster(inputfolder, cluster_n):
                         with open(splitfilepath, 'a') as splitfile:
                             datawriter = csv.writer(splitfile, delimiter=',', quotechar='|', lineterminator='\n')
                             for line in rows_towrite:
-                                if line !='':
+                                if line !='' or line !=[]:
                                     datawriter.writerow(line)
                         sys.stdout.write('--Cluster ' + str(cluster_n) + ' -- file ' + str(n_file) + '\n')
                         sys.stdout.flush()
@@ -67,7 +67,8 @@ def splitfiles_cluster(inputfolder, cluster_n):
                 with open(splitfilepath, 'a') as splitfile:
                     datawriter = csv.writer(splitfile, delimiter=',', quotechar='|', lineterminator='\n')
                     for line in rows_towrite:
-                        datawriter.writerow(line)
+                        if line != '' or line != []:
+                            datawriter.writerow(line)
 
                 #Create index
                 splitfilepath = inputfolder + 'split_data/cluster_' + str(cluster_n) + '/index_c_'+str(cluster_n) + '.csv'
@@ -78,8 +79,8 @@ def splitfiles_cluster(inputfolder, cluster_n):
                         datawriter.writerow(['valid'+str(i),sampleID[i]])
         num_head+=1
 
-    #Remove second line
-    print('--Cluster ' + str(cluster_n) +'-- Removing second line --')
+
+    """print('--Cluster ' + str(cluster_n) +'-- Removing second line --')
     for filetype in listfiles:
         n_file = 0
         while os.path.exists(inputfolder + 'split_data/cluster_' + str(cluster_n) + '/' + filetype + str(
@@ -93,7 +94,7 @@ def splitfiles_cluster(inputfolder, cluster_n):
                     writer = csv.writer(out, delimiter=",")
                     for row in reader:
                         writer.writerow(row)
-            n_file+=1
+            n_file+=1"""#Remove second line (BlankLine) -- Experimental
     sys.stdout.write('--Cluster ' + str(cluster_n) + ' -- Job finished !\n')
     sys.stdout.flush()
 
