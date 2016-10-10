@@ -143,7 +143,7 @@ Comme mentionné à la section précédente, nous avons accès aux réponses de 
 \end{table}
 
 
-\section{Méthodologie de l'étude}
+\section{Choix méthodologiques}
 	Dans un premier temps, il s'agit de recoder les variables, pour éviter les biais quantitatifs, notamment sur les variables catégorielles (issues des questions à choix multiples)\footnote{Une option codée '3' (= pays du Maghreb) ne vaut ni plus, ni moins, qu'une option codée '4' (= Extrême Orient). Les options sont ainsi codées par des variables booléennes $X_{opt}$, prenant la valeur vrai
 si la variable $X$ prend la valeur $opt$ et faux sinon.}. Une question comprenant $N$ options est ainsi représentée par $N+1$ variables booléennes (la dernière permettant de caractériser les cas où l'enquêté n'a pas pu ou pas voulu répondre à la question\footnote{Formellement, les options de fiabilité, définissant des variables drapeaux, prennent 4 valeurs : Réponse (1), Sans objet (0, par exemple si la question n'a pas été posée), Ne sait pas (-1) et Refuse de se prononcer (-2). }.
 Dans le cas des questions à réponse continue (e.g. ancienneté ou salaire), celles-ci sont représentées par une variable continue et une variable booléenne, cette dernière codant la non-réponse de l'enquêté, afin de prendre en compte le manque multiples valeurs dans le questionnaire.\par
@@ -187,23 +187,36 @@ L'analyse en composantes principales (ACP) est une procédure statistique invent
  \KwData{Données pré-traitées de taille $m_{variables} \times n_{exemples}$}
  \KwResult{Données à $p$ dimensions ($p<<m_{variables}$) }
  \BlankLine
- \tcp{Normalisation \& centrage des données}\label{cmt} 
+ \tcp{Normalisation \& centrage des données}
  \For{$i\leftarrow 1$ \KwTo $m_{variables}$}{
   \BlankLine
 
- 	$\mathbf{D} \leftarrow \textrm{Données}[i,:]$  \tcp{ Vecteur de données pour la variable $i$}\label{cmt} 
+ 	$\mathbf{D} \leftarrow \textrm{Données}[i,:]$  \tcp{ Vecteur de données pour la variable $i$}
 	$\mathbf{M}[i,:] \leftarrow \frac{\mathbf{D}- \textrm{moyenne}(\mathbf{D})}{\textrm{variance}(\mathbf{D})}$
  }
  \BlankLine
  $\mathbf{M}\leftarrow matrice\_covariance(\mathbf{M})$\\
- $\mathbf{T}\leftarrow vecteurs\_propres$
+ $\mathbf{W}\leftarrow vecteurs\_propres(\mathbf{M})$\\
+ \BlankLine
+
+ $p \leftarrow  \textrm{compromis(inertie,bruit)}$  
+ $\mathbf{W}\leftarrow \mathbf{W}[:p,:]$  \tcp{On tronque les $p$ vecteurs propres qu'on a choisis}
+ $\mathbf{R}\leftarrow \mathbf{M} \times\textrm{Données}^T$\\
  \KwRet{$\mathbf{R} $} 
+\label{alg:ACP}
 \end{algorithm}
 
 \end{definition}
+
+Le choix de $p$ s'effectue avec un compromis entre inertie expliquée et nombre de valeurs propres conservées (bruit). En effet, plus on rajoute des dimensions, moins on perd en information, mais plus on rajoute du bruit avec nouvelles dimensions.\par
+
+Toutefois, il y a la présence d'un biais assez important lié aux questions catégorielles : en effet, du fait que les variables catégorielles ont été éclatées en $n$ variables booléennes ($n$ étant le nombre de modalités de la question) et par conséquent, ces variables ont une variance très faible, voire nulle, si personne n'a répondu cette modalité à la question. Par conséquent, lors de la normalisation, certaines variables ont tendance à croître de manière très importante et donc fausser la PCA. Pour remédier à ce problème, on applique une normalisation différente aux variables catégorielles : l'\textit{Inverse Document Frequency} (IDF) de \cite{sparckjones1972}, qui revient à effectuer : 
+$$\mathbf{M}[i,:]\leftarrow \mathbf{D} \times ln \left(1+\frac{n_{exemples}}{occurences(\mathbf{D}_i=i)}\right)  $$
+avec les notations de l'algorithme 2.1.1 ; en ayant de plus $occurences(\mathbf{D}_i=i)=somme(\mathbf{D})$ car en éclatant nos questions catégorielles en variables booléennes, une somme de $\mathbf{D}_i$ revient à avoir le nombre d'occurrences de la modalité $i$.
+
 \subsection{Obtention des nouveaux axes }
 \paragraph{}
-Le recodage des questions catégorielles et l'ajout des variables booléennes conduit à un total de 2463 variables (numériques et booléennes). Une phase de réduction linéaire de dimensionnalité par analyse en composantes principales est effectuée. Concrètement, la matrice de covariance des variables est diagonalisée; l'ensemble ordonné de ses valeurs propres est représenté Fig. \ref{fig:spectreobj} et Fig. \ref{fig:spectresubj}. On se restreint à considérer les premiers vecteurs propres de cette matrice. Chacun de ces vecteurs propres (somme pondérée des variables initiales) définit une variable agrégée. 
+Le recodage des questions catégorielles et l'ajout des variables booléennes conduit à un total de 2463 variables (numériques et booléennes) ; et on réduit la dimension de ces données à l'aide de l'ACP. L'ensemble ordonné de ses valeurs propres, utilisé pour choisir la dimension de sortie des données, est représenté Fig. \ref{fig:spectreobj} et Fig. \ref{fig:spectresubj}. On se restreint à considérer les premiers vecteurs propres de cette matrice. Chacun de ces vecteurs propres (somme pondérée des variables initiales) définit une variable agrégée. 
 
 \paragraph{ACP sur les variables objectives\\}
 Le spectre des valeurs propres de la matrice de covariance des variables objectives est représenté Fig. \ref{fig:spectreobj}.  Nous avons choisi de sélectionner les 8 premiers vecteurs propres, comme un compromis entre la taille de la représentation réduite et l'inertie capturée (62\%)~; notons qu'il faut pratiquement doubler le nombre de vp. pour arriver à 70\% d'inertie. 
@@ -374,7 +387,7 @@ Les valeurs-test donnent directement les variables les plus significatives sur l
 
 \section{Clusters et analyses}
 
-Dans la suite, la représentation considérée est celle définie par les axes ci-dessus (i.e. chaque personne est projetée dans l'espace $\mathbb{R}^d$, où $d=8$ ou $d=5$ selon que l'on considère les données objectives ou subjectives). Les personnes sont ensuite partitionnées en communautés (clusters) à l'aide de l'algorithme \textit{k-means}\footnote{L'implémentation utilisée est celle de la librairie \textit{Scikit-Learn}.} se fondant sur la distance classique de $\mathbb{R}^d$ \cite{arthur2007k}.  On obtient ainsi 8 groupes objectifs et 8 groupes subjectifs. Notons que le fait de distinguer les données objectives et subjectives conduit à une meilleure stabilité des clusters obtenus ; le fait de considérer toutes les données conduit à des interférences entre situation objective et ressenti. 
+Dans la suite, la représentation considérée est celle définie par les axes ci-dessus (i.e. chaque personne est projetée dans l'espace $\mathbb{R}^d$, où $d=8$ ou $d=5$ selon que l'on considère les données objectives ou subjectives). Les personnes sont ensuite partitionnées en communautés (clusters) à l'aide de l'algorithme \textit{k-means++}\footnote{L'implémentation utilisée est celle de la librairie \textit{Scikit-Learn}.} se fondant sur la distance classique de $\mathbb{R}^d$ \cite{arthur2007k}.  On obtient ainsi 8 groupes objectifs et 6 groupes subjectifs. Notons que le fait de distinguer les données objectives et subjectives conduit à une meilleure stabilité des clusters obtenus ; le fait de considérer toutes les données conduit à des interférences entre situation objective et ressenti. 
 
 \subsection{Clusters objectifs}
 \paragraph{}
@@ -395,52 +408,52 @@ Chaque cluster est interprété en fonction de son centre (représenté en coord
 \label{fig:nafobj}
 \end{figure}
 
-\paragraph{Groupe 1 : Indépendants\\}
+\paragraph{Groupe 1 : Indépendants (\INDEP)\\}
 Ce cluster représente des personnes étant dans des entreprises très petites, un temps de travail assez élevé ainsi qu'un temps de travail élevé ; ce cluster est représenté par les classes NAF \textit{Agriculture, sylviculture et pêche}, \textit{Commerces}, \textit{Construction}, \textit{Hébergement et restauration}. Cette communauté représente donc les gens indépendants. Les caractéristiques de ce groupe sont, mis à part le fait que la taille de l'organisation qui emploie l'enquêté est très petite, le nombre de congés disponibles aux enquêtés (14,58 jours contre 36,58 dans la population globale), et le nombre de jours d'absence correspondant à des arrêts maladie sont peu importants (3,66 jours contre 8,34 jours).
 
-\paragraph{Groupe 2 : Services aux particuliers\\}
+\paragraph{Groupe 2 : Services aux particuliers (\SERV)\\}
 Les caractéristiques de ce deuxième groupe sont un faible niveau de qualification, un temps de travail et une sécurité faibles, travailleurs du secteur public, plutôt dans le domaine des activités de services. En analysant plus en détail les valeurs des v-test sur les codes NAF, la catégorie socioprofessionnelle la plus représentée est celle des services aux particuliers. Les revenus moyens de ce cluster sont bien inférieurs aux revenus moyens de l'ensemble des enquêtés (1163\euro{}/mois contre 1833\euro{} en moyenne), avec une qualification assez faible (19\% sans diplôme, 39\% avec un CAP, BEP ou équivalent).
 
-\paragraph{Groupe 3 : Lien à l'immigration\\}
+\paragraph{Groupe 3 : Lien à l'immigration (\IMM)\\}
 Une caractéristique principale de ce groupe, qui apparaît à la Fig.\ref{fig:CPobj}, est le lien à l'immigration. En effet, 53\% des personnes de ce cluster sont étrangers, et 42\% sont français par naturalisation, mariage, déclaration ou option à la majorité. Ils ont, d'après les moyennes calculées sur le cluster, travaillent principalement dans le secteur privé, comme l'indique la Fig.\ref{fig:CPobj}.
 
-\paragraph{Groupe 4 : Ouvriers\\}
+\paragraph{Groupe 4 : Ouvriers (\OUVR)\\}
 Le troisième cluster est représenté par des personnes employées dans une grande entreprise, ayant un faible niveau de qualification, et plutôt du secteur privé. Les code NAF sur-représentés dans cluster sont souvent des secteurs de fabrication de produits, d'industrie de l'énergie et des transports. Ce cluster met donc en valeur les ouvriers, techniciens, agents de maîtrise et contremaîtres du secteur privé. Les enquêtés sont à 93\% salariés d'une entreprise, d'un artisan, ou d'une association. Ce cluster est composé majoritairement d'hommes (76\%), qui mettent en avant des inconvénients du travail et des conditions de travail telles que la saleté (53\%), des courants d'air (62\%), des secousses ou vibrations (40\%), de l'humidité (44\%) et une température basse (56\%). 
 
-\paragraph{Groupe 5 : Employés de bureau du secteur privé\\}
+\paragraph{Groupe 5 : Employés de bureau du secteur privé (\CSPPPr)\\}
 Cette communauté est similaire à celle du cluster 4, à l'exception du niveau de qualification qui est élevé, ainsi que les secteurs d'activité, qui incluent ici les secteurs des services et des activités scientifiques. Ce cluster est identifiable à une population d'employés de bureau du privé, comprenant les cadres. Les salaires de ce groupe sont par ailleurs bien supérieurs à la moyenne (2328\euro{}/mois contre 1833\euro{}/mois pour l'ensemble de la population étudiée). 90\% des enquêtés n'ont pas à rester longtemps debout pour effectuer leur travail, 95\% disposent d'une boîte aux lettres électronique professionnelle et plus de 80\% des personnes du cluster sont satisfaits des conditions de travail.
 
-\paragraph{Groupe 6 : Employés de bureau du secteur public\\}
+\paragraph{Groupe 6 : Employés de bureau du secteur public (\CSPPPu)\\}
 Ce cluster a des caractéristiques très proches du cluster 5; à la différence du secteur d'activité, qui est public. Ce groupe peut donc être interprété comme le cluster des employés de bureau du secteur public. les enquêtés de ce groupe sont à 59\% des salariés de l'état, et sont aussi mieux payés que la moyenne : 2357\euro{}/mois contre 1833\euro{}/mois en moyenne. Contrairement au cluster 5, les personnes constituant ce cluster bénéficient d'un grand nombre de congés (60 jours contre 37 jours en moyenne).
 
-\paragraph{Groupe 7 : Santé\\}
+\paragraph{Groupe 7 : Santé (\SANTE) \\}
 Dans ce groupe, les enquêtés sont dans des entreprises de grande taille, avec aussi des temps de travail et une sécurité assez élevée, principalement dans le secteur public. Le code NAF le plus présent dans ce cluster est \textit{Action publique, enseignement, santé humaine, action sociale}, mais en affinant notre analyse la catégorie la plus représentée ici est celle de la santé humaine. Ce cluster peut être appelé "Santé". 62\% des enquêtés de ce groupe travaillent dans le soin des personnes et la plupart ont un grand nombre d'heures de travail, et travaillent aussi le matin, le soir et les fins de semaine. De plus, ces personnes ont souvent de grandes responsabilités : les erreurs de 85\% des personnes peuvent entraîner des conséquences dangereuses pour leur sécurité ou celle d'autre personnes.
 
-\paragraph{Groupe 8 : Accident du travail\\}
+\paragraph{Groupe 8 : Accident du travail (\ACC)\\}
 Cette dernière communauté possède aussi une caractéristique distincte des autres: l'accident au travail. Les enquêtés formant cette communauté sont souvent des personnes ayant un faible niveau de qualification, travaillent beaucoup et insistent sur la sécurité, mais ont subi un accident du travail. La plupart de ces enquêtés critiquent par ailleurs les conditions de travail pénibles et le manque de sécurité dans leur travail, ainsi que des situations de tension avec les supérieurs.\\
 
 
 \begin{table}[!h]
 \centering
-\begin{tabular}{|r||p{6cm}|}
+\begin{tabular}{|r|c|p{6cm}|}
 \hline
- Cluster & Intitulé \\
+ Cluster & Abréviation &  Intitulé \\
  \hline
- 1 & Indépendants \\ 
+ 1 &\INDEP & Indépendants \\ 
  \hline
- 2 & Services aux particuliers\\
+ 2 &\SERV & Services aux particuliers\\
  \hline
- 3 & Lien à l'immigration\\
+ 3 & \IMM & Lien à l'immigration\\
  \hline
- 4 & Ouvriers, techniciens, agents de maîtrise et contremaîtres du secteur privé\\
+ 4 & \OUVR & Ouvriers, techniciens, agents de maîtrise et contremaîtres du secteur privé\\
  \hline
- 5 & Employés de bureau du secteur privé\\
+ 5 & \CSPPPr & Employés de bureau du secteur privé\\
  \hline
- 6 & Employés de bureau du secteur public\\
+ 6 & \CSPPPu & Employés de bureau du secteur public\\
  \hline
- 7 & Santé \\
+ 7 & \SANTE & Santé \\
  \hline
- 8 & Accident du travail\\
+ 8 & \ACC & Accident du travail\\
  \hline
 \end{tabular}% Bien retravailler les noms de clusters
 \caption{Identification des clusters objectifs}
@@ -465,44 +478,44 @@ Après avoir analysé les clusters objectifs, il faut maintenant analyser les cl
 \label{fig:nafsubj}
 \end{figure}
 
-\paragraph{Groupe 1 : Indépendants\\}
+\paragraph{Groupe 1 : Indépendants (\INDEP)\\}
 Ce premier groupe est caractérisé par les enquêtés qui sont indépendants à leur travail, et donc isolés. Ils sont caractérisés par les secteurs d'agriculture,  de sylviculture, de pêche, ainsi que des activités de service. L'organisation du travail est plutôt stable, et ils sont assez satisfaits de leur travail, et ce malgré des revenus bien inférieurs à la moyenne (1512\euro{}/mois contre 1877\euro{}/mois en moyenne) et peu de congés (17,55 jours contre 38,48 en moyenne), et une moyenne d'âge supérieure à la moyenne globale (47 ans contre 43 en moyenne). Les axes 3 et 4 ont des valeurs pour ce cluster assez faibles car l'enquêté n'a pas de supérieur ni de collègues.
 
-\paragraph{Groupe 2 : Heureux\\}
+\paragraph{Groupe 2 : Heureux (\HEUR)\\}
 Ce cluster est représenté par les personnes qui n'ont pas de problèmes avec leur environnement de travail, qui sont satisfaites de leur travail et ont une bonne vie de groupe. Les enquêtés constituant ce cluster sont légèrement moins payées que la moyenne (1753\euro{}/mois contre 1877\euro{}/mois en moyenne) mais ont un score de bien-être défini par l'OMS bien supérieur à la moyenne (20,38 contre 15,65). Par ailleurs, la notion de tension et pression est très peu présente dans ce groupe : la plupart des enquêtés sont jamais sous pression et n'ont aucune tension avec leur équipe.
 
-\paragraph{Groupe 3 : Rien à signaler\\}
+\paragraph{Groupe 3 : Rien à signaler (\RAS)\\}
 Ce cluster semble être assez vague, alors que c'est l'un des plus peuplés. Dans cette communauté, les personnes sont plutôt satisfaites, n'ont pas subi de changement d'environnement de travail au cours des douze derniers mois, et proviennent à peu près que chaque catégorie socioprofessionnelle. Ce cluster représente donc les personnes qui n'ont rien à signaler de particulier et son plutôt satisfaites de leur vie au travail. Elles ont pourtant un salaire supérieur à la moyenne (2023\euro{}/mois) et plus de congés que la moyenne (41 jours).
 
 \paragraph{Groupe 4 : Changements   de   l'environnement   de
-travail\\}
+travail (\GLOB)\\}
 Cette communauté se caractérise par le fait que ses constituants proviennent de grandes organisations, et qu'ils ont récemment subi des changements dans leur milieu de travail au cours des douze derniers mois. Ils sont assez satisfaits du travail en équipe, et pensent que les changements ont été plutôt positifs et bien effectués. Ils proviennent principalement des catégories socioprofessionnelles "\textit{Administration publique, enseignement, santé humaine, action sociale}" et "\textit{Activités financières et d'assurance}", et sont mieux payés que la moyenne : 2094\euro{}/mois.
 
-\paragraph{Groupe 5 : Environnement stressant\\}
+\paragraph{Groupe 5 : Environnement stressant (\ENV)\\}
 Cette communauté représente ceux qui sont satisfaits du management, mais ont des problèmes liés à leur environnement de travail qui leur est, selon leur point de vue, néfaste et source de risques psychosociaux. Ces sentiments sont éprouvés à cause de situations de tension avec les collègues et de comportement nuisibles, par exemple l'enquêté ignoré, ou critiqué injustement.
 
-\paragraph{Groupe 6 : Malheureux\\}
+\paragraph{Groupe 6 : Malheureux (\MALH)\\}
 Enfin, ce groupe représente les personnes qui ont beaucoup de risques psychosociaux malgré une satisfaction du travail en équipe assez bonne. La pression ainsi que la tension avec les supérieurs sont très présentes dans ce cluster. Il y a un grand ressenti d'injustice, et un sentiment d'exploitation. Ceci se traduit sur la représentation en coordonnées parallèles par un mauvais score sur l'axe 3; ou encore un taux d'absentéisme assez élevé (17,25 jours contre 7,95 en moyenne). Ces éléments traduisent aussi un rejet du travail actuel de l'enquêté : 79\% de la population de ce groupe ne seraient pas heureux si l'un de leurs enfants s'engagent dans la même activité professionnelle qu'eux et 62\% ne se sentent pas capables de continuer leur travail jusqu'à leur retraite.
 
 
 
 \begin{table}[!h]
 \centering
-\begin{tabular}{|r||p{6cm}|}
+\begin{tabular}{|r|c|p{6cm}|}
 \hline
- Cluster & Intitulé \\
+ Cluster & Abréviation & Intitulé \\
  \hline
- 1 & Indépendants\\ 
+ 1 & \INDEP & Indépendants\\ 
  \hline
- 2 & Heureux \\
+ 2 & \HEUR & Heureux \\
   \hline
- 3 & Rien à signaler \\
+ 3 & \RAS & Rien à signaler \\
   \hline
- 4 & Changement de l'environnement de travail \\
+ 4 & \GLOB & Changement de l'environnement de travail \\
   \hline
- 5 & Environnement stressant\\
+ 5 & \ENV & Environnement stressant\\
   \hline
- 6 & Malheureux\\
+ 6 & \MALH & Malheureux\\
   \hline
 \end{tabular}% Bien retravailler les noms de clusters
 \caption{Identification des clusters subjectifs}
@@ -517,7 +530,7 @@ Enfin, ce groupe représente les personnes qui ont beaucoup de risques psychosoc
 \section{Correspondance entre clusters objectifs et subjectifs }
 \subsection{Croisement des populations de clusters}
 \paragraph{}
-Après avoir étudié les différents clusters individuellement, il est intéressant de voir comment se recoupent les clusters subjectifs et les clusters objectifs. Entre autres, cette étude nous permet de voir directement comment se projettent la situation des personnes sur le "bonheur" de celles-ci, autrement dit la relation entre la situation professionnelle et le ressenti de cette situation. La Figure \ref{fig:objxsubj} est une représentation de ce croisement qui permettent d'analyser les caractéristiques communes à ces deux clustering, qui est pour chaque case, 
+Après avoir étudié les différents clusters individuellement, il est intéressant de voir comment se recoupent les clusters subjectifs et les clusters objectifs. Entre autres, cette étude nous permet de voir directement comment se projettent la situation professionnelle des enquêtés et le ressenti de leur situation. La Figure \ref{fig:objxsubj} est une représentation de ce croisement qui permettent d'analyser les caractéristiques communes à ces deux clustering, qui est pour chaque case, 
 
 $$M_{i,j} = \frac{Card(O_j \cap S_i)}{Card(O_j)}$$
 
@@ -607,8 +620,8 @@ Les scores d'autonomie aux intersections des différents clusters sont représen
 
 L'analyse des résultats permet de tirer plusieurs enseignements:
     \begin{itemize}
-    \item Indépendemment des clusters subjectifs, l'autonomie des cadres apparaît logiquement bien plus élevée que celle des autres clusters, par contre il existe peu de différence entre public et privé. Le cluster de la Santé est quand à lui le groupe avec l'autonomie la plus faible.
-    \item En étudiant le lien avec les clusters subjectif (ordonnés selon une QVT approximativement décroissante de \HEUR\ à \MALH ), l'autonomie apparaît comme décroissante pour tous les groupes objectifs (les clusters avec une faible autonomie sont ceux ayant une faible QVT). De façon plus détaillée, l'absence d'autonomie est très fortement lié aux groupes \MALH\ et dans une moindre mesure \ENV (et ce pour tous les clusters objectifs). Le groupe \HEUR\ n'est par contre pas toujours caractérisée par l'autonomie la plus élevée (qui est souvent atteinte par \RAS ).  
+    \item[•] Indépendemment des clusters subjectifs, l'autonomie des cadres apparaît logiquement bien plus élevée que celle des autres clusters, par contre il existe peu de différence entre public et privé. Le cluster de la Santé est quand à lui le groupe avec l'autonomie la plus faible.
+    \item[•] En étudiant le lien avec les clusters subjectif (ordonnés selon une QVT approximativement décroissante de \HEUR\ à \MALH ), l'autonomie apparaît comme décroissante pour tous les groupes objectifs (les clusters avec une faible autonomie sont ceux ayant une faible QVT). De façon plus détaillée, l'absence d'autonomie est très fortement lié aux groupes \MALH\ et dans une moindre mesure \ENV (et ce pour tous les clusters objectifs). Le groupe \HEUR\ n'est par contre pas toujours caractérisée par l'autonomie la plus élevée (qui est souvent atteinte par \RAS ).  
     \end{itemize}
 
 
@@ -621,14 +634,64 @@ L'analyse des résultats permet de tirer plusieurs enseignements:
 \label{fig:rcpautonomie}
 \end{figure}
 
-
+%TODO : Conclusion de la partie
 
 %----------------------------------------------------------------------------------------
 %	CHAPTER 3
 %----------------------------------------------------------------------------------------
 \chapter{Analyse causale}
+%TODO \section{\'Etat de l'art}
+\section{Méthodologie}
+Notre objectif est de pouvoir construire un graphe reliant causalement l'ensemble, ou un maximum de variables de notre questionnaire. Pour cela, on adopte %dans un premier temps 
+une méthodologie assez employée en analyse de graphes causaux, c'est-à-dire :
 
+\begin{enumerate}
+\item Construire un graphe relationnel non dirigé en analysant les indépendances entre les variables
+\item Repérer et ne conserver que les relations d'adjacences (retirer les liens indirects, déconvolution)
+\item Orienter les relations restantes à l'aide du coefficient de causalité entre les deux variables 
+\end{enumerate}
 
+Mais plusieurs difficultés viennent s'ajouter à cette approche : l'hétérogénéité des données et la nature du coefficient de causalité.
+
+\subsection{Hétérogénéité des données}
+
+La méthode utilisée "habituellement" afin de construire le graphe relationnel consiste à calculer le coefficient de corrélation de Pearson sur l'ensemble des variables afin d'avoir une idée de la force des liens entre les différentes variables, ce qui va être employé par la suite pour appliquer la deuxième étape.\par
+
+Toutefois, nous avons dans notre cas des variables hétérogènes de nature, un ensemble de variables numériques, catégorielles (ordonnées ou non) et booléennes (notamment les drapeaux). Les coefficients de corrélation de classiques n'ont donc plus de sens en face de ces données. Il existe tout de même des mesures de corrélation pour les différents types de variables ; mais les techniques de déconvolution utilisent principalement des relations matricielles sur les matrices de liens ou de corrélation, ce qui relève une autre difficulté : la nécessité d'obtenir une matrice homogène avant d'appliquer les algorithmes de déconvolution.\par
+
+De plus, nous allons revenir sur la décomposition des variables catégorielles ; il n'est pas utile voire contre-intuitif de continuer de décomposer les variables catégorielles en variables booléennes:
+\begin{itemize}
+\item[•] le lien entre les variables booléennes sera ignoré par l'étude d'indépendance des variables
+\item[•] les algorithmes d'inférence sur la causalité ont une moins bonne performance sur les variables booléennes
+\end{itemize}
+
+%TODO Présenter les différents coefficients et comment ils ont été intégrés
+
+%Nécessité de cette partie
+\subsection{Nécessité d'une déconvolution}
+La nécessité de retirer les liens indirects ne semble pas être évidente au premier abord, et conserver tous les liens pour avoir le graphe total. En effet, pour les graphes de petite taille, le graphe reste intelligible comme l'indique la Figure \ref{fig:graph-in-direct}. \par
+
+\begin{figure}[!h]
+  \centering
+%  \subfloat[Graphe sans relation indirectes]{\includegraphics[width=6cm]{Pictures/graph_direct.pdf}}
+  \hspace{2pt}
+ % \subfloat[Graphe avec relation indirectes]{\includegraphics[width=6cm]{Pictures/graph_indirect.pdf}}
+  \caption{Graphe causal simple sans et avec la relation indirecte}
+  \label{fig:graph-in-direct}
+\end{figure}
+
+Ainsi, on pourrait penser que notre étude se limiterait à étudier les coefficients de causalité, et d'interpréter les résultats obtenus par la suite. Toutefois, avec notre volume de variables, il est impossible d'interpréter les résultats sans appliquer une déconvolution, comme le montre la Figure \ref{fig:graph-ind-lp}. En effet, avec 470 variables\footnote{Les variables drapeaux ont été retirées dans un premier temps.}, il y a plus de 5000 liens entre toutes les variables.
+
+\begin{figure}[!h]
+\centering
+% \includegraphics[width=14cm]{Pictures/graph-id-lptot.pdf}
+\caption{Graphe de causalité en se basant uniquement sur les résultats inférés par les paires deux à deux}
+\label{fig:graph-ind-lp}
+
+\end{figure}
+
+\subsection{Coefficient de causalité}
+Afin de pouvoir orienter nos graphes de causalité, on souhaite inférer la relation de causalité entre les variables deux à deux à la dernière étape de notre méthodologie. Pour cela, on fait appel aux résultats des compétitions \textit{Kaggle}\footnote{\href{https://www.kaggle.com/c/cause-effect-pairs}{kaggle.com/c/cause-effect-pairs}} et \textit{Codalab}\footnote{\href{https://competitions.codalab.org/competitions/1381}{competitions.codalab.org/competitions/1381}} sur la causalité, notamment les algorithmes ayant obtenu de bon résultats : \cite{follonosa2016causalityvar} et \cite{lopez-paz2015learningcausality}.
 
 %------------------------------------------------
 
