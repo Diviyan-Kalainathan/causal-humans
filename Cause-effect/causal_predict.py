@@ -9,6 +9,7 @@ from lib_fonollosa import predict as fo
 
 from lib_lopez_paz import experiment_challenge as lp
 
+from lib_test import test as te
 
 from multiprocessing import Process
 import os,sys
@@ -17,7 +18,7 @@ import os,sys
 if __name__=="__main__":
 
     # causal_predict_method = int(sys.argv[2])
-    causal_predict_method = 1
+    causal_predict_method = 2
 
     """Method used for causal prediction
     # 1 : Handcraft features J. Fonollosa method
@@ -62,25 +63,38 @@ if __name__=="__main__":
         #     outputfilespath.append("output/benchmark/Fonollosa_testset.csv")
         # elif (causal_predict_method == 2):
         #     outputfilespath.append("output/benchmark/LopezKernel_testset.csv")
+        #
+        #
+        # # SUP3 dataset (real data)
+        # inputfilespath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_pairs.csv")
+        # infopath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_publicinfo.csv")
+        # if (causal_predict_method == 1):
+        #     outputfilespath.append("output/benchmark/Fonollosa_SUP3.csv")
+        # elif (causal_predict_method == 2):
+        #     outputfilespath.append("output/benchmark/LopezKernel_SUP3.csv")
+        # elif (causal_predict_method == 4):
+        #     outputfilespath.append("output/benchmark/testalgo_SUP3_")
 
 
         # Validation dataset (real and artificial data)
-        # inputfilespath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_pairs.csv")
+        inputfilespath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_pairs.csv")
+        infopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_publicinfo.csv")
+        if (causal_predict_method == 1):
+            outputfilespath.append("output/benchmark/Fonollosa_validationset.csv")
+        elif (causal_predict_method == 2):
+            outputfilespath.append("output/benchmark/LopezKernel_validationset.csv")
+        elif (causal_predict_method == 4):
+            outputfilespath.append("output/benchmark/testalgo_validationset_variante")
+
+
+        # inputfilespath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_pairs1.csv")
         # infopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_publicinfo.csv")
         # if (causal_predict_method == 1):
-        #     outputfilespath.append("output/benchmark/Fonollosa_validationset.csv")
+        #     outputfilespath.append("output/benchmark/Fonollosa_validationset_1.csv")
         # elif (causal_predict_method == 2):
-        #     outputfilespath.append("output/benchmark/LopezKernel_validationset.csv")
-
-        # SUP3 dataset (real data)
-        inputfilespath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_pairs.csv")
-        infopath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_publicinfo.csv")
-        if (causal_predict_method == 1):
-            outputfilespath.append("output/benchmark/Fonollosa_SUP3.csv")
-        elif (causal_predict_method == 2):
-            outputfilespath.append("output/benchmark/LopezKernel_SUP3.csv")
-
-
+        #     outputfilespath.append("output/benchmark/LopezKernel_validationset_1.csv")
+        #
+        #
         # inputfilespath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_pairs2.csv")
         # infopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_publicinfo.csv")
         # if (causal_predict_method == 1):
@@ -170,6 +184,14 @@ if __name__=="__main__":
 
             # Creating process
             lp.predict(inputfilespath,outputfilespath,modelPath, max_proc)
+
+        elif (causal_predict_method == 3):
+
+            print("TODO : add neural network lopez paz")
+
+        elif (causal_predict_method == 4):
+
+            te.predict(inputfilespath, outputfilespath,max_proc)
 
         cluster_n += 1
 

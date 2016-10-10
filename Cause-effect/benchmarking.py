@@ -7,19 +7,38 @@ from sklearn.metrics import roc_auc_score
 
 
 def score(y,p):
-  return (roc_auc_score(y==1,p)+roc_auc_score(y==-1,-p))/2
+
+  try:
+      ROCscore = (roc_auc_score(y==1,p)+roc_auc_score(y==-1,-p))/2
+  except:
+      ROCscore = 0.5
+
+  return ROCscore
 
 def scoreAcauseB(y,p):
-  return roc_auc_score(y==1,p)
+  try:
+      ROCscore =  roc_auc_score(y==1,p)
+  except:
+      ROCscore = 0.5
+
+  return ROCscore
 
 def scoreBcauseA(y,p):
-  return roc_auc_score(y==-1,-p)
+
+  try:
+      ROCscore =  roc_auc_score(y==-1,-p)
+  except:
+      ROCscore = 0.5
+
+  return ROCscore
 
 
 def evalScore(benchmarkpath,benchmarkname, algo,targetpath,privateinfopath ):
 
-
-    dfresultsGlobal = pd.read_csv(benchmarkpath + algo + "_" + benchmarkname[0] + ".csv", index_col="SampleID")
+    try:
+        dfresultsGlobal = pd.read_csv(benchmarkpath + algo + "_" + benchmarkname[0] + ".csv", index_col="SampleID", sep = ";")
+    except:
+        dfresultsGlobal = pd.read_csv(benchmarkpath + algo + "_" + benchmarkname[0] + ".csv", index_col="SampleID", sep=",")
     dftargetGlobal = pd.read_csv(targetpath[0], index_col="SampleID")
     dfprivateinfoGlobal = pd.read_csv(privateinfopath[0], index_col="SampleID")
 
@@ -39,9 +58,11 @@ def evalScore(benchmarkpath,benchmarkname, algo,targetpath,privateinfopath ):
     dfresultsGlobal["Final target"] = dftargetGlobal["Target"]
     dfresultsGlobal["Source"] = dfprivateinfoGlobal["Source"]
     dfresultsGlobal["A type"] = dfprivateinfoGlobal["A type"]
-    dfresultsGlobal["B type"] = dfprivateinfoGlobal["A type"]
+    dfresultsGlobal["B type"] = dfprivateinfoGlobal["B type"]
     dfresultsGlobal["sample num"] = dfprivateinfoGlobal["sample num"]
     dfresultsGlobal["RealData [yes=1]"] = dfprivateinfoGlobal["RealData [yes=1]"]
+    dfresultsGlobal["spearmancoeff"] = dfprivateinfoGlobal["spearmancoeff"]
+
 
     listdf_type = []
     list_type = ["All data", "Real data","Artificial data" ]
@@ -54,46 +75,54 @@ def evalScore(benchmarkpath,benchmarkname, algo,targetpath,privateinfopath ):
     listNameTest = []
     listdf = []
 
-    for i in range(listdf_type):
+    for i in range(len(listdf_type)):
 
-        typename = list_type[i]
+        type = list_type[i]
         df = listdf_type[i]
 
         listNameTest.append(type)
         listdf.append(df)
 
+
         listNameTest.append(type + "_" + "Numerical-Numerical")
-        listdf.append(dfresultsGlobal[(df["A type"] == "Numerical") & (df["B type"] == "Numerical")])
+        listdf.append(df[(df["A type"] == "Numerical") & (df["B type"] == "Numerical")])
         listNameTest.append(type + "_" +"Categorical-Categorical")
-        listdf.append(dfresultsGlobal[(df["A type"] == "Categorical") & (df["B type"] == "Categorical")])
+        listdf.append(df[(df["A type"] == "Categorical") & (df["B type"] == "Categorical")])
         listNameTest.append(type + "_" + "Binary-Binary")
-        listdf.append(dfresultsGlobal[(df["A type"] == "Binary") & (df["B type"] == "Binary")])
+        listdf.append(df[(df["A type"] == "Binary") & (df["B type"] == "Binary")])
         listNameTest.append(type + "_" + "Numerical-Categorical")
-        listdf.append(dfresultsGlobal[((df["A type"] == "Numerical") & (df["B type"] == "Categorical"))
-                                    | ((df["B type"] == "Numerical") & (df["A type"] == "Categorical"))])
+        listdf.append(df[((df["A type"] == "Numerical") & (df["B type"] == "Categorical")) | ((df["B type"] == "Numerical") & (df["A type"] == "Categorical"))])
         listNameTest.append(type + "_" + "Numerical-Binary")
-        listdf.append(dfresultsGlobal[((df["A type"] == "Numerical" & df["B type"] == "Binary"))
-                                   | ( (df["B type"] == "Numerical") & (df["A type"] == "Binary"))])
+        listdf.append(df[((df["A type"] == "Numerical") & (df["B type"] == "Binary")) | ( (df["B type"] == "Numerical") & (df["A type"] == "Binary"))])
         listNameTest.append(type + "_" + "Categorical-Binary")
-        listdf.append(dfresultsGlobal[((df["A type"] == "Categorical") & (df["B type"] == "Binary"))
-                                   | ( (df["B type"] == "Categorical") & (df["A type"] == "Binary"))])
+        listdf.append(df[((df["A type"] == "Categorical") & (df["B type"] == "Binary")) | ( (df["B type"] == "Categorical") & (df["A type"] == "Binary"))])
 
         listNameTest.append(type + "_" + "num sample > 500")
-        listdf.append(dfresultsGlobal[(df["sample num"] > 500)])
+        listdf.append(df[(df["sample num"] > 500)])
 
         listNameTest.append(type + "_" + "Numerical-Numerical" + "_" + "num sample > 500")
-        listdf.append(dfresultsGlobal[(df["A type"] == "Numerical") & (df["B type"] == "Numerical") & (df["sample num"] > 500)])
+        listdf.append(df[(df["A type"] == "Numerical") & (df["B type"] == "Numerical") & (df["sample num"] > 500)])
+
+        listNameTest.append(type + "_" + "spearmancoeff > 0.2")
+        listdf.append(df[(df["spearmancoeff"] > 0.2) | (df["spearmancoeff"] < -0.2)])
+
+        listNameTest.append(type + "_" + "spearmancoeff > 0.2" + "_" + "num sample > 500")
+        listdf.append(df[((df["spearmancoeff"] > 0.2) | (df["spearmancoeff"] < -0.2)) & (df["sample num"] > 500)])
+
+        listNameTest.append(type + "_" + "spearmancoeff > 0.2" + "_" + "num sample > 500" + "_" + "Numerical-Numerical")
+        listdf.append(df[((df["spearmancoeff"] > 0.2) | (df["spearmancoeff"] < -0.2)) & (df["sample num"] > 500) & (df["A type"] == "Numerical") & (df["B type"] == "Numerical")])
 
         listNumSample = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 3000, 999999]
 
         for i in range(len(listNumSample)-1):
             listNameTest.append(type + "_" + "Num samples " + str(listNumSample[i]) + " - " +  str(listNumSample[i+1]))
-            listdf.append(dfresultsGlobal[(df["sample num"] >= listNumSample[i]) & (df["sample num"] < listNumSample[i+1])])
+            listdf.append(df[(df["sample num"] >= listNumSample[i]) & (df["sample num"] < listNumSample[i+1])])
 
 
     dfbenchmark = pd.DataFrame(columns=["Name test subset","Nb pairs", "ROC score avg", "ROC score A cause B", "ROC score B cause A"])
 
     for i in range(len(listdf)):
+        
         nameTest = listNameTest[i]
         df = listdf[i]
 
@@ -104,7 +133,7 @@ def evalScore(benchmarkpath,benchmarkname, algo,targetpath,privateinfopath ):
 
         if(df["Target"].count() > 0):
             ROCscoreAcauseB = scoreAcauseB(df["Final target"],df["Target"])
-            ROCscoreBcauseA = scoreAcauseB(df["Final target"], df["Target"])
+            ROCscoreBcauseA = scoreBcauseA(df["Final target"], df["Target"])
 
             ROCscoreavg = score(df["Final target"],df["Target"])
             nbPairs = df["Target"].count()
@@ -114,7 +143,7 @@ def evalScore(benchmarkpath,benchmarkname, algo,targetpath,privateinfopath ):
             print(nbPairs)
 
         newlignbenchmark = pd.DataFrame([[nameTest, nbPairs, ROCscoreavg, ROCscoreAcauseB,ROCscoreBcauseA ]], columns=["Name test subset","Nb pairs", "ROC score avg", "ROC score A cause B", "ROC score B cause A"])
-
+        dfbenchmark = dfbenchmark.append(newlignbenchmark)
 
     namebenchmark = "AllDataset"
     if(len(benchmarkname) == 1):
@@ -123,33 +152,48 @@ def evalScore(benchmarkpath,benchmarkname, algo,targetpath,privateinfopath ):
     dfbenchmark.to_csv("results_benchmark_" + namebenchmark + "_" + algo + '.csv', index=False, encoding='utf-8')
 
 
-    listCausalThreshold = [0, 0.05,1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.50,0.55,0.60,0.65,0.7,0.75,0.8]
+    listCausalThreshold = [0, 0.05,1,0.15,0.2,0.25,0.3,0.35,0.4,0.45,0.50,0.55,0.60,0.65,0.7,0.75,0.80,0.85,0.90,0.95,1]
 
     dfthreshold = pd.DataFrame(columns=["name subset", "value threshold", "pr True A cause B", "pr Error A cause B", "pr True B cause A", "pr Error B cause A", "pr True causality", "pr Error causality", "pr true indep", "pr error indep" ])
 
-    for i in range(listdf_type):
+    for i in range(len(listdf_type)):
 
         typename = list_type[i]
         df = listdf_type[i]
+        if(df.shape[0]>0):
+            for threshold in listCausalThreshold:
 
-        for threshold in listCausalThreshold:
+                prTrueAcauseB = df[(df["Target"] >= threshold) & (df["Final target"] == 1)].shape[0] / (float)(df[(df["Final target"] == 1)].shape[0])
 
-            prTrueAcauseB = dfresultsGlobal[(dfresultsGlobal["Target"] >= threshold) & (dfresultsGlobal["Final Target"] == 1)].count() / (float)(dfresultsGlobal[(dfresultsGlobal["Final Target"] == 1)].count())
-            prErrorAcauseB = dfresultsGlobal[(dfresultsGlobal["Target"] >= threshold) & (dfresultsGlobal["Final Target"] != 1)].count() / (float)(dfresultsGlobal[(dfresultsGlobal["Target"] >= threshold)])
+                if(df[(df["Target"] >= threshold)].shape[0] > 0):
+                    prErrorAcauseB = df[(df["Target"] >= threshold) & (df["Final target"] != 1)].shape[0] / (float)(df[(df["Target"] >= threshold)].shape[0])
+                else :
+                    prErrorAcauseB = 0
 
-            prTrueBcauseA = dfresultsGlobal[(dfresultsGlobal["Target"] <= -threshold) & (dfresultsGlobal["Final Target"] == -1)].count() / (float)(dfresultsGlobal[(dfresultsGlobal["Final Target"] == -1)].count())
-            prErrorBcauseA = dfresultsGlobal[(dfresultsGlobal["Target"] <= -threshold) & (dfresultsGlobal["Final Target"] != -1)].count() / (float)(dfresultsGlobal[(dfresultsGlobal["Target"] <= -threshold)])
+                prTrueBcauseA = df[(df["Target"] <= -threshold) & (df["Final target"] == -1)].shape[0] / (float)(df[(df["Final target"] == -1)].shape[0])
 
-            prTruecausality = (dfresultsGlobal[(dfresultsGlobal["Target"] >= threshold) & (dfresultsGlobal["Final Target"] == 1)].count()
-                             + dfresultsGlobal[(dfresultsGlobal["Target"] <= -threshold) & (dfresultsGlobal["Final Target"] == -1)].count())/ (float)(dfresultsGlobal[(dfresultsGlobal["Final Target"] == 1) | (dfresultsGlobal["Final Target"] == -1)].count())
+                if(df[(df["Target"] <= -threshold)].shape[0] > 0):
+                    prErrorBcauseA = df[(df["Target"] <= -threshold) & (df["Final target"] != -1)].shape[0] / (float)(df[(df["Target"] <= -threshold)].shape[0])
+                else:
+                    prErrorBcauseA = 0
 
-            prErrorcausality = (dfresultsGlobal[(dfresultsGlobal["Target"] >= threshold) & (dfresultsGlobal["Final Target"] != 1)].count() + dfresultsGlobal[(dfresultsGlobal["Target"] <= -threshold) & (dfresultsGlobal["Final Target"] != -1)].count()) / (float)(dfresultsGlobal[(dfresultsGlobal["Target"] >= threshold) | (dfresultsGlobal["Target"] <= -threshold)])
+                prTruecausality = (df[(df["Target"] >= threshold) & (df["Final target"] == 1)].shape[0]
+                                 + df[(df["Target"] <= -threshold) & (df["Final target"] == -1)].shape[0])/ (float)(df[(df["Final target"] == 1) | (df["Final target"] == -1)].shape[0])
 
-            prTrueAindepB = dfresultsGlobal[(dfresultsGlobal["Target"] > -threshold) & (dfresultsGlobal["Target"] < threshold) & (dfresultsGlobal["Final Target"] == 0)].count() / (float)(dfresultsGlobal[(dfresultsGlobal["Final Target"] == 0)].count())
-            prErrorAindepB = dfresultsGlobal[(dfresultsGlobal["Target"] > -threshold) & (dfresultsGlobal["Target"] < threshold) & (dfresultsGlobal["Final Target"] != 0)].count() /(float)(dfresultsGlobal[(dfresultsGlobal["Target"] > -threshold) & (dfresultsGlobal["Target"] < threshold)])
+                if(df[(df["Target"] >= threshold) | (df["Target"] <= -threshold)].shape[0] > 0):
+                    prErrorcausality = (df[(df["Target"] >= threshold) & (df["Final target"] != 1)].shape[0] + df[(df["Target"] <= -threshold) & (df["Final target"] != -1)].shape[0]) / (float)(df[(df["Target"] >= threshold) | (df["Target"] <= -threshold)].shape[0])
+                else:
+                    prErrorcausality = 0
 
-            newlignthreshold = pd.DataFrame([[typename, threshold, prTrueAcauseB, prErrorAcauseB, prTrueBcauseA,prErrorBcauseA,prTruecausality, prErrorcausality , prTrueAindepB, prErrorAindepB]], columns=["name subset","value threshold", "pr True A cause B", "pr Error A cause B", "pr True B cause A", "pr Error B cause A", "pr True causality", "pr Error causality", "pr true indep", "pr error indep" ])
+                prTrueAindepB = df[(df["Target"] > -threshold) & (df["Target"] < threshold) & (df["Final target"] == 0)].shape[0] / (float)(df[(df["Final target"] == 0)].shape[0])
 
+                if(df[(df["Target"] > -threshold) & (df["Target"] < threshold)].shape[0] > 0):
+                    prErrorAindepB = df[(df["Target"] > -threshold) & (df["Target"] < threshold) & (df["Final target"] != 0)].shape[0] /(float)(df[(df["Target"] > -threshold) & (df["Target"] < threshold)].shape[0])
+                else:
+                    prErrorAindepB = 0
+
+                newlignthreshold = pd.DataFrame([[typename, threshold, prTrueAcauseB, prErrorAcauseB, prTrueBcauseA,prErrorBcauseA,prTruecausality, prErrorcausality , prTrueAindepB, prErrorAindepB]], columns=["name subset","value threshold", "pr True A cause B", "pr Error A cause B", "pr True B cause A", "pr Error B cause A", "pr True causality", "pr Error causality", "pr true indep", "pr error indep" ])
+                dfthreshold = dfthreshold.append(newlignthreshold)
 
     dfthreshold.to_csv("results_causal_threshold_" + namebenchmark + "_" + algo + '.csv', index=False, encoding='utf-8')
 
@@ -166,9 +210,13 @@ if __name__=="__main__":
     # targetpath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_target.csv")
     # privateinfopath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_privateinfo.csv")
 
-    benchmarkname.append("validationset")
-    targetpath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_target.csv")
-    privateinfopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_privateinfo.csv")
+    benchmarkname.append("SUP4")
+    targetpath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_target.csv")
+    privateinfopath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_privateinfo1.csv")
+
+    # benchmarkname.append("validationset")
+    # targetpath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_target.csv")
+    # privateinfopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_privateinfo.csv")
 
     # benchmarkname.append("validationset2")
     # targetpath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_target.csv")
@@ -186,9 +234,9 @@ if __name__=="__main__":
     # targetpath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_target.csv")
     # privateinfopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_privateinfo.csv")
 
-    # listalgo = ["Fonolossa", "LopezKernel"]
+    listalgo = ["Fonollosa", "LopezKernel"]
     # listalgo = ["LopezKernel"]
-    listalgo = ["Fonollosa"]
+    # listalgo = ["LopezKernel"]
 
     for algo in listalgo:
         evalScore(benchmarkpath,benchmarkname, algo,targetpath,privateinfopath )
