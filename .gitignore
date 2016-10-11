@@ -23,6 +23,7 @@ Cause-effect/lib_fonollosa/pickles
 *.p
 Cause-effect/lib_lopez_paz/*.p
 Cause-effect/datacauseeffect/
+Cause-effect/lib_otherdatasets
 *.ps
 *.xlsx
 *.jpg
