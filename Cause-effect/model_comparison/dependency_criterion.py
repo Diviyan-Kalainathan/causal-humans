@@ -26,6 +26,8 @@ import scipy.stats as stats
 from lib_fonollosa import features
 import numpy
 from sklearn import metrics
+import csv
+
 
 BINARY = "Binary"
 CATEGORICAL = "Categorical"
@@ -39,6 +41,48 @@ crit_names=["Pearson's correlation",
             "Corrected Cramer's V",
             "Causation coefficient"
             "HSIC"]
+
+
+
+
+def confusion_mat(val1,val2):
+    '''
+    contingency_table = numpy.zeros((len(set(val1)), len(set(val2))))
+    for i in range(len(val1)):
+        contingency_table[list(set(val1)).index(val1[i]),
+                          list(set(val2)).index(val2[i])] += 1'''
+    contingency_table= numpy.asarray(pd.crosstab(numpy.asarray(val1,dtype='object'),numpy.asarray( val2, dtype='object')))
+    # Checking and sorting out bad columns/rows
+    max_len, axis_del = max(contingency_table.shape), [contingency_table.shape].index(
+        max([contingency_table.shape]))
+    toremove = [[], []]
+
+    for i in range(contingency_table.shape[0]):
+        for j in range(contingency_table.shape[1]):
+            if contingency_table[i, j] < 4:  # Suppress the line
+                toremove[0].append(i)
+                toremove[1].append(j)
+                continue
+
+    for value in toremove:
+        contingency_table = numpy.delete(contingency_table, value, axis=axis_del)
+
+    return contingency_table
+
+def cramers_corrected_stat(confusion_matrix):
+    """ calculate Cramers V statistic for categorial-categorial association.
+        uses correction from Bergsma and Wicher,
+        Journal of the Korean Statistical Society 42 (2013): 323-328
+    """
+
+    chi2 = stats.chi2_contingency(confusion_matrix)[0]
+    n = confusion_matrix.sum()
+    phi2 = chi2 / n
+    r, k = confusion_matrix.shape
+    phi2corr = max(0, phi2 - ((k - 1) * (r - 1)) / (n - 1))
+    rcorr = r - ((r - 1) ** 2) / (n - 1)
+    kcorr = k - ((k - 1) ** 2) / (n - 1)
+    return numpy.sqrt(phi2corr / min((kcorr - 1), (rcorr - 1)))
 
 
 def f_pearson(var1,var2,var1type,var2type):
@@ -87,72 +131,48 @@ dependency_functions=[f_pearson,
 
 def process_job(part_number,index):
     data = pd.read_csv(inputdata+'p'+str(part_number)+'.csv', sep=';')
+    #data.columns=['SampleID', 'A', 'B', 'A-Type', 'B-Type', 'Pairtype']
     results = []
 
-    for index, row in data.iterrows():
+    for idx, row in data.iterrows():
         var1 = row['A'].split()
         var2 = row['B'].split()
+        var1 = [float(i) for i in var1]
+        var2 = [float(i) for i in var2]
 
         res=dependency_functions[index](var1,var2,row['A-Type'],row['B-Type'])
         results.append([res,row['Pairtype']])
 
     r_df=pd.DataFrame(results,columns=['Target','Pairtype'])
+    sys.stdout.write('Writing results for '+crit_names[index][:4]+'-'+str(part_number) +'\n')
+    sys.stdout.flush()
     r_df.to_csv(inputdata + crit_names[index][:4]+'-'+str(part_number) + '.csv',sep=';',index=False)
 
 
-for idx,name in enumerate(crit_names):
+for idx_crit,name in enumerate(crit_names):
     part_number=1
     print('OK')
     pool=Pool(processes=max_proc)
     while os.path.exists(inputdata+'p'+str(part_number)+'.csv'):
         print(part_number)
-        pool.apply_async(process_job,args=(part_number,idx,))
+        pool.apply_async(process_job,args=(part_number,idx_crit))
         part_number+=1
     pool.close()
     pool.join()
+
+    #Merging file
+    with open(inputdata+crit_names[idx_crit][:4]+'.csv','wb') as mergefile:
+        merger= csv.writer(mergefile,delimiter=';',lineterminator='\n')
+        merger.writerow(['Target','Pairtype'])
+        for i in range(1,part_number):
+            with open(inputdata + crit_names[idx_crit][:4]+'-'+str(i) + '.csv','rb') as partfile:
+                reader=csv.reader(partfile,delimiter=';')
+                header=next(reader)
+                for row in reader:
+                    merger.writerow(row)
+            os.remove(inputdata + crit_names[idx_crit][:4]+'-'+str(i) + '.csv')
+
     #chunksize=10**4
 
 
 
-
-
-
-def cramers_corrected_stat(confusion_matrix):
-    """ calculate Cramers V statistic for categorial-categorial association.
-        uses correction from Bergsma and Wicher,
-        Journal of the Korean Statistical Society 42 (2013): 323-328
-    """
-
-    chi2 = stats.chi2_contingency(confusion_matrix)[0]
-    n = confusion_matrix.sum()
-    phi2 = chi2 / n
-    r, k = confusion_matrix.shape
-    phi2corr = max(0, phi2 - ((k - 1) * (r - 1)) / (n - 1))
-    rcorr = r - ((r - 1) ** 2) / (n - 1)
-    kcorr = k - ((k - 1) ** 2) / (n - 1)
-    return numpy.sqrt(phi2corr / min((kcorr - 1), (rcorr - 1)))
-
-
-def confusion_mat(val1,val2):
-    '''
-    contingency_table = numpy.zeros((len(set(val1)), len(set(val2))))
-    for i in range(len(val1)):
-        contingency_table[list(set(val1)).index(val1[i]),
-                          list(set(val2)).index(val2[i])] += 1'''
-    contingency_table= numpy.asarray(pd.crosstab(numpy.asarray(val1,dtype='object'),numpy.asarray( val2, dtype='object')))
-    # Checking and sorting out bad columns/rows
-    max_len, axis_del = max(contingency_table.shape), [contingency_table.shape].index(
-        max([contingency_table.shape]))
-    toremove = [[], []]
-
-    for i in range(contingency_table.shape[0]):
-        for j in range(contingency_table.shape[1]):
-            if contingency_table[i, j] < 4:  # Suppress the line
-                toremove[0].append(i)
-                toremove[1].append(j)
-                continue
-
-    for value in toremove:
-        contingency_table = numpy.delete(contingency_table, value, axis=axis_del)
-
-    return contingency_table
