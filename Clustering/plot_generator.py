@@ -8,7 +8,7 @@ import matplotlib.lines as mlines
 
 import numpy, csv
 
-mode = 1 # 1 for graph of misclassification
+mode = 2 # 1 for graph of misclassification
 # 2 for TSNE
 
 if mode == 1:
@@ -71,7 +71,7 @@ if mode == 1:
 
 elif mode == 2:
 
-    with open('output/idf/ws/wskm++_9/tsne_c9_n500_r0.csv', 'rb') as datafile:
+    with open('output/idf/ws/wskm++_6/tsne_c6_n500_r0.csv', 'rb') as datafile:
         var_reader = csv.reader(datafile, delimiter=';', quotechar='|')
         header = next(var_reader)
         for row in var_reader:

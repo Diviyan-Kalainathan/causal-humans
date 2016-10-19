@@ -22,7 +22,7 @@ def to_percent(y, position):
     else:
         return s + '%'
 
-output_folder = 'Cluster_8_obj'
+output_folder = 'Cluster_6_subj'
 
 var_to_analyze = [('naf17', 17), ('tranchre', 14), ('statut', 10), ('typemploi', 7), ('csei', 18), ('diplome', 9),
                   ('public', 2), ('public1', 4), ('public2', 4), ('tension1', 2), ('tension2', 2), ('tension3', 2),
@@ -44,7 +44,7 @@ else:
 
 legend = [legend[elt] for elt in permutation_clusters]
 
-mode = 3
+mode =2
 # 1 : matrices of v-tests for some vars
 # 2 : highest values of v-test per cluster
 # 3 : matrices of distance between objective and subjective clusters
