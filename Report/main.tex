@@ -65,7 +65,7 @@
 {\LARGE Analyse et causalités sur des données de qualité de vie au travail} \\% Book title
 \vspace*{0.5cm}
 {\Huge Diviyan Kalainathan}\\
-{\huge Encadré par M. Sébag, P. Caillou, I. Guyon, P. Tubaro}\par % Author name
+{\huge Encadré par M. Sébag, P. Caillou,\newline I. Guyon, P. Tubaro}\par % Author name
 {\Large INRIA - TAO (05/2016 - 11/2016) - Stage PFE-Master}\par
 \endgroup
 
@@ -143,7 +143,7 @@ Ce projet de fin d'études est un sujet multi-disciplinaire combinant sociologie
 
 
 \section{Démarche}
-Après cette phase de prétraitement, l'étude est divisée en deux : dans un premier temps on effectuera une analyse descriptive des données poussée, avant d'effectuer une analyse causale, où nous chercherons à déterminer les relations d'implication entre les variables du questionnaire.\par
+Après une première phase de prétraitement des données, l'étude est divisée en deux : on effectuera une analyse descriptive des données poussée, avant d'effectuer une analyse causale, où nous chercherons à déterminer les relations d'implication entre les variables du questionnaire.\par
 
 \subsection{Détermination des profils types}
 Les données pré-traitées comportent un nombre important de variables, rendant l'étude complexe : regrouper les individus pour former des profils types nécessite de prendre en compte toutes les variables. La solution employée est l'analyse en composantes principales, qui permet de remédier à la redondance des variables, pour définir un petit nombre d'axes (variables agrégées, définie par une somme pondérée des variables initiales) capturant la variabilité des données. L'interprétation d'un axe se fait en considérant les variables initiales les plus importantes (valeurs absolues des poids les plus élevés). \par
@@ -235,7 +235,7 @@ L'analyse en composantes principales (ACP) est une procédure statistique invent
  $\mathbf{W}\leftarrow vecteurs\_propres(\mathbf{M})$\\
  \BlankLine
 
- $p \leftarrow  \textrm{compromis(inertie,bruit)}$  
+ %$p \leftarrow  \textrm{compromis(inertie,bruit)}$  
  $\mathbf{W}\leftarrow \mathbf{W}[:p,:]$  \tcp{On tronque les $p$ vecteurs propres qu'on a choisis}
  $\mathbf{R}\leftarrow \mathbf{M} \times\textrm{Données}^T$\\
  \KwRet{$\mathbf{R} $} 
@@ -695,7 +695,7 @@ L'analyse descriptive nous permet d'identifier les phénomènes liés à la sati
  
 \section{Motivation}
 La corrélation caractérise le fait que deux variables ont des évolutions statistiques similaires, mais n'implique pas l'existence d'une relation de causalité entre les deux variables\footnote{Telles que la corrélation entre les dépenses des \'Etats-Unis pour la  science et le nombre de suicides}.La définition de la causalité pour cette étude est celle de \cite{statnikov2012new} : "$A$ est une cause de $B$ ($A \rightarrow B$) si la loi de probabilité de $B$ change pour une manipulation expérimentale de $A$. \par
-Les approches classiques pour étudier la causalité sont tout d'abord l'expérience contrôlée\footnote{P.ex. les tests cliniques} mais qui ont leur inconvénients : coûteux, non éthiques ou non réalisables, ou encore l'économie expérimentale, mais qui est dure à transposer à la réalité, mais aussi les expériences naturelles\footnote{P.ex. l'évolution du travail dans les restaurants Mc Donald's dans les différents états des \'Etats-Unis} sur lesquelles les chercheurs n'ont aucun contrôle. Une nouvelle approche est d'inférer sur les relations causales avec seulement des données d'observations. Sur cette approche, plusieurs méthodes sont mises en évidence, telles que la classification avec les outils d'apprentissage machine ou encore une approche sur la complexité des modèles \cite{stegle2010probabilistic}. Afin de rassembler les connaissances et comparer les approches en inférence de causalité, plusieurs challenges ont été organisés par Isabelle Guyon. Nous allons nous baser sur les meilleurs algorithmes de ces compétition pour lancer notre étude.   
+Les approches classiques pour étudier la causalité sont tout d'abord l'expérience contrôlée\footnote{P.ex. les tests cliniques} mais qui ont leur inconvénients : coûteux, non éthiques ou non réalisables, ou encore l'économie expérimentale, mais qui est dure à transposer à la réalité, mais aussi les expériences naturelles\footnote{P.ex. l'évolution du travail dans les restaurants Mc Donald's dans les différents états des \'Etats-Unis} sur lesquelles les chercheurs n'ont aucun contrôle. Une nouvelle approche est d'inférer sur les relations causales avec seulement des données d'observations. Sur cette approche, plusieurs méthodes sont mises en évidence, telles que la classification avec les outils d'apprentissage machine ou encore une approche sur la complexité des modèles \cite{stegle2010probabilistic}. Afin de rassembler les connaissances et comparer les approches en inférence de causalité, plusieurs challenges ont été organisés par Isabelle Guyon. Nous allons nous baser sur les meilleurs algorithmes de ces compétitions pour lancer notre étude.   
 
 \section{Méthodologie}
 Notre objectif est de pouvoir construire un graphe reliant causalement l'ensemble, ou un maximum de variables de notre questionnaire. Pour cela, on adopte %dans un premier temps 
