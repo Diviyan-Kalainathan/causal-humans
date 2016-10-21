@@ -36,7 +36,7 @@ permutation_subj = [2, 3, 0, 5, 1, 4]
 if output_folder[-4:] == 'subj':
     objective = False
     permutation_clusters = permutation_subj
-    legend = ['RAS', 'Stress', 'Indep.', 'Heur.', 'Malh.', 'Chgts']
+    legend = ['RAS', 'Tens.Col', 'Indep.', 'Heur.', 'Tens.Hie', 'Chgts']
 else:
     objective = True
     permutation_clusters = permutation_obj
@@ -44,7 +44,7 @@ else:
 
 legend = [legend[elt] for elt in permutation_clusters]
 
-mode =2
+mode =4
 # 1 : matrices of v-tests for some vars
 # 2 : highest values of v-test per cluster
 # 3 : matrices of distance between objective and subjective clusters
@@ -281,7 +281,7 @@ elif mode == 3:
     # 2 is objective
     # 1 is subjective
 
-    autonomy = False
+    autonomy = True
     clustering2 = 'cluster_predictions_c8_n500_r12-obj.csv'
     clustering1 = 'cluster_predictions_c6_n500_r12-subj.csv'
 
@@ -398,7 +398,7 @@ elif mode == 3:
 
 
     xticks = ['Indep.', u'Santé', 'Ouvriers', u'CSP+Privé', 'ServPart', 'CSP+Public', 'Immigr.', 'Accid.']
-    yticks = ['RAS', 'Stress', 'Indep.', 'Heur.', 'Malh.', 'Chgts']
+    yticks = ['RAS', 'Tens.Col', 'Indep.', 'Heur.', 'Tens.Hie', 'Chgts']
     xticks = [xticks[elt] for elt in permutation_obj]
     yticks = [yticks[elt] for elt in permutation_subj]
 
@@ -465,7 +465,8 @@ elif mode == 3:
     plt.title(u'Représentation en coordonnées parallèles \n de l\'autonomie en fonction des clusters')
     plt.xlabel('Clusters subjectifs')
     plt.ylabel("Score d'autonomie")
-    xticks=['RAS', 'Stress', 'Indep.', 'Heur.', 'Malh.', 'Chgts']
+    xticks= ['RAS', 'Tens.Col', 'Indep.', 'Heur.', 'Tens.Hie', 'Chgts']
+
     legend = ['Indep.', u'Santé', 'Ouvriers', u'CSP+Privé', 'ServPart', 'CSP+Public', 'Immigr.', 'Accid.']
     xticks = [xticks[elt] for elt in permutation_subj]
     legend = [legend[elt] for elt in permutation_obj]
@@ -515,7 +516,7 @@ elif mode == 4:
         permutation_clusters = permutation_subj
         permutation_axis = [0, 1, 3, 2, 4]
         inversion_axis = [1, -1, 1, 1, 1]
-        legend = ['RAS', 'Stress', 'Indep.', 'Heur.', 'Malh.', 'Chgts']
+        legend = ['RAS', 'Tens.Col', 'Indep.', 'Heur.', 'Tens.Hie', 'Chgts']
 
         # creating ticks
         xticks = []

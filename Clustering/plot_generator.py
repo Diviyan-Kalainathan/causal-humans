@@ -71,7 +71,7 @@ if mode == 1:
 
 elif mode == 2:
 
-    with open('output/idf/ws/wskm++_6/tsne_c6_n500_r0.csv', 'rb') as datafile:
+    with open('output/idf/ws/wskm++_8/tsne_c8_n500_r0.csv', 'rb') as datafile:
         var_reader = csv.reader(datafile, delimiter=';', quotechar='|')
         header = next(var_reader)
         for row in var_reader:
