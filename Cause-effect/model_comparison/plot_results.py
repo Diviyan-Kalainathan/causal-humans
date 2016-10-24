@@ -11,12 +11,14 @@ import numpy
 
 inputdata='../output/test/results/'
 
-crit_names= [ "Pearson's correlation",
+crit_names = ["Pearson's correlation",
               "Chi2 test",
               "Mutual information",
-              "Corrected Cramer's V"]
-              #""Causation coefficient"
-              #"HSIC"]
+              "Corrected Cramer's V",
+              "Causation coefficient",
+              "FSIC",
+              "BF2d mutual info",
+              "BFMat mutual info"]
 
 results=[]
 

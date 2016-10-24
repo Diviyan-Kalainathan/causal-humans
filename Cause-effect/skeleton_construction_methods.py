@@ -1,6 +1,6 @@
 import csv, numpy
 import scipy.stats as stats
-from lib_fonollosa import features
+from lib.fonollosa import features
 from sklearn import metrics
 import pandas as pd
 

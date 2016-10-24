@@ -3,10 +3,8 @@ Sorting people into different files according to the clustering
 Author : Diviyan Kalainathan
 Date : 28/06/2016
 """
-from lib_lopez_paz import experiment_challenge as lp
-from multiprocessing import Process
-import os,sys
-
+import sys
+import lib.lopez_paz.experiment_challenge as lp
 
 if __name__=="__main__":
 
@@ -16,7 +14,7 @@ if __name__=="__main__":
     # 1 : J. Fonolossa
     # 2 : Randomized Causation Coefficient D. Lopez-Paz
     # 3 : Deconvolution/global silencing by B. Barzel, A.-L. Barab\'asi
-
+    """
 
     inputdata = 'obj8'
     lopez_paz = True
@@ -25,7 +23,7 @@ if __name__=="__main__":
     # Creating parameters
     cluster_n = 1
     jobs = []
-    modelPath = "lib_lopez_paz/"
+    modelPath = "lib/lopez_paz/"
 
     # while os.path.exists('output/' + inputdata + '/split_data/cluster_' + str(cluster_n)) :
     #     inputfilespath = []
