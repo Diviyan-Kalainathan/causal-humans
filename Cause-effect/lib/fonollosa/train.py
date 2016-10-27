@@ -11,6 +11,9 @@ import numpy as np
 import pandas as pd
 import sys
 
+import numpy as np
+import pandas as pd
+
 import data_io
 import estimator as ce
 import util

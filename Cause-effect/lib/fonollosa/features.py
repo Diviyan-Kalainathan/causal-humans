@@ -305,6 +305,13 @@ def fit(x, tx, y, ty):
     y = (y - np.mean(y))/np.std(y)
     xy1 = np.polyfit(x, y, 1)
     xy2 = np.polyfit(x, y, 2)
+
+    xy1[np.isnan(xy1)] = 0
+    xy1[np.isinf(xy1)] = 0
+
+    xy2[np.isnan(xy2)] = 0
+    xy2[np.isinf(xy2)] = 0
+
     return abs(2*xy2[0]) + abs(xy2[1]-xy1[0])
 
 def fit_error(x, tx, y, ty, m=2):
@@ -321,6 +328,9 @@ def fit_error(x, tx, y, ty, m=2):
         xy = np.polyfit(x, y, min(count_unique(x), count_unique(y))-1)
     else:
         xy = np.polyfit(x, y, m)
+
+    xy[np.isnan(xy)] = 0
+
     return np.std(y - np.polyval(xy, x))
 
 def fit_noise_entropy(x, tx, y, ty, ffactor=3, maxdev=3, minc=10):

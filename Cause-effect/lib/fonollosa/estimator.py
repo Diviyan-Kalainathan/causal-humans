@@ -7,12 +7,14 @@ Cause-effect models.
 #
 # License: Apache, Version 2.0
 
-import features as f
+from multiprocessing import Pool
+
 import numpy as np
 from sklearn import pipeline
 from sklearn.base import BaseEstimator
 from sklearn.ensemble import GradientBoostingClassifier
-from multiprocessing import Pool
+
+import features as f
 
 gbc_params = {
     'loss':'deviance',
