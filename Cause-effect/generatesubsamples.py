@@ -7,16 +7,16 @@ inputfilespath = []
 privateinfopath = []
 
 # Benchmark test on Kaggle challenge data
-inputfilespath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_pairs")
-privateinfopath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_privateinfo")
-
-inputfilespath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_pairs")
-privateinfopath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_privateinfo")
+# inputfilespath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_pairs")
+# privateinfopath.append("datacauseeffect/CEpairs/SUP3/CEdata_train_privateinfo")
+#
+# inputfilespath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_pairs")
+# privateinfopath.append("datacauseeffect/CEpairs/SUP4/CEnovel_test_privateinfo")
 
 inputfilespath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_pairs")
 privateinfopath.append("datacauseeffect/CEpairs/CEdata/CEfinal_valid_privateinfo")
 
-ratiosubsamples = [1,2,3,5,10]
+ratiosubsamples = [2,3,5,10]
 
 
 def transformData(x):
@@ -51,13 +51,12 @@ for idx in range(len(inputfilespath)):
             n_samples = x.shape[0]
             indices = np.arange(n_samples)
             np.random.shuffle(indices)
-            n_subset = min(n_samples, max(50,n_samples))
+            n_subset = min(n_samples, max(50,n_samples/ratio))
 
 
             x = x[indices[0:n_subset]]
             y = y[indices[0:n_subset]]
 
-            spearmanrcoefflist += [stats.spearmanr(x,y)[0]]
 
             xValuesParse = transformData(x)
             yValuesParse = transformData(y)
@@ -67,7 +66,6 @@ for idx in range(len(inputfilespath)):
 
             newdfprivateinfo["sample num"].iat[i] = n_subset
 
-        newdfprivateinfo["spearmancoeff"] = spearmanrcoefflist
 
         newdfpair.to_csv(inputfilespath[idx] + str(ratio) + ".csv", encoding="utf-8")
         newdfprivateinfo.to_csv(privateinfopath[idx] + str(ratio) + ".csv", encoding="utf-8")

@@ -1,0 +1,23 @@
+https://www.codalab.org/competitions/1381
+
+to extract features of all the pairs, run:
+  python train.py 0 <number_of_random_features_to_extract>
+the features are stored in pickles/features_train.pkl and pickles/weights_train.pkl
+
+train and test the classifier on a 50/50 train/test partition:
+  python train.py 1 <number_trees> <features_per_tree_split> <tree_depth>
+the classifier is stored in pickles/classifier.pkl
+
+the test AUC is printed last. The previous winner achieves 0.82.
+
+Previous winner slides: http://bit.ly/TIvSun
+Previous winner code:   http://github.com/jarfo/cause-effect
+
+QUICK EXAMPLE:
+
+dlopez@c72:~$ python train.py 0 100
+dlopez@c72:~$ python train.py 1 100 10 5
+built tree 1 of 100, train score = 1.091052e+00
+built tree 2 of 100, train score = 1.062847e+00
+...
+100 10 5 0.868 0.589 # AUC is 0.589
