@@ -5,7 +5,7 @@ Date : 11/10/2016
 """
 
 import os, sys
-sys.path.insert(0, os.path.abspath("..")) #For imports
+sys.path.insert(0, os.path.abspath(".."))  # For imports
 import pandas as pd
 from multiprocessing import Pool
 import scipy.stats as stats
@@ -13,19 +13,25 @@ from lib.fonollosa import features
 import numpy
 from sklearn import metrics
 import csv
-import lib.fsic as fsic
+#import lib.fsic as fsic
+import lib.fsic.data as data
+import lib.fsic.indtest as it
 import lib.mutual_info_bf.mutual_info as mi
 import lib.lopez_paz.indep_crit as lp_crit
+import warnings
+import time
 
-lp=lp_crit.lp_indep_criterion()
+warnings.filterwarnings("ignore", category=DeprecationWarning)  # Need to fix Lopez paz Ic
 
+lp = lp_crit.lp_indep_criterion()
 
 BINARY = "Binary"
 CATEGORICAL = "Categorical"
 NUMERICAL = "Numerical"
 
 max_proc = int(sys.argv[1])
-inputdata = '../output/test/test_crit_'
+inputdata = '../input/kaggle/CEfinal_train'
+
 crit_names = ["Pearson's correlation",
               "Pval-Pearson",
               "Chi2 test",
@@ -37,6 +43,9 @@ crit_names = ["Pearson's correlation",
               "BFMat mutual info"]
 
 
+# FSIC param :
+# Significance level of the test
+
 
 def confusion_mat(val1, val2):
     '''
@@ -47,11 +56,12 @@ def confusion_mat(val1, val2):
     contingency_table = numpy.asarray(
         pd.crosstab(numpy.asarray(val1, dtype='object'), numpy.asarray(val2, dtype='object')))
     # Checking and sorting out bad columns/rows
-    max_len, axis_del = max(contingency_table.shape), [contingency_table.shape].index(
-        max([contingency_table.shape]))
-    toremove = [[], []]
+    #max_len, axis_del = max(contingency_table.shape), [contingency_table.shape].index(
+    #    max([contingency_table.shape]))
+    contingency_table+=1
+    #toremove = [[], []]
 
-    for i in range(contingency_table.shape[0]):
+    '''for i in range(contingency_table.shape[0]):
         for j in range(contingency_table.shape[1]):
             if contingency_table[i, j] < 4:  # Suppress the line
                 toremove[0].append(i)
@@ -59,7 +69,7 @@ def confusion_mat(val1, val2):
                 continue
 
     for value in toremove:
-        contingency_table = numpy.delete(contingency_table, value, axis=axis_del)
+        contingency_table = numpy.delete(contingency_table, value, axis=axis_del)'''
 
     return contingency_table
 
@@ -83,8 +93,10 @@ def cramers_corrected_stat(confusion_matrix):
 def f_pearson(var1, var2, var1type, var2type):
     return abs(stats.pearsonr(var1, var2)[0])
 
+
 def f_pval_pearson(var1, var2, var1type, var2type):
-    return 1-abs(stats.pearsonr(var1, var2)[1])
+    return 1 - abs(stats.pearsonr(var1, var2)[1])
+
 
 def f_chi2_test(var1, var2, var1type, var2type):
     values1, values2 = features.discretized_sequences(var1, var1type, var2, var2type)
@@ -101,11 +113,17 @@ def f_mutual_info_score(var1, var2, var1type, var2type):
     values1, values2 = features.discretized_sequences(var1, var1type, var2, var2type)
     return metrics.adjusted_mutual_info_score(values1, values2)
 
-def  f_bf_mutual_info_2d(var1, var2, var1type, var2type):
-    return mi.mutual_information_2d(var1,var2)
 
-def  f_bf_mutual_info_mat(var1, var2, var1type, var2type):
-    return mi.mutual_information((var1,var2))
+def f_bf_mutual_info_2d(var1, var2, var1type, var2type):
+    return mi.mutual_information_2d(var1, var2)
+
+
+def f_bf_mutual_info_mat(var1, var2, var1type, var2type):
+    var1=[float(i) for i in var1]
+    var2=[float(i) for i in var2]
+
+    return mi.mutual_information((numpy.reshape(numpy.asarray(var1),(len(var1),1)),numpy.reshape(numpy.asarray(var2),(len(var2),1))))
+
 
 def f_corr_CramerV(var1, var2, var1type, var2type):
     values1, values2 = features.discretized_sequences(var1, var1type, var2, var2type)
@@ -118,11 +136,59 @@ def f_corr_CramerV(var1, var2, var1type, var2type):
 
 
 def f_lp_indep_c(var1, var2, var1type, var2type):
-    return lp.predict_indep(var1,var2)
+    return lp.predict_indep(var1, var2)
 
 
 def f_fsic(var1, var2, var1type, var2type):
-    return 0
+    alpha = 0.01
+
+    # Random seed
+    seed = 1
+
+    # J is the number of test locations
+    J = 1
+
+    # There are many options for the optimization.
+    # Almost all of them have default values.
+    # Here, we will list a few to give you a sense of what you can control.
+    op = {
+        'n_test_locs': J,  # number of test locations
+        'max_iter': 200,  # maximum number of gradient ascent iterations
+        'V_step': 1,  # Step size for the test locations of X
+        'W_step': 1,  # Step size for the test locations of Y
+        'gwidthx_step': 1,  # Step size for the Gaussian width of X
+        'gwidthy_step': 1,  # Step size for the Gaussian width of Y
+        'tol_fun': 1e-4,  # Stop if the objective function does not increase more than this
+        'seed': seed + 7  # random seed
+    }
+
+    try:
+        var1 = [float(i) for i in var1]
+        var2 = [float(i) for i in var2]
+
+        pdata = data.PairedData(numpy.reshape(numpy.asarray(var1),(len(var1),1)),numpy.reshape(numpy.asarray(var2),(len(var2),1)))
+        tr, te = pdata.split_tr_te(tr_proportion=0.5, seed=seed + 1)
+        # Do the optimization with the options in op.
+        op_V, op_W, op_gwx, op_gwy, info = it.GaussNFSIC.optimize_locs_widths(tr, alpha, **op)
+        nfsic_opt = it.GaussNFSIC(op_gwx, op_gwy, op_V, op_W, alpha)
+        results = nfsic_opt.perform_test(te)
+
+        print('OK')
+        if results['h0_rejected']:
+            return 1 - results['pvalue']
+        else:
+            return results['pvalue']
+    except ValueError:
+        print('VE')
+        #print(var1,var2)
+        #print(len(var1),len(var2))
+        return 0
+    except AssertionError:
+        print('AE')
+        #print(var1,var2)
+        #print(len(var1),len(var2))
+
+        return 0
 
 
 dependency_functions = [f_pearson,
@@ -136,8 +202,9 @@ dependency_functions = [f_pearson,
                         f_bf_mutual_info_mat]
 
 
-def process_job(part_number, index):
+def process_job_parts(part_number, index):
     data = pd.read_csv(inputdata + 'p' + str(part_number) + '.csv', sep=';')
+
     # data.columns=['SampleID', 'A', 'B', 'A-Type', 'B-Type', 'Pairtype']
     results = []
 
@@ -155,19 +222,50 @@ def process_job(part_number, index):
     sys.stdout.flush()
     r_df.to_csv(inputdata + crit_names[index][:4] + '-' + str(part_number) + '.csv', sep=';', index=False)
 
+def process_job(index):
+    data = pd.read_csv(inputdata + '_pairs.csv', sep=',')
+    pub_info=pd.read_csv(inputdata + '_publicinfo.csv', sep=',')
+    target=pd.read_csv(inputdata+'_target.csv',sep=',')
+    target.columns=['SampleID','T1','Pairtype']
+    data=pd.merge(data,pub_info,on=['SampleID'])
+    data=pd.merge(data,target,on=['SampleID'])
+
+    # data.columns=['SampleID', 'A', 'B', 'A-Type', 'B-Type', 'Pairtype']
+    results = []
+
+    for idx, row in data.iterrows():
+        var1 = row['A'].split()
+        var2 = row['B'].split()
+        var1 = [float(i) for i in var1]
+        var2 = [float(i) for i in var2]
+
+        res = dependency_functions[index](var1, var2, row['A type'], row['B type'])
+        results.append([res, row['Pairtype'],row['A type'], row['B type']])
+
+    r_df = pd.DataFrame(results, columns=['Target', 'Pairtype','A type','B type'])
+    sys.stdout.write('Writing results for ' + crit_names[index][:4] + '\n')
+    sys.stdout.flush()
+    r_df.to_csv(inputdata +'_' +crit_names[index][:4]+'.csv', sep=';', index=False)
 
 for idx_crit, name in enumerate(crit_names):
-    part_number = 1
+    """part_number = 1
     print('OK')
     pool = Pool(processes=max_proc)
+
     while os.path.exists(inputdata + 'p' + str(part_number) + '.csv'):
         print(part_number)
-        pool.apply_async(process_job, args=(part_number, idx_crit,))
+        pool.apply_async(process_job_parts, args=(part_number, idx_crit,))
         part_number += 1
+        time.sleep(1)
+        #process_job_parts(part_number,idx_crit)
     pool.close()
-    pool.join()
+    pool.join()"""#For data in parts
+    print('Begin '+ name )
+    process_job(idx_crit)
 
-    # Merging file
+
+
+    """"# Merging file
     with open(inputdata + crit_names[idx_crit][:4] + '.csv', 'wb') as mergefile:
         merger = csv.writer(mergefile, delimiter=';', lineterminator='\n')
         merger.writerow(['Target', 'Pairtype'])
@@ -179,4 +277,4 @@ for idx_crit, name in enumerate(crit_names):
                     merger.writerow(row)
             os.remove(inputdata + crit_names[idx_crit][:4] + '-' + str(i) + '.csv')
 
-            # chunksize=10**4
+            # chunksize=10**4"""#For data in parts

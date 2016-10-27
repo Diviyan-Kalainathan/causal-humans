@@ -31,7 +31,7 @@ class KHoPoly(Kernel):
     def eval(self, X1, X2):
         return X1.dot(X2.T)**self.degree
 
-    def pair_eval(self, X, Y):
+    def pair_eval(self, X1, X2):
         return np.sum(X1*X2, 1)**self.degree
 
     def __str__(self):

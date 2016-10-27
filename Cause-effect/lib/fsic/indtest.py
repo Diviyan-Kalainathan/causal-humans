@@ -5,15 +5,15 @@ Module containing many types of independence testing methods.
 __author__ = 'wittawat'
 
 from abc import ABCMeta, abstractmethod
-from fsic.data import PairedData
-import matplotlib.pyplot as plt
+from data import PairedData
+#import matplotlib.pyplot as plt
 import numpy as np
 #from numba import jit
-import fsic.data as data
-import fsic.util as util
-import fsic.feature as fea
+import data as data
+import util as util
+import feature as fea
 #from fsic.util import ContextTimer
-import fsic.kernel as kernel
+import kernel as kernel
 import logging
 import os
 

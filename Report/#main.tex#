@@ -14,10 +14,10 @@
 %----------------------------------------------------------------------------------------
 
 \documentclass[11pt,fleqn,openany,frenchb]{book} % Default font size and left-justified equations
-\usepackage[top=3cm,bottom=3cm,left=3.2cm,right=3.2cm,headsep=10pt,letterpaper]{geometry} % Page margins
+\usepackage[top=3cm,bottom=3cm,left=3.2cm,right=3.2cm,headsep=10pt,a4paper]{geometry} % Page margins
 \usepackage{xcolor} % Required for specifying colors by name
-\definecolor{ocre}{RGB}{40,80,140} % Define the orange color used for highlighting throughout the book
-
+\definecolor{ocre}{RGB}{20,60,120} % Define the orange color used for highlighting throughout the book
+\definecolor{ocredark}{RGB}{5,20,60} 
 % Font Settings
 \usepackage{avant} % Use the Avantgarde font for headings
 %\usepackage{times} % Use the Times font for headings
@@ -42,7 +42,13 @@
 %
 
 \input{structure} % Insert the commands.tex file which contains the majority of the structure behind the template
-z
+%\usepackage{xcolor}
+\usepackage[Sonny]{fncychap}
+  % defaults:
+  \ChNameVar{\Large\sf\color{ocredark}}
+  \ChNumVar{\Huge\color{ocredark}}
+  % custom:
+  \ChTitleVar{\Large\scshape\color{ocre}}
 \begin{document}
 
 %----------------------------------------------------------------------------------------
@@ -51,7 +57,7 @@ z
 
 \begingroup
 \thispagestyle{empty}
-\AddToShipoutPicture*{\put(0,0){\includegraphics[scale=1.25]{img7.png}}} % Image background
+\AddToShipoutPicture*{\put(0,0){\includegraphics[scale=1]{couv.pdf}}} % Image background
 \centering
 \vspace*{5cm}
 \par\normalfont\fontsize{35}{35}\sffamily\selectfont
@@ -59,7 +65,7 @@ z
 {\LARGE Analyse et causalités sur des données de qualité de vie au travail} \\% Book title
 \vspace*{0.5cm}
 {\Huge Diviyan Kalainathan}\\
-{\huge Encadré par M. Sébag, P. Caillou, I. Guyon, P. Tubaro}\par % Author name
+{\huge Encadré par M. Sébag, P. Caillou,\newline I. Guyon, P. Tubaro}\par % Author name
 {\Large INRIA - TAO (05/2016 - 11/2016) - Stage PFE-Master}\par
 \endgroup
 
@@ -86,7 +92,7 @@ z
 %	TABLE OF CONTENTS
 %----------------------------------------------------------------------------------------
 
-\chapterimage{head1.png} % Table of contents heading image
+%\chapterimage{blank_chap.pdf}
 
 \pagestyle{empty} % No headers
 
@@ -98,34 +104,72 @@ z
 %----------------------------------------------------------------------------------------
 %	THANKS
 %----------------------------------------------------------------------------------------
-\chapterimage{head1.png}
+%\chapterimage{blank_chap2.pdf}
 \chapter*{Remerciements}
 \addcontentsline{toc}{chapter}{Remerciements}
-
-%TODO
+{\large
+Je souhaite tout d'abord remercier Michèle Sebag, Phillipe Caillou, Isabelle Guyon et Paola Tubaro pour m'avoir accepté en tant que stagiaire à TAO, mais aussi pour m'avoir encadré et apporté de nombreux conseils qui m'ont permis de me développer et d'acquérir de nouvelles compétences.\vspace{0.2cm}\par
+Je remercie aussi Olivier Goudet, pour son esprit d'équipe et son aide précieuse. En travaillant aussi sur le projet AMIQAP il m'a apporté un autre point de vue à mon étude qui m'a été très bénéfique.\vspace{0.2cm}\par
+Je suis très reconnaissant envers les partenaires du projet AMIQAP, en particulier M.Thierry Weil et \'Emilie Bourdu de La Fabrique de l'industrie pour leur expertise dans le monde du travail.\vspace{0.2cm}\par
+Je souhaite également remercier toute l'équipe TAO pour son amabilité et sa convivialité.
+}%TODO
 
 %----------------------------------------------------------------------------------------
-%	CHAPTER 1
+%	CHAPTER 0
 %----------------------------------------------------------------------------------------
 
-\chapterimage{head2.png} % Chapter heading image
+%\chapterimage{blank_chap2.pdf}
 
 \chapter{Introduction}
 
 %\section{Motivation}
 
-La qualité de vie au travail est un aspect de la vie en société qui est peu quantifiable, mais qui tout de même n'a pas cessé de croître en France au cours de ces dernières décennies, contrairement à d'autres pays qui favorisent la production aux dépends des conditions de travail. Toutefois, les sociologues se sont souvent posé la question du lien entre cette qualité de vie au travail (QVT) et de la satisfaction d'un employé : comment évolue la satisfaction au travail avec la qualité de vie? Sont-ils liés? Comment l'amélioration de la qualité de vie au travail va-t-elle impacter l'environnement de travail de ses employés? C'est à ces questions que nous souhaitons répondre au cours de ce projet de fin d'études.\par
+La qualité de vie au travail (QVT) a comme objectif de concilier les modalités de l’amélioration des conditions de travail et de vie pour les professionnels et la performance collective de l’entreprise, selon la Haute Autorité de Santé. De plus, la QVT a été identifiée comme un levier possible de compétitivité industrielle, selon une étude menée par \textit{La Fabrique de l'industrie} \cite{bourdu2016qvt}. Toutefois, la notion de qualité de vie au travail est difficile à évaluer à cause de son caractère subjectif. Ainsi dans cette étude on souhaite étudier le lien entre travail et la satisfaction au travail pour faire apparaître la QVT, mais aussi les mécanismes  de la QVT.\par % TODO : Etat de l'art 
+%La qualité de vie au travail est un aspect de la vie en société qui est peu quantifiable, mais qui tout de même n'a pas cessé de croître en France au cours de ces dernières décennies, contrairement à d'autres pays qui favorisent la production aux dépends des conditions de travail. Toutefois, les sociologues se sont souvent posé la question du lien entre cette qualité de vie au travail (QVT) et de la satisfaction d'un employé : comment évolue la satisfaction au travail avec la qualité de vie? Sont-ils liés? Comment l'amélioration de la qualité de vie au travail va-t-elle impacter l'environnement de travail de ses employés? C'est à ces questions que nous souhaitons répondre au cours de ce projet de fin d'études.\par
+Cette étude fait partie du projet AMIQAP\footnote{Analyse multi-variée des impacts de la qualité de vie au travail sur la performance de l’entreprise}, qui a pour objet de définir une méthodologie opérationnelle pour analyser l’impact de la QVT sur la performance de l’entreprise, en caractérisant les relations entre d’une part les données liées à la qualité de la vie en entreprise  et d’autre part les indicateurs de performance des entreprises. Les partenaires de ce projet sont :\\ 
+\begin{itemize}
+\item[•] Michèle Sebag, Philippe Caillou, Paola Tubaro, Isabelle Guyon, Diviyan Kalainathan, Olivier Goudet : 
+TAO, CNRS - INRIA - LRI, Univ. Paris-Sud, Univ. Paris-Saclay
+\item[•] Jean-Luc Bazet \& Ahmed Bounfour :  RITM (Réseaux Innovation Territoires et Mondialisation), Université Paris-Sud
+\item[•] Emilie Bourdu-Szwedek \& Thierry Weil : La Fabrique de l'Industrie
+%\item Pierre-Yves AUBERT : Secafi
+\item[•] Valérie Fernandez \& Valérie Beaudouin : SES, Telecom-ParisTech
+\& Institut Interdisciplinaire de l'Innovation, CNRS UMR 9217\\
+\end{itemize}
 
-Pour y parvenir, nous disposons d'une quantité importante de données : les réponses de 33673 personnes sur un questionnaire effectué par la DARES\footnote{Direction de l'animation de la recherche, des études et des statistiques du Ministère du travail, de l'emploi, de la formation professionnelle et du dialogue social.} en collaboration avec l'INSEE\footnote{Institut national de la statistique et des études économiques collecte, produit, analyse et diffuse des informations sur l'économie et la société françaises}, portant sur divers aspect de la vie des enquêtés dans le cadre de l'enquête conditions de travail 2013. Nous allons donc étudier ces données sous différents angles afin de pouvoir en tirer des interprétations sur les raisons derrière les différences entre la satisfaction au travail des enquêtés et leur situation.\par
+Nous disposons d'une quantité importante de données : les réponses de 33673 personnes sur un questionnaire effectué par la DARES\footnote{Direction de l'animation de la recherche, des études et des statistiques du Ministère du travail, de l'emploi, de la formation professionnelle et du dialogue social.} en collaboration avec l'INSEE\footnote{Institut national de la statistique et des études économiques collecte, produit, analyse et diffuse des informations sur l'économie et la société françaises}, portant sur divers aspect de la vie des enquêtés dans le cadre de l'enquête Conditions de travail 2013. Nous allons donc étudier ces données afin de pouvoir en tirer des interprétations sur les mécanismes à l'origine des différences entre la satisfaction au travail des enquêtés et leur situation.\par
 
-Ce sujet de projet de fin d'études peut paraître être plus une étude de sociologie qu'une étude d'ingénieur en traitement et analyse de données. Toutefois, la méthode et l'angle d'approche du problème correspondent à celles utilisées en ingénierie des données . En effet, le but est de tirer des conclusions de l'analyse des données, c'est-à-dire les réponses au questionnaire. A l'aide de ces réponses et l'analyse de celles-ci par le biais de techniques et d'algorithmes issus de la recherche en informatique, il s'agit de non seulement interpréter les résultats pour obtenir des éléments de réponse à notre problématique et constituer une  méthodologie opérationnelle pour analyser l'impact de la QVT sur la performance de l'entreprise, mais aussi permettre de tester la validité des techniques sur un ensemble de données avec les connaissances des sociologues.\par
+Ce projet de fin d'études est un sujet multi-disciplinaire combinant sociologie et ingénierie des données. En effet, le but est de tirer des conclusions de l'analyse des données, c'est-à-dire les réponses au questionnaire. \`A l'aide de ces réponses et l'analyse de celles-ci par le biais de techniques et d'algorithmes issus de la recherche en informatique, il s'agit d'interpréter les résultats pour obtenir des éléments de réponse à notre problématique et constituer une  méthodologie opérationnelle pour analyser l'impact de la QVT sur la performance de l'entreprise, mais aussi de permettre de tester la validité des techniques sur un ensemble de données avec les connaissances des sociologues.\par
 
-\section{\'Etat de l'art}
-Les études de données de la Dares faites jusqu'à nos jours, sont non seulement des analyses descriptives,
 
+\section{Démarche}
+Après une première phase de prétraitement des données, l'étude est divisée en deux : on effectuera une analyse descriptive des données poussée, avant d'effectuer une analyse causale, où nous chercherons à déterminer les relations d'implication entre les variables du questionnaire.\par
+
+\subsection{Détermination des profils types}
+Les données pré-traitées comportent un nombre important de variables, rendant l'étude complexe : regrouper les individus pour former des profils types nécessite de prendre en compte toutes les variables. La solution employée est l'analyse en composantes principales, qui permet de remédier à la redondance des variables, pour définir un petit nombre d'axes (variables agrégées, définie par une somme pondérée des variables initiales) capturant la variabilité des données. L'interprétation d'un axe se fait en considérant les variables initiales les plus importantes (valeurs absolues des poids les plus élevés). \par
+
+Dans l'espace des axes, chaque individu est un vecteur de $\mathbb{R}^d$. On utilise la catégorisation (clustering) pour identifier les sous-groupes de données homogènes ; l'algorithme employé est un K-means++ \cite{arthur2007k}. Avant d'analyser les clusters, on s'assure de leur stabilité selon les critères définis par \cite{meilua2006uniqueness}. \par
+
+Chaque cluster est interprété par ses variables significatives au sens de la mesure statistique valeur-test \cite{lebart2006statistique}~; formellement, une variable est significative pour un cluster lorsque sa valeur moyenne sur ce cluster est significativement distincte de la valeur moyenne sur l'ensemble des données (compte tenu de la taille du cluster). Après avoir établi des clusters sur les variables de  situation et de ressenti (respectivement sur les variables objectives et subjectives), il s'agit d'analyser comment évoluent les groupes à travers des variables choisies, telles que le revenu ou le score de bien-être défini par l'OMS\footnote{\href{http://www.euro.who.int/fr/publications/abstracts/measurement-of-and-target-setting-for-well-being-an-initiative-by-the-who-regional-office-for-europe}{cf www.euro.who.int.}} ; mais aussi étudier le croisement des populations entre les groupes objectifs et subjectifs est une analyse qui permet mettre en évidence le lien entre la situation de l'enquêté et son ressenti de sa situation. La méthodologie est illustrée à la Fig.\ref{fig:metho}.\par
+
+\begin{figure}[!h]
+\centering
+\includegraphics[height=13cm]{schema_methode_fr.pdf}
+\caption{Méthodologie de l'analyse descriptive des données}
+\label{fig:metho}
+\end{figure}
+
+\subsection{Causalité}
+La deuxième partie de l'étude consiste à approfondir l'étude en étudiant la causalité au sens de \cite{granger1969causality} ; la causalité inclut plus d'informations qu'une simple corrélation, par la présence d'une hiérarchie entre les variables reliées causalement. En effet, la présence d'une corrélation traduit juste la "ressemblance entre deux courbes", et ne permet pas de conclure sur l'existence d'un réel lien entre les deux variables\footnote{Par exemple, la corrélation entre le nombre de pirates en activité et le réchauffement climatique est importante alors que ces deux variables ne sont pas directement liées causalement.}. L'étude de la causalité, se basant sur des techniques complexes et variées, entre prédiction par machine learning et inférence par l'étude des distributions de probabilités permettent de déterminer la présence ou non d'une relation de causalité, mais aussi du sens de cette relation. Ainsi, on aura pour but de construire le graphe le plus complet et le plus fiable des variables et de leurs liens causaux, afin de comprendre les phénomènes moteurs dans le questionnaire et dans l'étude du bien-être au travail. Le but étant de pouvoir faire des recommendations aux managers afin d'améliorer la qualité de vie au travail, les enjeux que représentent cette étude sont mis en valeur par le fait que la causalité à l'aide d'analyse de données n'a pas été étudiée jusqu'à aujourd'hui en sociologie. \par % a compléter
+
+%----------------------------------------------------------------------------------------
+%	CHAPTER 1
+%----------------------------------------------------------------------------------------
+%\chapterimage{blank_chap2.pdf}
+\chapter{Prétraitement des données}
 \section{Présentation des données}
 
-Comme mentionné à la section précédente, nous avons accès aux réponses de 33673 personnes sur un questionnaire de 520 questions. Dans cette ensemble d'enquêtés, on ne considère que les actifs, c'est-à-dire ceux occupant un emploi à la date du questionnaire, ce qui nous laisse 31112 enquêtés. Les questions portant sur les aspects de la vie de l'enquêté, sont regroupées en 7 rubriques (Table \ref{tab:cat_questions}). Notons de plus que les données issues du questionnaire sont hétérogènes : les enquêtés avaient le choix de refuser de répondre à une question, ou de dire qu'ils ne connaissaient pas la réponse ; mais la principale source d'hétérogénéité est la nature du questionnaire lui-même, qui est un questionnaire à multiples branchements. Par ailleurs, la nature des réponses aux questions peut varier. En effet, on peut demander au questionné soit une réponse numérique (p. ex. \textit{Quel est le montant de votre revenu ?}), soit une réponse parmi un choix de réponses multiples (QCM). Les données comportent aussi une quantité importante de données manquantes (21\%), dû au fait que le questionnaire est un questionnaire à branches.\par
+Les données se composent des réponses de 33673 personnes sur un questionnaire de 520 questions. Dans cette ensemble d'enquêtés, on ne considère que les actifs, c'est-à-dire ceux occupant un emploi à la date du questionnaire, ce qui nous laisse 31112 enquêtés. Les questions portant sur les aspects de la vie de l'enquêté, sont regroupées en 7 rubriques (Table \ref{tab:cat_questions}). Notons de plus que les données issues du questionnaire sont hétérogènes : les enquêtés avaient le choix de refuser de répondre à une question, ou de dire qu'ils ne connaissaient pas la réponse ; mais la principale source d'hétérogénéité est la nature du questionnaire lui-même, qui est un questionnaire à multiples branchements. Par ailleurs, la nature des réponses aux questions peut varier. En effet, on peut demander au questionné soit une réponse numérique (p. ex. \textit{Quel est le montant de votre revenu ?}), soit une réponse parmi un choix de réponses multiples (QCM). Les données comportent aussi une quantité importante de données manquantes (21\%), dû au fait que le questionnaire est un questionnaire à branches.\par
 
 \begin{table}[!h]
 \centering
@@ -163,27 +207,17 @@ Cette méthodologie nous permet d'analyser indépendamment les deux blocs de don
 \label{fig:repar_objsubj}
 \end{figure}
 
-\section{Démarche}
-Après cette phase de prétraitement, l'étude est divisée en deux : dans un premier temps on effectuera une analyse descriptive des données poussée, avant d'effectuer une analyse causale, où nous chercherons à déterminer les relations d'implication entre les variables du questionnaire.\par
-
-\subsection{Clustering et analyses}
-Une analyse en composantes principales permet de remédier à la redondance des variables, pour définir un petit nombre d'axes (variables agrégées, définie par une somme pondérée des variables initiales) capturant la variabilité des données. L'interprétation d'un axe se fait en considérant les variables initiales les plus importantes (valeurs absolues des poids les plus élevés). \par
-
-Dans l'espace des axes, chaque individu est un vecteur de $\mathbb{R}^d$. On utilise la catégorisation (clustering) pour identifier les sous-groupes de données homogènes ; l'algorithme employé est un K-means++ \cite{arthur2007k}. Avant d'analyser les clusters, on s'assure de leur stabilité selon les critères définis par \cite{meilua2006uniqueness}. \par
-
-Chaque cluster est interprété par ses variables significatives au sens du v-test \cite{lebart2006statistique}~; formellement, une variable est significative pour un cluster lorsque sa valeur moyenne sur ce cluster est significativement distincte de la valeur moyenne sur l'ensemble des données (compte tenu de la taille du cluster). Après avoir établi des clusters sur les variables de  situation et de ressenti (respectivement sur les variables objectives et subjectives), il s'agit d'analyser comment évoluent les groupes à travers des variables choisies, telles que le revenu ou le score de bien-être défini par l'OMS\footnote{\href{http://www.euro.who.int/fr/publications/abstracts/measurement-of-and-target-setting-for-well-being-an-initiative-by-the-who-regional-office-for-europe}{cf www.euro.who.int.}} ; mais aussi étudier le croisement des populations entre les clusters de situation et de ressenti est une analyse qui peut s'avérer intéressante.\par
-
-\subsection{Causalité}
-La deuxième partie de l'étude consiste à analyser la causalité au sens de \cite{granger1969causality} ; la causalité inclut plus d'informations qu'une simple corrélation, par la présence d'une hiérarchie entre les variables reliées causalement. En effet, la présence d'une corrélation traduit juste la "ressemblance entre deux courbes", et ne permet pas de conclure sur l'existence d'un réel lien entre les deux variables\footnote{Par exemple, la corrélation entre le nombre de pirates en activité et le réchauffement climatique est importante alors que ces deux variables ne sont pas directement liées causalement.}. L'étude de la causalité, se basant sur des techniques complexes et variées, entre prédiction par machine learning et inférence par l'étude des distributions de probabilités permettent de déterminer la présence ou non d'une relation de causalité, mais aussi du sens de cette relation. Ainsi, on aura pour but de construire le graphe le plus complet et le plus fiable des variables et de leurs liens causaux, afin de comprendre les phénomènes moteurs dans le questionnaire et dans l'étude du bien-être au travail. \par % a compléter
 %----------------------------------------------------------------------------------------
 %	CHAPTER 2
 %----------------------------------------------------------------------------------------
+%\chapterimage{desc_chap.pdf}
 \chapter{Analyse descriptive des données}
-\section{Analyse en composantes principales}
+Les données pré-traitées sont représentées par une matrice de 2463 variables $\times$ 31112 enquêtés. Un nombre de variables élevé ne permet pas d'analyser de manière simple les individus, dans le but d'établir des profils types. Notre démarche serait de réduire la dimensionnalité de nos données, puis d'établir des profils-types et enfin analyser les résultats obtenus (Fig.\ref{fig:metho}). 
+\section{Réduction de la dimensionnalité des données}
 \subsection{Principe}
 L'analyse en composantes principales (ACP) est une procédure statistique inventée en 1901 par Karl Pearson qui permet de déterminer un ensemble de variables décorrélées à partir d'un ensemble de variables possiblement corrélées. De plus, étudier l'inertie des valeurs propres associées à ces nouvelles variables permet de mettre en évidence la dimension intrinsèque des données, et donc de réduire la dimension de nos données initiales, afin de remédier à la redondance des variables et d'obtenir un nombre de variables pour représenter les individus dans un espace intelligible. L'algorithme est le suivant : \vspace{0.2cm}\par
 
-\begin{definition}[ACP\vspace{0.2cm}\\]
+\begin{definition}[ACP\vspace{0.1cm}\\]
 %TODO
 \begin{algorithm}[H]
  \KwData{Données pré-traitées de taille $m_{variables} \times n_{exemples}$}
@@ -201,7 +235,7 @@ L'analyse en composantes principales (ACP) est une procédure statistique invent
  $\mathbf{W}\leftarrow vecteurs\_propres(\mathbf{M})$\\
  \BlankLine
 
- $p \leftarrow  \textrm{compromis(inertie,bruit)}$  
+ %$p \leftarrow  \textrm{compromis(inertie,bruit)}$  
  $\mathbf{W}\leftarrow \mathbf{W}[:p,:]$  \tcp{On tronque les $p$ vecteurs propres qu'on a choisis}
  $\mathbf{R}\leftarrow \mathbf{M} \times\textrm{Données}^T$\\
  \KwRet{$\mathbf{R} $} 
@@ -243,11 +277,9 @@ Dans le cas des variables subjectives (environ 20\% des variables), le spectre e
   \caption{Données DARES, variables subjectives: Spectre de la matrice de covariance.}
 \end{figure}
 
-%Peut etre un peu trop mathématique?
-%/////////////// Je m'arrete ici
 \subsection{\'Etude des axes }
 \paragraph{}
-13 nouveaux axes d'étude\footnote{8 axes objectifs et 5 axes subjectifs} sont ainsi obtenus, dont nous allons étudier les caractéristiques. Ces 13 axes sont obtenus par une combinaison linéaire de multiples variables. Afin de connaître la nature de ces nouveaux axes, le poids des différentes variables sur les axes en fonction de leur catégories est un bon indicateur, qui est représenté sur la figure 4 pour les axes objectifs et sur la figure 5 pour les axes subjectifs. 
+13 nouveaux axes d'étude\footnote{8 axes objectifs et 5 axes subjectifs} sont ainsi obtenus, dont nous allons étudier les caractéristiques. Ces 13 axes sont obtenus par une combinaison linéaire de multiples variables. Afin de connaître la nature de ces nouveaux axes, le poids des différentes variables sur les axes en fonction de leur catégories est un bon indicateur, qui est représenté sur la Fig.\ref{fig:ACPobj} pour les axes objectifs et sur la Fig.\ref{fig:ACPsubj} pour les axes subjectifs. 
 \begin{figure}[!h]
     \centering
   \includegraphics[scale=0.55]{Pictures/acp/matrices-poids/axes_wo_idf.pdf}
@@ -263,21 +295,21 @@ Dans le cas des variables subjectives (environ 20\% des variables), le spectre e
   \label{fig:ACPsubj}
 \end{figure}
 
-Les risques psychosociaux, l'organisation du travail et la santé n'apparaissent pas de manière évidente dans les axes objectifs : ceci est du au faible nombre de questions objectives dans ces catégories qu'on peut voir sur la figure 1, ce qui réduit la variance expliquée par ces catégories. Ainsi, les poids des catégories de variables sur les nouveaux axes subjectifs ressemble à un graphe complémentaire sauf pour la "Santé", car elle ne comporte que 4 questions dans le questionnaire. Toutefois, pour déterminer précisément la nature des axes, une analyse des valeurs-test permet de relever les caractéristiques qu'ils mettent en valeur pour différencier les personnes enquêtées.%Description des axes plus précise?
+Les risques psychosociaux, l'organisation du travail et la santé n'apparaissent pas de manière évidente dans les axes objectifs : ceci est du au faible nombre de questions objectives dans ces catégories qu'on peut voir sur la Fig.\ref{fig:repar_objsubj} ce qui réduit la variance expliquée par ces catégories. Ainsi, les poids des catégories de variables sur les nouveaux axes subjectifs ressemble à un graphe complémentaire sauf pour la "Santé", car elle ne comporte que 4 questions dans le questionnaire. Cette première étude ne nous permet pas de caractériser les axes de l'ACP.%Description des axes plus précise?
 
 \subsection{Interprétation des axes}
 \paragraph{}
-Les valeurs-test donnent directement les variables les plus significatives sur les 10\% des personnes les plus élevées et 10\% des personnes les plus basses sur l'axe, ce qui permet d'identifier ces sous-populations, et donc d'interpréter l'axe. Ainsi, nous avons pour chaque axe un graphique en annexe des valeurs-test des variables les plus représentées, et nous pouvons résumer l'analyse des axes dans les tables 1 \& 2.\\ %cf illustration_dares/acp/axes/ 
-%Tables, graphiques? 
+Afin de pouvoir déterminer précisément la nature des axes, il est nécessaire d'étudier la composition de ceux-ci, c'est-à-dire la contribution des variables aux axes. Ainsi, observer les variables les plus corrélées à l'axe, positivement et négativement, nous permet d'inférer sur les caractéristiques de l'axe. Les résultats de l'analyse sont décrits aux Tables \ref{tab:ACPobj} et \ref{tab:ACPsubj}.
+
 \begin{table}[!h]
 \centering
-\begin{tabular}{|p{4cm}|p{5cm}|p{5cm}|}
+\begin{tabular}{|p{3cm}|c|p{4.8cm}|p{4.8cm}|}
 \hline
-    Axes de l'ACP objectif & Variables corrélées positivement & Variables corrélées négativement\\ 
+    Axes de l'ACP \newline objectif & Inertie &  Variables corrélées positivement & Variables corrélées négativement\\ 
     \hline
-    Axe 1 : Taille de l'entreprise employant l'enquêté & Ancienneté \newline Possibilité de congés \newline Entretiens d'évaluation \newline Présence de ressources humaines & Statut indépendant \newline Pas de collègues  \newline Non syndiqué \\
+    Axe 1 : Taille de l'entreprise employant l'enquêté & 20\% & Ancienneté \newline Possibilité de congés \newline Entretiens d'évaluation \newline Présence de ressources humaines & Statut indépendant \newline Pas de collègues  \newline Non syndiqué \\
     \hline
-    Axe 2 : Rémunération et niveau de qualification 
+    Axe 2 : Rémunération et niveau de qualification  & 36\%
     & Pas de mails, d'intranet 
     \newline Doit effectuer des mouvements fatiguants 
     \newline Nécessité de rester longtemps debout 
@@ -285,7 +317,7 @@ Les valeurs-test donnent directement les variables les plus significatives sur l
     \newline Temps passé devant l'informatique, mails 
     \newline Travail non pénible physiquement\\
     \hline
-    Axe 3 : Temps de travail et sécurité & 
+    Axe 3 : Temps de travail et sécurité & 41\% &  
     Nombre d'heures de travail par semaine 
     \newline Nombre de dimanches/samedis travaillés
     \newline Nombre de nuits travaillées
@@ -293,21 +325,21 @@ Les valeurs-test donnent directement les variables les plus significatives sur l
     \newline Pas de risque de blessure/accident
     \newline Pas de consignes de sécurité\\
     \hline
-    Axe 4 : Nature de l'organisme employeur 
+    Axe 4 : Nature de l'organisme employeur & 48\%
     & Salarié du privé
     \newline Entreprise de grande taille
     \newline Cadres d'entreprise
     & Employé d'administration publique, enseignement, santé, social
     \newline Salarié de l'\'Etat \\
     \hline
-    Axe 5 : Immigration
+    Axe 5 : Immigration & 52\%
     & Père/Mère nés en France
     \newline Pas de lien à la migration 
     & Mère/Père immigré(e)
     \newline Immigré
     \newline Naturalisé ou étranger\\
     \hline  
-    Axe 6 : Accidents du travail
+    Axe 6 : Accidents du travail & 57\%
     & Age
     \newline Information sur les risques du travail
     \newline Origine de ces informations
@@ -315,7 +347,7 @@ Les valeurs-test donnent directement les variables les plus significatives sur l
     \newline Accident signalé à l'employeur
     \newline L'employeur n'a pas pris de mesures pour réduire les risques \\
     \hline
-    Axe 7 : Ancienneté/ Taille de la famille %Heureux?Isolé?
+    Axe 7 : Ancienneté/ Taille de la famille & 60\%  %Heureux?Isolé?
     & Année de naissance
     \newline Nombre de personnes au foyer
     \newline Année de début de contrat
@@ -323,8 +355,8 @@ Les valeurs-test donnent directement les variables les plus significatives sur l
     \newline Personne seule
     \newline Date du dernier accident de travail \\
     \hline
-    Axe 8 : Situation familiale
-    & Nombre de personnes au foyer
+    Axe 8 : Situation familiale & 63\%
+    & Nombre de personnes au foyer 
     \newline Nombre d'actifs au foyer 
     \newline Revenus
     \newline En couple et marié
@@ -340,23 +372,23 @@ Les valeurs-test donnent directement les variables les plus significatives sur l
 \newpage
 \begin{table}[!h]
 \centering
-\begin{tabular}{|p{4cm}|p{5cm}|p{5cm}|}
+\begin{tabular}{|p{3cm}|c|p{4.7cm}|p{4.7cm}|}
 	\hline
-    Axes de l'ACP subjectif & Variables corrélées positivement & Variables corrélées négativement\\ 
+    Axes de l'ACP \newline subjectif & Inertie & Variables corrélées positivement & Variables corrélées négativement\\ 
     \hline 
-    Axe 1 : Risques psychosociaux
+    Axe 1 : Risques psychosociaux & 59\% 
     & Personnes provenant de l'entreprise ont des comportements inappropriés 
     \newline Personne ignorée, critiquée, a son travail saboté
     & Score de bien-être de l'OMS\\
     \hline
-    Axe 2 : Indépendance/ Présence de collègues/ supérieurs
+    Axe 2 : Indépendance/ Présence de collègues/ supérieurs & 67\%
     & Possibilité de discuter avec son supérieur
     \newline Parfois en désaccord avec ses collègues
     \newline A été consulté pour un changement de l'environnement de travail
     & Pas de collègues
     \newline Indépendant \\
     \hline
-    Axe 3 : Bon management
+    Axe 3 : Bon management & 72\%
     & Score de bien-être de l'OMS
     \newline Le supérieur prête attention aux propos de l'enquêté et lui apporte de l'aide
     \newline
@@ -365,14 +397,14 @@ Les valeurs-test donnent directement les variables les plus significatives sur l
     \newline pas de possibilité de coopérer
     \newline Doit se dépêcher\\
     \hline
-    Axe 4 : Changement du milieu de travail
+    Axe 4 : Changement du milieu de travail & 76\% 
     & Informé des changements
     \newline Consulté pour effectuer les changements
     \newline Pense que ces changements sont positifs
     & Pas de changement de poste
     \newline Le travail ne permet pas d'apprendre des choses nouvelles\\
     \hline
-    Axe 5 : Satisfaction du travail en équipe 
+    Axe 5 : Satisfaction du travail en équipe & 79\% 
     & Bonne humeur 
     \newline Frais et disposé, calme et tranquille
     \newline Pas de pression
@@ -386,7 +418,7 @@ Les valeurs-test donnent directement les variables les plus significatives sur l
 \label{tab:ACPsubj}
 \end{table}
 
-\section{Clusters et analyses}
+\section{Détermination des profils types}
 \subsection{Méthode employée}
 Dans la suite, la représentation considérée est celle définie par les axes ci-dessus (i.e. chaque personne est projetée dans l'espace $\mathbb{R}^d$, où $d=8$ ou $d=5$ selon que l'on considère les données objectives ou subjectives). Les personnes sont ensuite partitionnées en communautés (clusters) à l'aide de l'algorithme \textit{k-means++}\footnote{L'implémentation utilisée est celle de la librairie \textit{Scikit-Learn}.} se fondant sur la distance classique de $\mathbb{R}^d$ \cite{arthur2007k}.  On obtient ainsi 8 groupes objectifs et 6 groupes subjectifs. Notons que le fait de distinguer les données objectives et subjectives conduit à une meilleure stabilité des clusters obtenus ; le fait de considérer toutes les données conduit à des interférences entre situation objective et ressenti. Parmi nos outils d'analyse nous avons utilisé la valeur-test (v-test) de \cite{lebart2006statistique}, défini par les formules suivantes pour les variables numériques ($V_n$) et catégorielles ($V_c$) : 
  $$ V_n= \frac{\mu_g-\mu}{\sqrt{\frac{n-n_g}{n-1}\times\frac{\sigma^2}{n_g}}} $$
@@ -402,9 +434,9 @@ avec : \\
  index $_j$ :& valeur sur une catégorie\vspace{0.2cm}\\
  \end{tabular}
  
- Finalement, la valeur du v-test peut-être interprétée comme une différence de moyenne entre les valeurs des variables entre le cluster et la population globale, dans le but de mettre en valeur les variables significatives.
+Finalement, la valeur du v-test peut-être interprétée comme une différence de moyenne entre les valeurs des variables entre le cluster et la population globale, dans le but de mettre en valeur les variables significatives.
  
-\subsection{Clusters objectifs}
+\subsection{Profils-types objectifs}
 \paragraph{}
 Chaque cluster est interprété en fonction de son centre (représenté en coordonnées parallèles en fonction des  axes de l'ACP\footnote{Ce qui correspond à la moyenne du cluster ou encore l'individu représentatif du cluster projeté sur les axes de l'ACP} à la  Fig.\ref{fig:CPobj}), et considérant les variables significatives au sens du v-test pour ce cluster: dont la valeur sur le cluster est soit significativement plus élevée, soit moins élevée que pour l'ensemble des données. Une variable particulière, le code NAF17 (Fig.\ref{fig:nafobj}) permet d'avoir une idée de la répartition des classes socioprofessionnelles dans les différentes communautés. Les résultats de l'analyse sont résumés dans la table \ref{tab:nom_clusters_obj}.
 
@@ -412,7 +444,7 @@ Chaque cluster est interprété en fonction de son centre (représenté en coord
 \begin{figure}[!h]
 \centering
   \includegraphics[width=16cm]{Pictures/coord_paralleles/rcp_wo.pdf}
-\caption{Représentation en coordonnées parallèles des centres des clusters objectifs sur les axes de l'ACP}
+\caption{Représentation en coordonnées parallèles des centres des clusters objectifs sur les axes de l'ACP. Le groupe \INDEP\ est caractérisé par sa faible valeur sur l'axe 1, car les indépendants ont une taille d'entreprise peu importante.}
 \label{fig:CPobj}
 \end{figure}
 
@@ -429,14 +461,14 @@ Ce cluster représente des personnes étant dans des entreprises très petites, 
 \paragraph{Groupe 2 : Services aux particuliers (\SERV)\\}
 Les caractéristiques de ce deuxième groupe sont un faible niveau de qualification, un temps de travail et une sécurité faibles, travailleurs du secteur public, plutôt dans le domaine des activités de services. En analysant plus en détail les valeurs des v-test sur les codes NAF, la catégorie socioprofessionnelle la plus représentée est celle des services aux particuliers. Les revenus moyens de ce cluster sont bien inférieurs aux revenus moyens de l'ensemble des enquêtés (1163\euro{}/mois contre 1833\euro{} en moyenne), avec une qualification assez faible (19\% sans diplôme, 39\% avec un CAP, BEP ou équivalent).
 
-\paragraph{Groupe 3 : Lien à l'immigration (\IMM)\\}
+\paragraph{Groupe 3 : Lien à l'immigration (\IMM)\\ }
 Une caractéristique principale de ce groupe, qui apparaît à la Fig.\ref{fig:CPobj}, est le lien à l'immigration. En effet, 53\% des personnes de ce cluster sont étrangers, et 42\% sont français par naturalisation, mariage, déclaration ou option à la majorité. Ils ont, d'après les moyennes calculées sur le cluster, travaillent principalement dans le secteur privé, comme l'indique la Fig.\ref{fig:CPobj}.
 
 \paragraph{Groupe 4 : Ouvriers (\OUVR)\\}
-Le troisième cluster est représenté par des personnes employées dans une grande entreprise, ayant un faible niveau de qualification, et plutôt du secteur privé. Les code NAF sur-représentés dans cluster sont souvent des secteurs de fabrication de produits, d'industrie de l'énergie et des transports. Ce cluster met donc en valeur les ouvriers, techniciens, agents de maîtrise et contremaîtres du secteur privé. Les enquêtés sont à 93\% salariés d'une entreprise, d'un artisan, ou d'une association. Ce cluster est composé majoritairement d'hommes (76\%), qui mettent en avant des inconvénients du travail et des conditions de travail telles que la saleté (53\%), des courants d'air (62\%), des secousses ou vibrations (40\%), de l'humidité (44\%) et une température basse (56\%). 
+Le troisième cluster est représenté par des personnes employées dans une grande entreprise, ayant un faible niveau de qualification, et plutôt du secteur privé. Les code NAF sur-représentés dans cluster sont souvent des secteurs de fabrication de produits, d'industrie de l'énergie et des transports. Ce cluster est caractérisé par les ouvriers, techniciens, agents de maîtrise et contremaîtres du secteur privé. Les enquêtés sont à 93\% salariés d'une entreprise, d'un artisan, ou d'une association. Ce cluster est composé majoritairement d'hommes (76\%), qui mettent en avant des la pénibilité des tâches et des conditions de travail telles que la saleté (53\%), des courants d'air (62\%), des secousses ou vibrations (40\%), de l'humidité (44\%) et une température basse (56\%). 
 
 \paragraph{Groupe 5 : Employés de bureau du secteur privé (\CSPPPr)\\}
-Cette communauté est similaire à celle du cluster 4, à l'exception du niveau de qualification qui est élevé, ainsi que les secteurs d'activité, qui incluent ici les secteurs des services et des activités scientifiques. Ce cluster est identifiable à une population d'employés de bureau du privé, comprenant les cadres. Les salaires de ce groupe sont par ailleurs bien supérieurs à la moyenne (2328\euro{}/mois contre 1833\euro{}/mois pour l'ensemble de la population étudiée). 90\% des enquêtés n'ont pas à rester longtemps debout pour effectuer leur travail, 95\% disposent d'une boîte aux lettres électronique professionnelle et plus de 80\% des personnes du cluster sont satisfaits des conditions de travail.
+Le profil type de ce groupe est similaire à celle du cluster 4, à l'exception du niveau de qualification qui est élevé et des secteurs d'activité (services et des activités scientifiques). Ce cluster est identifiable à une population d'employés de bureau du privé, comprenant les cadres. Les salaires de ce groupe sont par ailleurs bien supérieurs à la moyenne (2328\euro{}/mois contre 1833\euro{}/mois pour l'ensemble de la population étudiée). 90\% des enquêtés n'ont pas à rester longtemps debout pour effectuer leur travail, 95\% disposent d'une boîte aux lettres électronique professionnelle et plus de 80\% des personnes du cluster sont satisfaits des conditions de travail.
 
 \paragraph{Groupe 6 : Employés de bureau du secteur public (\CSPPPu)\\}
 Ce cluster a des caractéristiques très proches du cluster 5; à la différence du secteur d'activité, qui est public. Ce groupe peut donc être interprété comme le cluster des employés de bureau du secteur public. les enquêtés de ce groupe sont à 59\% des salariés de l'état, et sont aussi mieux payés que la moyenne : 2357\euro{}/mois contre 1833\euro{}/mois en moyenne. Contrairement au cluster 5, les personnes constituant ce cluster bénéficient d'un grand nombre de congés (60 jours contre 37 jours en moyenne).
@@ -475,14 +507,14 @@ Cette dernière communauté possède aussi une caractéristique distincte des au
 \label{tab:nom_clusters_obj}
 \end{table}
 
-\subsection{Clusters subjectifs }
+\subsection{Profils-types subjectifs }
 
-Après avoir analysé les clusters objectifs, il faut maintenant analyser les clusters subjectifs, avant de pouvoir comparer les deux analyses. On dispose aussi de la représentation en coordonnées parallèles à la Fig.\ref{fig:CPsubj} et de la répartition des v-test avec le code NAF17 à la Figure \ref{nafsubj}. Le résumé de ces analyses se retrouve à la Table \ref{tab:nom_clusters_subj}.
+Après avoir analysé les clusters objectifs, il faut maintenant analyser les clusters subjectifs, avant de pouvoir comparer les deux analyses. On dispose aussi de la représentation en coordonnées parallèles à la Fig.\ref{fig:CPsubj} et de la répartition des v-test avec le code NAF17 à la Figure \ref{fig:nafsubj}. Le résumé de ces analyses se retrouve à la Table \ref{tab:nom_clusters_subj}.
 
 \begin{figure}[!h]
 \centering
   \includegraphics[width=16cm]{Pictures/coord_paralleles/rcp_ws.pdf}
-\caption{Représentation en coordonnées parallèles des centres des clusters subjectifs sur les axes de l'ACP}
+\caption{{Représentation en coordonnées parallèles des centres des clusters subjectifs sur les axes de l'ACP. Ici, les enquêtés du groupe \HEUR\ ont une valeur assez élevée sur l'axe 5, traduisant une bonne satisfaction du travail en équipe.}}
 \label{fig:CPsubj}
 \end{figure}
 
@@ -500,16 +532,16 @@ Ce premier groupe est caractérisé par les enquêtés qui sont indépendants à
 Ce cluster est représenté par les personnes qui n'ont pas de problèmes avec leur environnement de travail, qui sont satisfaites de leur travail et ont une bonne vie de groupe. Les enquêtés constituant ce cluster sont légèrement moins payées que la moyenne (1753\euro{}/mois contre 1877\euro{}/mois en moyenne) mais ont un score de bien-être défini par l'OMS bien supérieur à la moyenne (20,38 contre 15,65). Par ailleurs, la notion de tension et pression est très peu présente dans ce groupe : la plupart des enquêtés sont jamais sous pression et n'ont aucune tension avec leur équipe.
 
 \paragraph{Groupe 3 : Rien à signaler (\RAS)\\}
-Ce cluster semble être assez vague, alors que c'est l'un des plus peuplés. Dans cette communauté, les personnes sont plutôt satisfaites, n'ont pas subi de changement d'environnement de travail au cours des douze derniers mois, et proviennent à peu près que chaque catégorie socioprofessionnelle. Ce cluster représente donc les personnes qui n'ont rien à signaler de particulier et son plutôt satisfaites de leur vie au travail. Elles ont pourtant un salaire supérieur à la moyenne (2023\euro{}/mois) et plus de congés que la moyenne (41 jours).
+Ce cluster semble être assez vague, alors que c'est l'un des plus peuplés. Dans cette communauté, les personnes sont plutôt satisfaites, n'ont pas subi de changement d'environnement de travail au cours des douze derniers mois, et proviennent à peu près que chaque catégorie socioprofessionnelle. Ce cluster représente donc les personnes qui n'ont rien à signaler de particulier et son plutôt satisfaites de leur vie au travail. Elles ont pourtant un salaire supérieur à la moyenne (2023\euro{}/mois contre 1877\euro{}/mois en moyenne) et plus de congés que la moyenne (41 jours).
 
 \paragraph{Groupe 4 : Changements   de   l'environnement   de
 travail (\GLOB)\\}
-Cette communauté se caractérise par le fait que ses constituants proviennent de grandes organisations, et qu'ils ont récemment subi des changements dans leur milieu de travail au cours des douze derniers mois. Ils sont assez satisfaits du travail en équipe, et pensent que les changements ont été plutôt positifs et bien effectués. Ils proviennent principalement des catégories socioprofessionnelles "\textit{Administration publique, enseignement, santé humaine, action sociale}" et "\textit{Activités financières et d'assurance}", et sont mieux payés que la moyenne : 2094\euro{}/mois.
+Cette communauté se caractérise par le fait que ses constituants proviennent de grandes organisations, et qu'ils ont récemment subi des changements dans leur milieu de travail au cours des douze derniers mois. Ils sont assez satisfaits du travail en équipe, et pensent que les changements ont été plutôt positifs et bien effectués. Ils proviennent principalement des catégories socioprofessionnelles "\textit{Administration publique, enseignement, santé humaine, action sociale}" et "\textit{Activités financières et d'assurance}", et sont mieux payés que la moyenne : 2094\euro{}/mois contre 1877\euro{}/mois en moyenne.
 
-\paragraph{Groupe 5 : Environnement stressant (\ENV)\\}
-Cette communauté représente ceux qui sont satisfaits du management, mais ont des problèmes liés à leur environnement de travail qui leur est, selon leur point de vue, néfaste et source de risques psychosociaux. Ces sentiments sont éprouvés à cause de situations de tension avec les collègues et de comportement nuisibles, par exemple l'enquêté est ignoré, ou critiqué injustement.
+\paragraph{Groupe 5 : Tension avec les collègues (\ENV)\\}
+Cette communauté représente ceux qui sont satisfaits du management, mais ont des problèmes liés à leur collègues/équipe qui leur sont, selon leur point de vue, néfastes et sources de risques psychosociaux. Ces sentiments sont éprouvés à cause de situations de tension avec les collègues et de comportement nuisibles, par exemple l'enquêté est ignoré, ou critiqué injustement.
 
-\paragraph{Groupe 6 : Malheureux (\MALH)\\}
+\paragraph{Groupe 6 : Tension avec la hiérarchie (\MALH)\\}
 Enfin, ce groupe représente les personnes qui ont beaucoup de risques psychosociaux malgré une satisfaction du travail en équipe assez bonne. La pression ainsi que la tension avec les supérieurs sont très présentes dans ce cluster. Il y a un grand ressenti d'injustice, et un sentiment d'exploitation. Ceci se traduit sur la représentation en coordonnées parallèles par un mauvais score sur l'axe 3; ou encore un taux d'absentéisme assez élevé (17,25 jours contre 7,95 en moyenne). Ces éléments traduisent aussi un rejet du travail actuel de l'enquêté : 79\% de la population de ce groupe ne seraient pas heureux si l'un de leurs enfants s'engagent dans la même activité professionnelle qu'eux et 62\% ne se sentent pas capables de continuer leur travail jusqu'à leur retraite.
 
 
@@ -528,9 +560,9 @@ Enfin, ce groupe représente les personnes qui ont beaucoup de risques psychosoc
   \hline
  4 & \GLOB & 17.5\% & Changement de l'environnement de travail \\
   \hline
- 5 & \ENV & 22.5\% &  Environnement stressant\\
+ 5 & \ENV & 22.5\% &  Tension avec les collègues\\
   \hline
- 6 & \MALH & 13.0\% & Malheureux\\
+ 6 & \MALH & 13.0\% & Tension avec la hiérarchie\\
   \hline
 \end{tabular}% Bien retravailler les noms de clusters
 \caption{Identification des clusters subjectifs}
@@ -556,10 +588,9 @@ La normalisation est effectuée sur les clusters objectifs, c'est-à-dire que la
 \begin{figure}[!h]
 \center
 \includegraphics[scale=0.5]{Pictures/croisement/Matrice_xnormObj8subj6.pdf}
-\caption{Matrice de correspondance entre les clusters subjectifs et objectifs}
+\caption{Correspondance entre les clusters objectifs (en colonnes) et les clusters subjectifs (en ligne): La case $(i,j)$ indique le pourcentage du cluster objectif $i$ appartenant au cluster subjectif $j$. Par exemple, 30\% des enquêtés du groupe \ACC\ sont du groupe \MALH\, et 25\% des \ACC\ sont dans le cluster \ENV\ .}
 \label{fig:objxsubj}
 \end{figure} %
-
 \paragraph{}
 Le premier élement qui apparaît de manière claire est le recoupement des clusters \INDEP\ objectifs et \INDEP\ subjectifs : il y a en effet plus de 70\% de la population de ces groupes en commun. 
 
@@ -569,12 +600,12 @@ Les clusters objectifs \OUVR\ et \IMM\ se répartissent de manière similaire en
 essentiellement les clusters subjectifs \MALH\ (30\%) et \ENV (26\%).
 
 \paragraph{}
-La spécificité des indépendants ici peut être perçue comme un artefact du questionnaire : beaucoup de questions font référence au travail en équipe et au management d'équipe. Ainsi, ces questions ne concernent pas les indépendants ; et donc un grand nombre de leurs réponses sont {\em sans objet} ou {\em non pertinent}. En revanche, la présence d'un environnement stressant dans la majorité des clusters objectifs n'était pas attendue ;  ce résultat fait écho à d'autres travaux montrant l'augmentation des facteurs de stress au cours des années, en particulier en lien à la "transformation numérique" des entreprises \cite{datchary2011dispersion}.
+La spécificité des indépendants ici peut être perçue comme un artefact du questionnaire : beaucoup de questions font référence au travail en équipe et au management d'équipe. Ainsi, ces questions ne concernent pas les indépendants ; et donc un grand nombre de leurs réponses sont {\em sans objet} ou {\em non pertinent}. En revanche, la présence d'un environnement stressant et de tension dans la majorité des clusters objectifs n'était pas attendue ;  ce résultat fait écho à d'autres travaux montrant l'augmentation des facteurs de stress au cours des années, en particulier en lien à la "transformation numérique" des entreprises \cite{datchary2011dispersion}.
 %Interprétation à venir
 
 \subsection{Autonomie et clusters}
 \paragraph{}
-Les différents clusters identifiés et leurs intersections peuvent être utilisés pour approfondir les liens entre QVT et d'autres facteurs tel que l'autonomie au travail des individus.
+Les différents clusters identifiés et leurs intersections peuvent être utilisés pour approfondir les liens entre QVT et d'autres facteurs tel que l'autonomie au travail des individus, un aspect de la QVT très étudié récemment.
 Pour réaliser cette étude, nous avons définit un score d'autonomie à partir de 4 questions. Le score sur dix est une somme pondérée en fonction de la réponse aux questions, dont les détails sont données Table \ref{tab:autonomiescore}. Afin d'obtenir un score homogène, nous ne considérons que les personnes ayant répondu aux quatre questions. 
 
 Les quatre questions utilisées sont : 
@@ -644,18 +675,28 @@ L'analyse des résultats permet de tirer plusieurs enseignements:
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width=16cm]{Pictures/coord_paralleles/rcp_autonomie.pdf}
+\includegraphics[width=13cm]{Pictures/coord_paralleles/rcp_autonomie.pdf}
 \caption{Représentation en coordonnées parallèles du score d'autonomie en fonction des clusters. Par exemple, les individus à la fois dans le cluster objectif Santé (ligne la plus basse - jaune) et dans le cluster subjectif \HEUR\ (tout a gauche sur le graphique) ont un score d'autonomie moyen de 5,6.}
 \label{fig:rcpautonomie}
 \end{figure}
 
 %TODO : Conclusion de la partie
-
+\section{Récapitulatif de l'analyse descriptive}
+L'analyse descriptive nous a permis d'établir des profils-types à partir d'un volume important de données et hétérogènes. La méthodologie employée est intéressante dans le sens où tous les résultats ont été obtenus par des algorithmes traditionnels de regroupement et de réduction de dimension ; et que nous n'avons eu aucun contrôle sur la nature des résultats. Toutefois, nous avons quand même obtenus des résultats cohérents que ce soit en étude de situation ou de ressenti, sauf pour les groupes des indépendants qui ont été plutôt mis à l'écart à cause du questionnaire à branches et sur les multiples questions sur la hiérarchie et les collègues.\par	
+Les résultats que nous pouvons retenir de cette première partie sont le fait que l'autonomie est majoritairement supérieure pour les enquêtés qui sont plutôt satisfaits de leur travail comparé aux enquêtés victimes de malheur au travail(Fig.\ref{fig:rcpautonomie}), mais que les plus autonomes ne sont pas les plus heureux. De plus, on remarque que les groupes les plus heureux sont ceux ayant le moins de qualifications (Fig.\ref{fig:objxsubj}), que le secteur de la santé connaît une quantité importante d'enquêtés mécontents de leur travail, et que les accidentés au travail sont très mécontents de la hiérarchie. Ce dernier comportement est lié au manque de réaction de la hiérarchie face à l'accident qu'à subi l'enquêté.\par
+Ainsi nous avons pu analyser de manière assez précise les données, mais cette première étude ne nous permet pas de déterminer les mécanismes à l'origine de la satisfaction au travail, c'est-à-dire si la situation détermine la satisfaction, ou si d'autres facteurs la déterminent.
 %----------------------------------------------------------------------------------------
-%	CHAPTER 3
+%	CHAPTER 4
 %----------------------------------------------------------------------------------------
+%\chapterimage{graph_nodes_arr2.pdf}
 \chapter{Analyse causale}
 %TODO \section{\'Etat de l'art}
+L'analyse descriptive nous permet d'identifier les phénomènes liés à la satisfaction au travail, mais ne nous permet pas de déterminer les causes derrière ces phénomènes  \cite{pearl2000causal}. L'enjeu représenté par cette étude est important : elle nous permettrait de faire des recommandations aux managers afin de pouvoir améliorer la qualité de vie au travail.\par
+ 
+\section{Motivation}
+La corrélation caractérise le fait que deux variables ont des évolutions statistiques similaires, mais n'implique pas l'existence d'une relation de causalité entre les deux variables\footnote{Telles que la corrélation entre les dépenses des \'Etats-Unis pour la  science et le nombre de suicides}.La définition de la causalité pour cette étude est celle de \cite{statnikov2012new} : "$A$ est une cause de $B$ ($A \rightarrow B$) si la loi de probabilité de $B$ change pour une manipulation expérimentale de $A$. \par
+Les approches classiques pour étudier la causalité sont tout d'abord l'expérience contrôlée\footnote{P.ex. les tests cliniques} mais qui ont leur inconvénients : coûteux, non éthiques ou non réalisables, ou encore l'économie expérimentale, mais qui est dure à transposer à la réalité, mais aussi les expériences naturelles\footnote{P.ex. l'évolution du travail dans les restaurants Mc Donald's dans les différents états des \'Etats-Unis} sur lesquelles les chercheurs n'ont aucun contrôle. Une nouvelle approche est d'inférer sur les relations causales avec seulement des données d'observations. Sur cette approche, plusieurs méthodes sont mises en évidence, telles que la classification avec les outils d'apprentissage machine ou encore une approche sur la complexité des modèles \cite{stegle2010probabilistic}. Afin de rassembler les connaissances et comparer les approches en inférence de causalité, plusieurs challenges ont été organisés par Isabelle Guyon. Nous allons nous baser sur les meilleurs algorithmes de ces compétitions pour lancer notre étude.   
+
 \section{Méthodologie}
 Notre objectif est de pouvoir construire un graphe reliant causalement l'ensemble, ou un maximum de variables de notre questionnaire. Pour cela, on adopte %dans un premier temps 
 une méthodologie employée en analyse de graphes causaux, c'est-à-dire :
@@ -666,7 +707,17 @@ une méthodologie employée en analyse de graphes causaux, c'est-à-dire :
 \item Orienter les relations restantes à l'aide du coefficient de causalité entre les deux variables 
 \end{enumerate}
 
-Mais plusieurs difficultés viennent s'ajouter à cette approche : l'hétérogénéité des données et la nature du coefficient de causalité.
+Mais plusieurs difficultés viennent s'ajouter à cette approche : l'hétérogénéité des données et la fiabilité du graphe de causalité.
+
+\subsection{Coefficient de causalité}
+Afin de pouvoir orienter nos graphes de causalité, on souhaite inférer la relation de causalité entre les variables deux à deux à la dernière étape de notre méthodologie. Pour cela, on fait appel aux résultats des compétitions \textit{Kaggle}\footnote{\href{https://www.kaggle.com/c/cause-effect-pairs}{kaggle.com/c/cause-effect-pairs}} et \textit{Codalab}\footnote{\href{https://competitions.codalab.org/competitions/1381}{competitions.codalab.org/competitions/1381}} sur la causalité, notamment les algorithmes ayant obtenu de bon résultats : \cite{follonosa2016causalityvar} et \cite{lopez-paz2015learningcausality}. Dans ces différents challenges, on a demandé de présenter les résultats sous la forme $target \in [-1;1]$, $target$ étant la valeur de la prédiction de la causalité d'une paire $A,B$ de variables. Ainsi, $target$ est interprétée de la manière suivante : 
+
+\begin{itemize}
+\item[•] Si $target = -1$, on a $A\leftarrow B$
+\item[•] Si $target = 1$, on a $A\rightarrow B$
+\item[•] $target = 0$ pour les autres cas\footnote{Les cas de \textit{cofounder} (existence d'une variable $C$ causant $A$ et $B$), \textit{indépendance}, \textit{cycle}, et de \textit{contrainte}}\vspace{0.3cm}
+\end{itemize}
+Ce dernier point peut montrer les limites du modèle : de nombreux cas ont été intégrés dans le cas $target=0$, et l'on ne s'intéresse qu'aux relations de causalité directes.
 
 \subsection{Hétérogénéité des données}
 
@@ -688,9 +739,9 @@ La nécessité de retirer les liens indirects ne semble pas être évidente au p
 
 \begin{figure}[!h]
   \centering
-  \subfloat[Graphe sans relation indirectes]{\includegraphics[width=6cm]{Pictures/graph_direct.pdf}}
+  \subfloat[Graphe sans relation indirectes]{\includegraphics[width=5.5cm]{Pictures/graph_direct.pdf}}
   \hspace{2pt}
-  \subfloat[Graphe avec relation indirectes]{\includegraphics[width=6cm]{Pictures/graph_indirect.pdf}}
+  \subfloat[Graphe avec relation indirectes]{\includegraphics[width=5.5cm]{Pictures/graph_indirect.pdf}}
   \caption{Graphe causal simple sans et avec la relation indirecte}
   \label{fig:graph-in-direct}
 \end{figure}
@@ -705,14 +756,9 @@ Ainsi, on pourrait penser que notre étude se limiterait à étudier les coeffic
 
 \end{figure}
 
-\subsection{Coefficient de causalité}
-Afin de pouvoir orienter nos graphes de causalité, on souhaite inférer la relation de causalité entre les variables deux à deux à la dernière étape de notre méthodologie. Pour cela, on fait appel aux résultats des compétitions \textit{Kaggle}\footnote{\href{https://www.kaggle.com/c/cause-effect-pairs}{kaggle.com/c/cause-effect-pairs}} et \textit{Codalab}\footnote{\href{https://competitions.codalab.org/competitions/1381}{competitions.codalab.org/competitions/1381}} sur la causalité, notamment les algorithmes ayant obtenu de bon résultats : \cite{follonosa2016causalityvar} et \cite{lopez-paz2015learningcausality}. Dans ces différents challenges, on a demandé de présenter les résultats sous la forme $target \in [-1;1]$, $target$ étant la valeur de la prédiction de la causalité d'une paire $A,B$ de variables. Ainsi, $target$ est interprétée de la manière suivante : 
-\begin{itemize}
-\item[•] Si $target = -1$, on a $A\leftarrow B$
-\item[•] Si $target = 1$, on a $A\rightarrow B$
-\item[•] $target = 0$ pour les autres cas\footnote{Les cas de \textit{cofounder} (existence d'une variable $C$ causant $A$ et $B$), \textit{indépendance}, \textit{cycle}, et de \textit{contrainte}}\vspace{0.3cm}
-\end{itemize}
-Ce dernier point peut montrer les limites du modèle
+\section{Travaux futurs}
+	Afin de pouvoir prendre en compte l’hétérogénéité des données, il s'agit de comparer un ensemble de critères d'indépendance. En créant un ensemble de paires de variables que l'on sait indépendantes\footnote{On génère des paires indépendantes à partir d'une vraie paire en mélangeant aléatoirement l'ordre des valeurs d'une des variables de la paire}, on compte le nombre de fausses paires détectées par le modèle en fonction de la confiance du critère. De cette manière, on souhaite tester de multiples critères tels que (Pearson, $\chi^2$, FSIC, information mutuelle, Cramer's V) et ainsi déterminer le critère le plus adapté à nos données.\par
+Pour inférer sur la structure du graphe ou encore vérifier la structure du graphe, nous pourra utiliser les travaux de \cite{aliferis2010local}, qui cherchent à déterminer la couverture de Markov dans un graphe causal.
 
 
 %------------------------------------------------
@@ -730,6 +776,8 @@ Ce dernier point peut montrer les limites du modèle
 %----------------------------------------------------------------------------------------
 %	APPENDIX
 %----------------------------------------------------------------------------------------
+%\chapterimage{blank_chap2.pdf}
+
 \bibliographystyle{apalike-fr}
 \bibliography{bibliography.bib}
 \addcontentsline{toc}{chapter}{Bibliographie}

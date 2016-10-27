@@ -64,4 +64,5 @@ for i in results:
 plt.legend(crit_names,loc=4)
 plt.xlabel('Number of probes retrieved')
 plt.ylabel('False discovery rate')
+plt.xscale('log')
 plt.show()
