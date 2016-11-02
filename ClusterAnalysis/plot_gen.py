@@ -44,7 +44,7 @@ else:
 
 legend = [legend[elt] for elt in permutation_clusters]
 
-mode =4
+mode =3
 # 1 : matrices of v-tests for some vars
 # 2 : highest values of v-test per cluster
 # 3 : matrices of distance between objective and subjective clusters
@@ -281,7 +281,7 @@ elif mode == 3:
     # 2 is objective
     # 1 is subjective
 
-    autonomy = True
+    autonomy = False
     clustering2 = 'cluster_predictions_c8_n500_r12-obj.csv'
     clustering1 = 'cluster_predictions_c6_n500_r12-subj.csv'
 

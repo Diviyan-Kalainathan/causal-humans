@@ -32,7 +32,7 @@ NUMERICAL = "Numerical"
 max_proc = int(sys.argv[1])
 inputdata = '../input/kaggle/CEfinal_train'
 
-crit_names = ["Pearson's correlation",
+'''crit_names = ["Pearson's correlation",
               "Pval-Pearson",
               "Chi2 test",
               "Mutual information",
@@ -40,8 +40,8 @@ crit_names = ["Pearson's correlation",
               "Lopez Paz's coefficient",
               "FSIC",
               "BF2d mutual info",
-              "BFMat mutual info"]
-
+              "BFMat mutual info"]'''
+crit_names=["BF2d mutual info"]
 
 # FSIC param :
 # Significance level of the test
@@ -191,15 +191,16 @@ def f_fsic(var1, var2, var1type, var2type):
         return 0
 
 
-dependency_functions = [f_pearson,
-                        f_pval_pearson,
-                        f_chi2_test,
-                        f_mutual_info_score,
-                        f_corr_CramerV,
-                        f_lp_indep_c,
-                        f_fsic,
-                        f_bf_mutual_info_2d,
-                        f_bf_mutual_info_mat]
+dependency_functions = [#f_pearson,
+                        #f_pval_pearson,
+                        #f_chi2_test,
+                        #f_mutual_info_score,
+                        #f_corr_CramerV,
+                        #f_lp_indep_c,
+                        #f_fsic,
+                        f_bf_mutual_info_2d#,
+                        #f_bf_mutual_info_mat
+                        ]
 
 
 def process_job_parts(part_number, index):
