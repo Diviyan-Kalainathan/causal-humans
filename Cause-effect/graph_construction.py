@@ -35,6 +35,7 @@ outputTarget="net1_expression_data_InSilico_target.csv"
 
 df_input = pd.read_csv(variables_data, sep='\t', encoding="latin-1")
 
+nb_proc=int(sys.argv[1])
 independancy_criterion=0
 deconvolution_method=1
 predict_method=1
@@ -134,7 +135,7 @@ for i in range(0,Gdir.shape[0]):
             newLignOutput = pd.DataFrame([[sampleID, aValuesParse, bValuesParse]],
                                          columns=["SampleID", "A", "B"])
 
-            df_ouput = pd.concat([df_output, newLignOutput])
+            df_output = pd.concat([df_output, newLignOutput])
 
             newLignPublicinfo = pd.DataFrame([[sampleID, "Numerical", "Numerical"]],
                                          columns=["SampleID", "A type", "B type"])
@@ -148,4 +149,17 @@ df_publicinfo.to_csv(outputPath + outputPublicInfo, index=False, encoding='utf-8
 #Create file id not exists
 open(outputPath+outputTarget,'a').close()
 
-cp.ce_pairs_predict(predict_method,outputPath + outputCausalityPairs,outputPath + outputPublicInfo,outputPath+outputTarget,1)
+cp.ce_pairs_predict(predict_method,outputPath + outputCausalityPairs,outputPath + outputPublicInfo,outputPath+outputTarget,nb_proc)
+
+df_causation_results=pd.read_csv(outputPath+outputTarget,columns=['SampleID','Value'])
+
+results=[]
+
+for idx,row in df_causation_results.iterrows():
+    v_names=row['SampleID'].split('-')
+    if row['Value']>0:
+        results.append([v_names[0],v_names[1],row['Value']])
+    else:
+        results.append([v_names[1],v_names[0],abs(row['Value'])])
+
+df_results=pd.DataFrame(results,columns=['Source','Target','Score'])
