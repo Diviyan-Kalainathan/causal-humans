@@ -4,12 +4,12 @@ Author : Diviyan Kalainathan
 Date : 28/06/2016
 """
 
-from lib_fonollosa import*
-from lib_fonollosa import predict as fo
+from lib.fonollosa import*
+from lib.fonollosa import predict as fo
 
-from lib_lopez_paz import experiment_challenge as lp
+from lib.lopez_paz import experiment_challenge as lp
 
-from lib_lopez_codalab import predict as lc
+from lib.lopez_codalab import predict as lc
 
 # from lib_test import test as te
 
@@ -17,7 +17,7 @@ from multiprocessing import Process
 import os,sys
 
 
-def ce_pairs_predict(causal_predict_method,inputdata,max_proc=1):
+def ce_pairs_predict(causal_predict_method,inputfilespath,infopath,outputfilespath,max_proc=1):
     """Method used for causal prediction
     # 1 : Handcraft features J. Fonollosa method
     # 2 : RCC - Randomized Causation Coefficient D. Lopez-Paz et al. 2015 (Toward a learning theory of cause effect inference)
@@ -90,39 +90,37 @@ def ce_pairs_predict(causal_predict_method,inputdata,max_proc=1):
         #     outputfilespath.append("output/resultpredict/LopezKernel_SUP4.csv")
     ########'''
 
-        if(causal_predict_method == 1):
+    if(causal_predict_method == 1):
 
-            modelPath = "lib_fonollosa/"
+        modelPath = "lib/fonollosa/"
 
-            for idx in range(len(inputfilespath)):
+        for idx in range(len(inputfilespath)):
 
-                fo.predict(inputfilespath[idx], infopath[idx], outputfilespath[idx], modelPath )
-
-
-        elif(causal_predict_method == 2):
+            fo.predict(inputfilespath[idx], infopath[idx], outputfilespath[idx], modelPath )
 
 
-            lopez_paz = True
+    elif(causal_predict_method == 2):
 
-            # Creating parameters
 
-            modelPath = "lib.lopez_paz/"
+        lopez_paz = True
 
-            # Creating process
-            lp.predict(inputfilespath,outputfilespath,modelPath, max_proc)
+        # Creating parameters
 
-        elif (causal_predict_method == 3):
+        modelPath = "lib/lopez_paz/"
 
-            print("TODO : add neural network lopez paz")
+        # Creating process
+        lp.predict(inputfilespath,outputfilespath,modelPath, max_proc)
 
-        elif (causal_predict_method == 4):
+    elif (causal_predict_method == 3):
 
-            modelPath = "lib.lopez_codalab/pickles/"
+        print("TODO : add neural network lopez paz")
 
-            lc.predict(inputfilespath, outputfilespath,modelPath, max_proc)
+    elif (causal_predict_method == 4):
 
-        # elif (causal_predict_method == 5):
-        #
-        #     te.predict(inputfilespath, outputfilespath,max_proc)
+        modelPath = "lib/lopez_codalab/pickles/"
+
+        lc.predict(inputfilespath, outputfilespath,modelPath, max_proc)
+
+
 
 print('End of program.')
