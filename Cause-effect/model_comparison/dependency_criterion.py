@@ -5,6 +5,7 @@ Date : 11/10/2016
 """
 
 import os, sys
+
 sys.path.insert(0, os.path.abspath(".."))  # For imports
 import pandas as pd
 from multiprocessing import Pool
@@ -13,7 +14,7 @@ from lib.fonollosa import features
 import numpy
 from sklearn import metrics
 import csv
-#import lib.fsic as fsic
+# import lib.fsic as fsic
 import lib.fsic.data as data
 import lib.fsic.indtest as it
 import lib.mutual_info_bf.mutual_info as mi
@@ -30,18 +31,20 @@ CATEGORICAL = "Categorical"
 NUMERICAL = "Numerical"
 
 max_proc = int(sys.argv[1])
-inputdata = '../input/kaggle/CEfinal_train'
-
-'''crit_names = ["Pearson's correlation",
+#inputdata = '../input/kaggle/CEfinal_train'
+inputdata='../output/test/test_crit_'
+crit_names = ["Pearson's correlation",
               "Pval-Pearson",
               "Chi2 test",
               "Mutual information",
               "Corrected Cramer's V",
               "Lopez Paz's coefficient",
-              "FSIC",
+              #"FSIC",
               "BF2d mutual info",
-              "BFMat mutual info"]'''
-crit_names=["BF2d mutual info"]
+              "BFMat mutual info",
+              "ScPearson correlation",
+              "ScPval-Pearson"]
+
 
 # FSIC param :
 # Significance level of the test
@@ -56,10 +59,10 @@ def confusion_mat(val1, val2):
     contingency_table = numpy.asarray(
         pd.crosstab(numpy.asarray(val1, dtype='object'), numpy.asarray(val2, dtype='object')))
     # Checking and sorting out bad columns/rows
-    #max_len, axis_del = max(contingency_table.shape), [contingency_table.shape].index(
+    # max_len, axis_del = max(contingency_table.shape), [contingency_table.shape].index(
     #    max([contingency_table.shape]))
-    contingency_table+=1
-    #toremove = [[], []]
+    contingency_table += 1
+    # toremove = [[], []]
 
     '''for i in range(contingency_table.shape[0]):
         for j in range(contingency_table.shape[1]):
@@ -98,6 +101,58 @@ def f_pval_pearson(var1, var2, var1type, var2type):
     return 1 - abs(stats.pearsonr(var1, var2)[1])
 
 
+def f_sc_pval_pearson(var1, var2, var1type, var2type):
+    #Switching categories to obtain the best correlation values
+    if var1type == CATEGORICAL or var1type == BINARY:
+        var1 = [int(i) for i in var1]
+        df = pd.DataFrame([pd.Categorical(var1), var2], columns=['cate', 'val'])
+    elif var2type == CATEGORICAL or var2type == BINARY:
+        var2 = [int(i) for i in var2]
+        df = pd.DataFrame([pd.Categorical(var2), var1], columns=['cate', 'val'])
+    else:
+        return 1 - abs(stats.pearsonr(var1, var2)[1])
+
+    mean_values = []  # Per category
+
+    for i in df.cate.cat.categories:
+        mean_values.append(df[df['cate'] == i].val.mean())  # getting mean values for each category
+
+    n_categories = sorted(range(len(mean_values)), key=lambda k: mean_values[k])  # getting index of sorting
+
+    df['cate'] = df.cate.cat.rename_categories(n_categories)
+
+    nvar1 = df.cate.tolist()
+    nvar2 = df.val.tolist()
+
+    return 1 - abs(stats.pearsonr(nvar1, nvar2)[1])
+
+
+def f_sc_pearson(var1, var2, var1type, var2type):
+    #Switching categories to obtain the best correlation values
+
+    if var1type == CATEGORICAL or var1type == BINARY:
+        var1 = [int(i) for i in var1]
+        df = pd.DataFrame([pd.Categorical(var1), var2], columns=['cate', 'val'])
+    elif var2type == CATEGORICAL or var2type == BINARY:
+        var2 = [int(i) for i in var2]
+        df = pd.DataFrame([pd.Categorical(var2), var1], columns=['cate', 'val'])
+    else:
+        return abs(stats.pearsonr(var1, var2)[0])
+
+    mean_values = []  # Per category
+
+    for i in df.cate.cat.categories:
+        mean_values.append(df[df['cate'] == i].val.mean())  # getting mean values for each category
+    n_categories = sorted(range(len(mean_values)), key=lambda k: mean_values[k])  # getting index of sorting
+
+    df['cate'] = df.cate.cat.rename_categories(n_categories)
+
+    nvar1 = df.cate.tolist()
+    nvar2 = df.val.tolist()
+
+    return abs(stats.pearsonr(nvar1, nvar2)[0])
+
+
 def f_chi2_test(var1, var2, var1type, var2type):
     values1, values2 = features.discretized_sequences(var1, var1type, var2, var2type)
     contingency_table = confusion_mat(values1, values2)
@@ -119,10 +174,11 @@ def f_bf_mutual_info_2d(var1, var2, var1type, var2type):
 
 
 def f_bf_mutual_info_mat(var1, var2, var1type, var2type):
-    var1=[float(i) for i in var1]
-    var2=[float(i) for i in var2]
+    var1 = [float(i) for i in var1]
+    var2 = [float(i) for i in var2]
 
-    return mi.mutual_information((numpy.reshape(numpy.asarray(var1),(len(var1),1)),numpy.reshape(numpy.asarray(var2),(len(var2),1))))
+    return mi.mutual_information(
+        (numpy.reshape(numpy.asarray(var1), (len(var1), 1)), numpy.reshape(numpy.asarray(var2), (len(var2), 1))))
 
 
 def f_corr_CramerV(var1, var2, var1type, var2type):
@@ -166,7 +222,8 @@ def f_fsic(var1, var2, var1type, var2type):
         var1 = [float(i) for i in var1]
         var2 = [float(i) for i in var2]
 
-        pdata = data.PairedData(numpy.reshape(numpy.asarray(var1),(len(var1),1)),numpy.reshape(numpy.asarray(var2),(len(var2),1)))
+        pdata = data.PairedData(numpy.reshape(numpy.asarray(var1), (len(var1), 1)),
+                                numpy.reshape(numpy.asarray(var2), (len(var2), 1)))
         tr, te = pdata.split_tr_te(tr_proportion=0.5, seed=seed + 1)
         # Do the optimization with the options in op.
         op_V, op_W, op_gwx, op_gwy, info = it.GaussNFSIC.optimize_locs_widths(tr, alpha, **op)
@@ -180,26 +237,29 @@ def f_fsic(var1, var2, var1type, var2type):
             return results['pvalue']
     except ValueError:
         print('VE')
-        #print(var1,var2)
-        #print(len(var1),len(var2))
+        # print(var1,var2)
+        # print(len(var1),len(var2))
         return 0
     except AssertionError:
         print('AE')
-        #print(var1,var2)
-        #print(len(var1),len(var2))
+        # print(var1,var2)
+        # print(len(var1),len(var2))
 
         return 0
 
 
-dependency_functions = [#f_pearson,
-                        #f_pval_pearson,
-                        #f_chi2_test,
-                        #f_mutual_info_score,
-                        #f_corr_CramerV,
-                        #f_lp_indep_c,
-                        #f_fsic,
-                        f_bf_mutual_info_2d#,
-                        #f_bf_mutual_info_mat
+dependency_functions = [
+                         f_pearson,
+                         f_pval_pearson,
+                         f_chi2_test,
+                         f_mutual_info_score,
+                         f_corr_CramerV,
+                         f_lp_indep_c,
+                        # f_fsic,
+                         f_bf_mutual_info_2d,
+                         f_bf_mutual_info_mat,
+                         f_sc_pearson,
+                         f_sc_pval_pearson
                         ]
 
 
@@ -223,13 +283,14 @@ def process_job_parts(part_number, index):
     sys.stdout.flush()
     r_df.to_csv(inputdata + crit_names[index][:4] + '-' + str(part_number) + '.csv', sep=';', index=False)
 
+
 def process_job(index):
     data = pd.read_csv(inputdata + '_pairs.csv', sep=',')
-    pub_info=pd.read_csv(inputdata + '_publicinfo.csv', sep=',')
-    target=pd.read_csv(inputdata+'_target.csv',sep=',')
-    target.columns=['SampleID','T1','Pairtype']
-    data=pd.merge(data,pub_info,on=['SampleID'])
-    data=pd.merge(data,target,on=['SampleID'])
+    pub_info = pd.read_csv(inputdata + '_publicinfo.csv', sep=',')
+    target = pd.read_csv(inputdata + '_target.csv', sep=',')
+    target.columns = ['SampleID', 'T1', 'Pairtype']
+    data = pd.merge(data, pub_info, on=['SampleID'])
+    data = pd.merge(data, target, on=['SampleID'])
 
     # data.columns=['SampleID', 'A', 'B', 'A-Type', 'B-Type', 'Pairtype']
     results = []
@@ -241,16 +302,17 @@ def process_job(index):
         var2 = [float(i) for i in var2]
 
         res = dependency_functions[index](var1, var2, row['A type'], row['B type'])
-        results.append([res, row['Pairtype'],row['A type'], row['B type']])
+        results.append([res, row['Pairtype'], row['A type'], row['B type']])
 
-    r_df = pd.DataFrame(results, columns=['Target', 'Pairtype','A type','B type'])
+    r_df = pd.DataFrame(results, columns=['Target', 'Pairtype', 'A type', 'B type'])
     sys.stdout.write('Writing results for ' + crit_names[index][:4] + '\n')
     sys.stdout.flush()
-    r_df.to_csv(inputdata +'_' +crit_names[index][:4]+'.csv', sep=';', index=False)
+    r_df.to_csv(inputdata + '_' + crit_names[index][:4] + '.csv', sep=';', index=False)
+
 
 for idx_crit, name in enumerate(crit_names):
-    """part_number = 1
-    print('OK')
+    print(name)
+    part_number = 1
     pool = Pool(processes=max_proc)
 
     while os.path.exists(inputdata + 'p' + str(part_number) + '.csv'):
@@ -258,24 +320,21 @@ for idx_crit, name in enumerate(crit_names):
         pool.apply_async(process_job_parts, args=(part_number, idx_crit,))
         part_number += 1
         time.sleep(1)
-        #process_job_parts(part_number,idx_crit)
     pool.close()
-    pool.join()"""#For data in parts
-    print('Begin '+ name )
-    process_job(idx_crit)
+    pool.join() # For data in parts'''
+    #print('Begin ' + name)
+    #process_job(idx_crit)
 
+    # Merging file
+    if os.path.exists(inputdata + crit_names[idx_crit][:4] + '-1' + '.csv'):
+        with open(inputdata + crit_names[idx_crit][:4] + '.csv', 'wb') as mergefile:
+            merger = csv.writer(mergefile, delimiter=';', lineterminator='\n')
+            merger.writerow(['Target', 'Pairtype'])
+            for i in range(1, part_number):
 
-
-    """"# Merging file
-    with open(inputdata + crit_names[idx_crit][:4] + '.csv', 'wb') as mergefile:
-        merger = csv.writer(mergefile, delimiter=';', lineterminator='\n')
-        merger.writerow(['Target', 'Pairtype'])
-        for i in range(1, part_number):
-            with open(inputdata + crit_names[idx_crit][:4] + '-' + str(i) + '.csv', 'rb') as partfile:
-                reader = csv.reader(partfile, delimiter=';')
-                header = next(reader)
-                for row in reader:
-                    merger.writerow(row)
-            os.remove(inputdata + crit_names[idx_crit][:4] + '-' + str(i) + '.csv')
-
-            # chunksize=10**4"""#For data in parts
+                with open(inputdata + crit_names[idx_crit][:4] + '-' + str(i) + '.csv', 'rb') as partfile:
+                    reader = csv.reader(partfile, delimiter=';')
+                    header = next(reader)
+                    for row in reader:
+                        merger.writerow(row)
+                os.remove(inputdata + crit_names[idx_crit][:4] + '-' + str(i) + '.csv') #For data in parts

@@ -1,0 +1,135 @@
+\message{ !name(main.tex)}%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%Template by Mathias Legrand
+%  My documentation report
+%  Objetive: Explain what I did and how, so someone can continue with the investigation
+%
+% Important note:
+% Chapter heading images should have a 2:1 width:height ratio,
+% e.g. 920px width and 460px height.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[11pt,fleqn,openany,frenchb]{book} % Default font size and left-justified equations
+\usepackage[top=3cm,bottom=3cm,left=3.2cm,right=3.2cm,headsep=10pt,a4paper]{geometry} % Page margins
+\usepackage{xcolor} % Required for specifying colors by name
+\definecolor{ocre}{RGB}{20,60,120} % Define the orange color used for highlighting throughout the book
+\definecolor{ocredark}{RGB}{5,20,60} 
+% Font Settings
+\usepackage{avant} % Use the Avantgarde font for headings
+%\usepackage{times} % Use the Times font for headings
+\usepackage{mathptmx} % Use the Adobe Times Roman as the default text font together with math symbols from the Sym­bol, Chancery and Com­puter Modern fonts
+%\usepackage{hyperref}
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+\usepackage[utf8]{inputenc} % Required for including letters with accents
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\usepackage[french,onelanguage]{algorithm2e}
+
+\usepackage{eurosym}%pour le symbole €
+\usepackage{subfig}
+\include{macro}
+
+% Bibliography
+\PassOptionsToPackage{hyphens}{url}
+\usepackage{hyperref}
+\hypersetup{hidelinks,backref=true,pagebackref=true,hyperindex=true,colorlinks=false,breaklinks=true,urlcolor= ocre}%,%bookmarks=true,bookmarksopen=false,pdftitle={Title},pdfauthor={Author}}
+%\usepackage[style=alphabetic,sorting=nyt,sortcites=true,autopunct=true,babel=hyphen,hyperref=true,abbreviate=false,backref=true,backend=biber]{biblatex}
+%\addbibresource{bibliography.bib} % BibTeX bibliography file
+%\defbibheading{bibempty}{}
+%
+
+\input{structure} % Insert the commands.tex file which contains the majority of the structure behind the template
+%\usepackage{xcolor}
+\usepackage[Sonny]{fncychap}
+  % defaults:
+  \ChNameVar{\Large\sf\color{ocredark}}
+  \ChNumVar{\Huge\color{ocredark}}
+  % custom:
+  \ChTitleVar{\Large\scshape\color{ocre}}
+\begin{document}
+
+\message{ !name(main.tex) !offset(99) }
+\section{Démarche}
+Après une première phase de prétraitement des données, l'étude est
+divisée en deux : on effectuera une analyse descriptive des données
+poussée, avant d'effectuer une analyse causale, où nous chercherons à
+déterminer les relations d'implication entre les variables du
+questionnaire.\par
+
+\subsection{Détermination des profils types}
+Les données pré-traitées comportent un nombre important de variables,
+rendant l'étude complexe : regrouper les individus pour former des
+profils types nécessite de prendre en compte toutes les variables. La
+solution employée est l'analyse en composantes principales, qui permet
+de remédier à la redondance des variables, pour définir un petit
+nombre d'axes (variables agrégées, définie par une somme pondérée des
+variables initiales) capturant la variabilité des
+données. L'interprétation d'un axe se fait en considérant les
+variables initiales les plus importantes (valeurs absolues des poids
+les plus élevés). \par
+
+Dans l'espace des axes, chaque individu est un vecteur de
+$\mathbb{R}^d$. On utilise la catégorisation (clustering) pour
+identifier les sous-groupes de données homogènes ; l'algorithme
+employé est un K-means++ \cite{arthur2007k}. Avant d'analyser les
+clusters, on s'assure de leur stabilité selon les critères définis par
+\cite{meilua2006uniqueness}. \par
+
+Chaque cluster est interprété par ses variables significatives au sens
+de la mesure statistique valeur-test \cite{lebart2006statistique}~;
+formellement, une variable est significative pour un cluster lorsque
+sa valeur moyenne sur ce cluster est significativement distincte de la
+valeur moyenne sur l'ensemble des données (compte tenu de la taille du
+cluster). Après avoir établi des clusters sur les variables de
+situation et de ressenti (respectivement sur les variables objectives
+et subjectives), il s'agit d'analyser comment évoluent les groupes à
+travers des variables choisies, telles que le revenu ou le score de
+bien-être défini par
+l'OMS\footnote{\href{http://www.euro.who.int/fr/publications/abstracts/measurement-of-and-target-setting-for-well-being-an-initiative-by-the-who-regional-office-for-europe}{cf
+    www.euro.who.int.}} ; mais aussi étudier le croisement des
+populations entre les groupes objectifs et subjectifs est une analyse
+qui permet mettre en évidence le lien entre la situation de l'enquêté
+et son ressenti de sa situation. La méthodologie est illustrée à la
+Fig.\ref{fig:metho}.\par
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[height=13cm]{schema_methode_fr.pdf}
+  \caption{Méthodologie de l'analyse descriptive des données}
+  \label{fig:metho}
+\end{figure}
+
+\subsection{Causalité}
+La deuxième partie de l'étude consiste à approfondir l'étude en
+étudiant la causalité au sens de \cite{granger1969causality} ; la
+causalité inclut plus d'informations qu'une simple corrélation, par la
+présence d'une hiérarchie entre les variables reliées causalement. En
+effet, la présence d'une corrélation traduit juste la "ressemblance
+entre deux courbes", et ne permet pas de conclure sur l'existence d'un
+réel lien entre les deux variables\footnote{Par exemple, la
+  corrélation entre le nombre de pirates en activité et le
+  réchauffement climatique est importante alors que ces deux variables
+  ne sont pas directement liées causalement.}. L'étude de la
+causalité, se basant sur des techniques complexes et variées, entre
+prédiction par machine learning et inférence par l'étude des
+distributions de probabilités permettent de déterminer la présence ou
+non d'une relation de causalité, mais aussi du sens de cette
+relation. Ainsi, on aura pour but de construire le graphe le plus
+complet et le plus fiable des variables et de leurs liens causaux,
+afin de comprendre les phénomènes moteurs dans le questionnaire et
+dans l'étude du bien-être au travail. Le but étant de pouvoir faire
+des recommendations aux managers afin d'améliorer la qualité de vie au
+travail, les enjeux que représentent cette étude sont mis en valeur
+par le fait que la causalité à l'aide d'analyse de données n'a pas été
+étudiée jusqu'à aujourd'hui en sociologie. \par % a compléter
+
+% ----------------------------------------------------------------------------------------
+% CHAPTER 1
+% ----------------------------------------------------------------------------------------
+% \chapterimage{blank_chap2.pdf}
+\message{ !name(main.tex) !offset(721) }
+
+\end{document}

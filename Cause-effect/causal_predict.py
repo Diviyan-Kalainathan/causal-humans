@@ -17,11 +17,7 @@ from multiprocessing import Process
 import os,sys
 
 
-if __name__=="__main__":
-
-    # causal_predict_method = int(sys.argv[2])
-    causal_predict_method = 2
-
+def ce_pairs_predict(causal_predict_method,inputdata,max_proc=1):
     """Method used for causal prediction
     # 1 : Handcraft features J. Fonollosa method
     # 2 : RCC - Randomized Causation Coefficient D. Lopez-Paz et al. 2015 (Toward a learning theory of cause effect inference)
@@ -29,10 +25,6 @@ if __name__=="__main__":
     # 4 : Codalab : D. Lopez Paz Method
     """
 
-    inputdata = 'obj8'
-    cluster_n = 1
-    # max_proc=int(sys.argv[1])
-    max_proc = 4
 
     ###A decommenter pour passer en mode multi cluster
     # while os.path.exists('output/' + inputdata + '/split_data/cluster_' + str(cluster_n)) :
@@ -51,7 +43,7 @@ if __name__=="__main__":
     #         part_number += 1
 
     ###A commenter pour passer en mode multi cluster
-    while cluster_n < 2:
+    '''while cluster_n < 2:
 
         inputfilespath = []
         infopath = []
@@ -96,7 +88,7 @@ if __name__=="__main__":
         #     outputfilespath.append("output/resultpredict/Fonollosa_SUP4.csv")
         # elif (causal_predict_method == 2):
         #     outputfilespath.append("output/resultpredict/LopezKernel_SUP4.csv")
-    ########
+    ########'''
 
         if(causal_predict_method == 1):
 
@@ -114,7 +106,7 @@ if __name__=="__main__":
 
             # Creating parameters
 
-            modelPath = "lib_lopez_paz/"
+            modelPath = "lib.lopez_paz/"
 
             # Creating process
             lp.predict(inputfilespath,outputfilespath,modelPath, max_proc)
@@ -125,14 +117,12 @@ if __name__=="__main__":
 
         elif (causal_predict_method == 4):
 
-            modelPath = "lib_lopez_codalab/pickles/"
+            modelPath = "lib.lopez_codalab/pickles/"
 
             lc.predict(inputfilespath, outputfilespath,modelPath, max_proc)
 
         # elif (causal_predict_method == 5):
         #
         #     te.predict(inputfilespath, outputfilespath,max_proc)
-
-        cluster_n += 1
 
 print('End of program.')
