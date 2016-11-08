@@ -30,7 +30,7 @@ outputPath = "output/Dream5/"
 outputCausalityPairs = "net1_expression_data_InSilico_pairs.csv"
 outputPublicInfo = "net1_expression_data_InSilico_publicinfo.csv"
 outputTarget="net1_expression_data_InSilico_target.csv"
-
+outputResults="net1_expression_data_InSilico_results.csv"
 
 
 df_input = pd.read_csv(variables_data, sep='\t', encoding="latin-1")
@@ -40,7 +40,7 @@ independancy_criterion=0
 deconvolution_method=1
 predict_method=1
 thresholdDepLink = 0.1
-
+epsilon=0.5
 
 """
 #1 : "Pearson's correlation",
@@ -71,7 +71,11 @@ skel_mat=np.ones((len(var_names),len(var_names))) #Skeleton matrix
 for idx1, var1 in enumerate(var_names[:-1]):
     for idx2, var2 in enumerate(var_names[idx1:]):
         skel_mat[idx1,idx2]=dc.crit_names[independancy_criterion](df_input[var1].values,df_input[var2].values,NUMERICAL,NUMERICAL)
+        skel_mat[idx2,idx1]=skel_mat[idx1,idx2]
 
+#Set diagonal terms
+for idx in range(len(var_names)):
+    skel_mat[idx,idx]=epsilon*1 #Reg. Hyperparameter?
 
 #### Apply deconvolution ####
 print('Deconvolution')
@@ -112,7 +116,9 @@ else:
     raise ValueError
 print('Done.')
 
+#### Causality computation ####
 
+#Prepare files
 df_output = pd.DataFrame(columns=["SampleID", "A", "B"])
 df_publicinfo = pd.DataFrame(columns=["SampleID", "A type", "B type"])
 
@@ -146,15 +152,16 @@ for i in range(0,Gdir.shape[0]):
 df_output.to_csv(outputPath + outputCausalityPairs, index=False, encoding='utf-8', sep= ",")
 df_publicinfo.to_csv(outputPath + outputPublicInfo, index=False, encoding='utf-8', sep= ",")
 
-#Create file id not exists
+#Compute causation
+#Create output file if not exists
 open(outputPath+outputTarget,'a').close()
 
 cp.ce_pairs_predict(predict_method,outputPath + outputCausalityPairs,outputPath + outputPublicInfo,outputPath+outputTarget,nb_proc)
-
+#Fetch results
 df_causation_results=pd.read_csv(outputPath+outputTarget,columns=['SampleID','Value'])
 
 results=[]
-
+#Write final results
 for idx,row in df_causation_results.iterrows():
     v_names=row['SampleID'].split('-')
     if row['Value']>0:
@@ -163,3 +170,4 @@ for idx,row in df_causation_results.iterrows():
         results.append([v_names[1],v_names[0],abs(row['Value'])])
 
 df_results=pd.DataFrame(results,columns=['Source','Target','Score'])
+df_results.to_csv(outputPath+outputResults,sep='\t', index=False)
