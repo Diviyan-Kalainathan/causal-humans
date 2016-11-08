@@ -248,8 +248,7 @@ def f_fsic(var1, var2, var1type, var2type):
         return 0
 
 
-dependency_functions = [
-                         f_pearson,
+dependency_functions = [f_pearson,
                          f_pval_pearson,
                          f_chi2_test,
                          f_mutual_info_score,

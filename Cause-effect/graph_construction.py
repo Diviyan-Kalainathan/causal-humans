@@ -11,6 +11,8 @@ import sys
 import pandas as pd
 import model_comparison.dependency_criterion as dc
 import causal_predict as cp
+from sklearn.metrics import auc, average_precision_score,precision_recall_curve
+from matplotlib import pyplot as plt
 
 BINARY = "Binary"
 CATEGORICAL = "Categorical"
@@ -29,8 +31,9 @@ outputPath = "output/Dream5/"
 
 outputCausalityPairs = "net1_expression_data_InSilico_pairs.csv"
 outputPublicInfo = "net1_expression_data_InSilico_publicinfo.csv"
-outputTarget="net1_expression_data_InSilico_target.csv"
+outputforCausation="net1_expression_data_InSilico_fcausation.csv"
 outputResults="net1_expression_data_InSilico_results.csv"
+outputTarget="net1_expression_data_InSilico_target.csv"
 
 
 df_input = pd.read_csv(variables_data, sep='\t', encoding="latin-1")
@@ -207,11 +210,11 @@ df_publicinfo.to_csv(outputPath + outputPublicInfo, index=False, encoding='utf-8
 
 #Compute causation
 #Create output file if not exists
-open(outputPath+outputTarget,'a').close()
+open(outputPath+outputforCausation,'a').close()
 
-cp.ce_pairs_predict(predict_method,outputPath + outputCausalityPairs,outputPath + outputPublicInfo,outputPath+outputTarget,nb_proc)
+cp.ce_pairs_predict(predict_method,outputPath + outputCausalityPairs,outputPath + outputPublicInfo,outputPath+outputforCausation,nb_proc)
 #Fetch results
-df_causation_results=pd.read_csv(outputPath+outputTarget,columns=['SampleID','Value'])
+df_causation_results=pd.read_csv(outputPath+outputforCausation,columns=['SampleID','Value'])
 
 results=[]
 #Write final results
@@ -223,4 +226,53 @@ for idx,row in df_causation_results.iterrows():
         results.append([v_names[1],v_names[0],abs(row['Value'])])
 
 df_results=pd.DataFrame(results,columns=['Source','Target','Score'])
+df_results = df_results.sort_values(by='Score', ascending=False)
 df_results.to_csv(outputPath+outputResults,sep='\t', index=False)
+
+#### Compare results to target values ####
+df_target=pd.read_csv(outputPath+outputTarget,sep='\t',encoding="latin-1",columns=['Source','Target','Score'])
+
+P=float(len(df_target.index))
+N=float(len(var_names)*(len(var_names)-1))-P
+
+TP=0.0
+FP=0.0
+tpr=[] # = recall
+fpr=[]
+ppv=[]
+
+for idx,row in df_results.iterrows():
+    if ((df_target['Source']==row['Source']) & (df_target['Target']==row['Target'])).any(): #Scores  are only 1 :
+        #Need to modify if scores are different than 1.
+        TP+=1
+    else:
+        FP+=1
+
+    tpr.append(TP / P)  # TPR=recall
+    fpr.append(FP / N)  # FPR
+    ppv.append(TP / (TP + FP))
+
+tpr, fpr, ppv = (list(t) for t in zip(*sorted(zip(tpr, fpr, ppv))))
+auc_roc_score = auc(fpr, tpr)
+auc_pr_score=auc(tpr,ppv)
+fig1 = plt.figure()
+ax1 = fig1.add_subplot(111)
+fig2=plt.figure()
+ax2=fig2.add_subplot(111)
+
+pl1 = ax1.plot(fpr, tpr, label=' (area: {0:3f})'.format(auc_roc_score), color='r')
+pl2 = ax2.plot(tpr, ppv, label=' (area: {0:3f})'.format(auc_pr_score), color='r')
+
+
+ax1.plot([0, 1], [0, 1], linestyle='--', color='k',
+         label='Luck')
+
+ax1.set_xlabel('False Positive Rate')
+ax1.set_ylabel('True Positive Rate')
+ax1.set_title('ROC Curve ')
+ax1.legend(loc="lower right")
+ax2.set_xlabel('Recall')
+ax2.set_ylabel('Precision')
+ax2.set_title('Precision recall curve')
+ax2.legend(loc='best')
+plt.show()
