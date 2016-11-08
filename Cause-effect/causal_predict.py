@@ -11,6 +11,9 @@ from lib.lopez_paz import experiment_challenge as lp
 
 from lib.lopez_codalab import predict as lc
 
+from lib.causal_deep import predict as cd
+
+
 # from lib_test import test as te
 
 from multiprocessing import Process
@@ -23,6 +26,7 @@ def ce_pairs_predict(causal_predict_method,inputfilespath,infopath,outputfilespa
     # 2 : RCC - Randomized Causation Coefficient D. Lopez-Paz et al. 2015 (Toward a learning theory of cause effect inference)
     # 3 : TODO : add Lopez-Paz method with neural network
     # 4 : Codalab : D. Lopez Paz Method
+    # 5 : Convnet
     """
 
 
@@ -121,6 +125,13 @@ def ce_pairs_predict(causal_predict_method,inputfilespath,infopath,outputfilespa
 
         lc.predict(inputfilespath, outputfilespath,modelPath, max_proc)
 
+    elif (causal_predict_method == 5):
+
+        modelPath = "lib/causal_deep/model.h5"
+
+        for idx in range(len(inputfilespath)):
+
+            cd.predict(inputfilespath[idx], outputfilespath[idx], modelPath)
 
 
 print('End of program.')
