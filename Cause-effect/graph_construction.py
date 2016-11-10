@@ -19,10 +19,6 @@ CATEGORICAL = "Categorical"
 NUMERICAL = "Numerical"
 
 
-inputfolder = 'output/obj8/pca_var/cluster_5/'
-input_publicinfo = inputfolder+'publicinfo_c_5.csv'
-causal_results = ''  # csv with 3 cols, Avar, Bvar & target
-variables_data= inputfolder + 'pairs_c_5.csv'
 
 path = "Dream5ChallengeData/"
 filenameData = "net1_expression_data_InSilico.tsv"
@@ -36,7 +32,7 @@ outputResults="net1_expression_data_InSilico_results.csv"
 outputTarget="net1_expression_data_InSilico_target.csv"
 
 
-df_input = pd.read_csv(variables_data, sep='\t', encoding="latin-1")
+df_input = pd.read_csv(path+filenameData, sep='\t', encoding="latin-1")
 
 nb_proc=int(sys.argv[1])
 independancy_criterion=0

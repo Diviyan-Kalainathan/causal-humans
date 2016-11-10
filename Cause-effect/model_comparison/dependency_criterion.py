@@ -15,8 +15,8 @@ import numpy
 from sklearn import metrics
 import csv
 # import lib.fsic as fsic
-import lib.fsic.data as data
-import lib.fsic.indtest as it
+#import lib.fsic.data as data
+#import lib.fsic.indtest as it #Removed for theano locks
 import lib.mutual_info_bf.mutual_info as mi
 import lib.lopez_paz.indep_crit as lp_crit
 import warnings
@@ -24,13 +24,13 @@ import time
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)  # Need to fix Lopez paz Ic
 
-lp = lp_crit.lp_indep_criterion()
+#lp = lp_crit.lp_indep_criterion()
 
 BINARY = "Binary"
 CATEGORICAL = "Categorical"
 NUMERICAL = "Numerical"
 
-max_proc = int(sys.argv[1])
+max_proc = 1 #int(sys.argv[1])
 #inputdata = '../input/kaggle/CEfinal_train'
 inputdata='../output/test/test_crit_'
 crit_names = ["Pearson's correlation",
@@ -308,32 +308,32 @@ def process_job(index):
     sys.stdout.flush()
     r_df.to_csv(inputdata + '_' + crit_names[index][:4] + '.csv', sep=';', index=False)
 
+if __name__ == '__main__':
+    for idx_crit, name in enumerate(crit_names):
+        print(name)
+        part_number = 1
+        pool = Pool(processes=max_proc)
 
-for idx_crit, name in enumerate(crit_names):
-    print(name)
-    part_number = 1
-    pool = Pool(processes=max_proc)
+        while os.path.exists(inputdata + 'p' + str(part_number) + '.csv'):
+            print(part_number)
+            pool.apply_async(process_job_parts, args=(part_number, idx_crit,))
+            part_number += 1
+            time.sleep(1)
+        pool.close()
+        pool.join() # For data in parts'''
+        #print('Begin ' + name)
+        #process_job(idx_crit)
 
-    while os.path.exists(inputdata + 'p' + str(part_number) + '.csv'):
-        print(part_number)
-        pool.apply_async(process_job_parts, args=(part_number, idx_crit,))
-        part_number += 1
-        time.sleep(1)
-    pool.close()
-    pool.join() # For data in parts'''
-    #print('Begin ' + name)
-    #process_job(idx_crit)
+        # Merging file
+        if os.path.exists(inputdata + crit_names[idx_crit][:4] + '-1' + '.csv'):
+            with open(inputdata + crit_names[idx_crit][:4] + '.csv', 'wb') as mergefile:
+                merger = csv.writer(mergefile, delimiter=';', lineterminator='\n')
+                merger.writerow(['Target', 'Pairtype'])
+                for i in range(1, part_number):
 
-    # Merging file
-    if os.path.exists(inputdata + crit_names[idx_crit][:4] + '-1' + '.csv'):
-        with open(inputdata + crit_names[idx_crit][:4] + '.csv', 'wb') as mergefile:
-            merger = csv.writer(mergefile, delimiter=';', lineterminator='\n')
-            merger.writerow(['Target', 'Pairtype'])
-            for i in range(1, part_number):
-
-                with open(inputdata + crit_names[idx_crit][:4] + '-' + str(i) + '.csv', 'rb') as partfile:
-                    reader = csv.reader(partfile, delimiter=';')
-                    header = next(reader)
-                    for row in reader:
-                        merger.writerow(row)
-                os.remove(inputdata + crit_names[idx_crit][:4] + '-' + str(i) + '.csv') #For data in parts
+                    with open(inputdata + crit_names[idx_crit][:4] + '-' + str(i) + '.csv', 'rb') as partfile:
+                        reader = csv.reader(partfile, delimiter=';')
+                        header = next(reader)
+                        for row in reader:
+                            merger.writerow(row)
+                    os.remove(inputdata + crit_names[idx_crit][:4] + '-' + str(i) + '.csv') #For data in parts
