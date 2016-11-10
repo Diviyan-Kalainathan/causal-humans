@@ -65,7 +65,7 @@ def transformData(x):
     return transformedData
 
 var_names=df_input.columns.values
-skel_mat=np.zeros((len(var_names),len(var_names))) #Skeleton matrix
+skel_mat=np.ones((len(var_names),len(var_names))) #Skeleton matrix
 
 #### Create Skeleton ####
 print('Create skeleton'),
@@ -128,12 +128,12 @@ if deconvolution_method == 1:
     m = max(m1, m2);
 
 
-    D = D * np.identity(D.shape[0])
+    D = D *np.identity(D.shape[0])
 
     for i in range(0, D.shape[0]):
         D[i, i] = D[i, i] / (m + D[i, i]);
 
-    mat_new1 = U * D * np.linalg.inv(U)
+    mat_new1 =np.dot( np.dot(U, D), np.linalg.inv(U))
 
     m2 = np.min(mat_new1);
     mat_new2 = (mat_new1 + max(-m2, 0));
