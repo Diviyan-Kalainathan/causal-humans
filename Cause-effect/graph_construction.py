@@ -21,22 +21,23 @@ NUMERICAL = "Numerical"
 
 
 path = "Dream5ChallengeData/"
-filenameData = "net3_expression_data_Ecoli_toy.tsv"
+test_set_name='net1_expression_data_InSilico'#'net3_expression_data_Ecoli_toy'
+
+filenameData = test_set_name+".tsv"
 
 outputPath = "output/Dream5/"
-test_set_name='net3_expression_data_Ecoli_toy'#'net1_expression_data_InSilico_'
-outputCausalityPairs = test_set_name+"pairs.csv"
-outputPublicInfo = test_set_name+"publicinfo.csv"
-outputforCausation=test_set_name+"fcausation.csv"
-outputResults=test_set_name+"results.csv"
-outputTarget=test_set_name+"target.csv"
+outputCausalityPairs = test_set_name+"_pairs.csv"
+outputPublicInfo = test_set_name+"_publicinfo.csv"
+outputforCausation=test_set_name+"_fcausation.csv"
+outputResults=test_set_name+"_results.csv"
+outputTarget=test_set_name+"_target.csv"
 
 
 df_input = pd.read_csv(path+filenameData, sep='\t', encoding="latin-1")
 
 nb_proc= 2  #int(sys.argv[1])
 independancy_criterion=0
-deconvolution_method=1
+deconvolution_method=3
 predict_method=1
 thresholdDepLink = 0.01
 # epsilon=0.5
@@ -72,7 +73,6 @@ print('Create skeleton'),
 
 for idx1 in range(len(var_names)-1):
     for idx2 in range(idx1+1,len(var_names)):
-        print(idx1,idx2)
         var1=var_names[idx1]
         var2=var_names[idx2]
         skel_mat[idx1,idx2]=dc.dependency_functions[independancy_criterion](df_input[var1].values,df_input[var2].values,NUMERICAL,NUMERICAL)
@@ -162,7 +162,8 @@ elif deconvolution_method == 2:
     Gdir = np.dot((skel_mat - np.identity(len(var_names)) + mat_diag), np.linalg.inv(skel_mat))
 
 elif deconvolution_method == 3:
-    inv_mat=np.inv(skel_mat)
+    """Partial correlation coefficient"""
+    inv_mat=np.linalg.inv(skel_mat)
     Gdir=np.zeros(inv_mat.shape)
     for i in range(len(var_names)):
         for j in range(len(var_names)):
@@ -178,8 +179,8 @@ print('...Done.')
 print('Causality computation')
 #Prepare files
 print('Prepare Files'),
-df_output = pd.DataFrame(columns=["SampleID", "A", "B"])
-df_publicinfo = pd.DataFrame(columns=["SampleID", "A type", "B type"])
+df_output = pd.DataFrame(columns=["SampleID", "A", "B"],index=None)
+df_publicinfo = pd.DataFrame(columns=["SampleID", "A type", "B type"],index=None)
 
 print(Gdir)
 
@@ -200,14 +201,14 @@ for i in range(0,Gdir.shape[0]):
             newLignOutput = pd.DataFrame([[sampleID, aValuesParse, bValuesParse]],
                                          columns=["SampleID", "A", "B"])
 
-            df_output = pd.concat([df_output, newLignOutput])
+            df_output = pd.concat([df_output, newLignOutput],ignore_index=True)
 
             newLignPublicinfo = pd.DataFrame([[sampleID, "Numerical", "Numerical"]],
                                          columns=["SampleID", "A type", "B type"])
 
-            df_publicinfo = pd.concat([df_publicinfo, newLignPublicinfo])
+            df_publicinfo = pd.concat([df_publicinfo, newLignPublicinfo],ignore_index=True)
 
-
+print(df_output)
 df_output.to_csv(outputPath + outputCausalityPairs, index=False, encoding='utf-8', sep= ",")
 df_publicinfo.to_csv(outputPath + outputPublicInfo, index=False, encoding='utf-8', sep= ",")
 print('...Done.')
@@ -217,10 +218,12 @@ print('...Done.')
 print('Compute causation'),
 open(outputPath+outputforCausation,'a').close()
 
-cp.ce_pairs_predict(predict_method,outputPath + outputCausalityPairs,outputPath + outputPublicInfo,outputPath+outputforCausation,nb_proc)
+cp.ce_pairs_predict(predict_method,[outputPath + outputCausalityPairs],
+                    [outputPath + outputPublicInfo],
+                    [outputPath+outputforCausation],nb_proc)
 #Fetch results
-df_causation_results=pd.read_csv(outputPath+outputforCausation,columns=['SampleID','Value'])
-
+df_causation_results=pd.read_csv(outputPath+outputforCausation)
+df_causation_results.columns=['SampleID','Value']
 print('...Done.')
 
 print('Output values')
@@ -233,12 +236,14 @@ for idx,row in df_causation_results.iterrows():
     else:
         results.append([v_names[1],v_names[0],abs(row['Value'])])
 
-df_results=pd.DataFrame(results,columns=['Source','Target','Score'])
+df_results=pd.DataFrame(results)
+df_results.columns=['Source','Target','Score']
 df_results = df_results.sort_values(by='Score', ascending=False)
 df_results.to_csv(outputPath+outputResults,sep='\t', index=False)
 
 #### Compare results to target values ####
-df_target=pd.read_csv(outputPath+outputTarget,sep='\t',encoding="latin-1",columns=['Source','Target','Score'])
+df_target=pd.read_csv(outputPath+outputTarget,sep='\t',encoding="latin-1")
+df_target.columns=['Source','Target','Score']
 
 P=float(len(df_target.index))
 N=float(len(var_names)*(len(var_names)-1))-P
