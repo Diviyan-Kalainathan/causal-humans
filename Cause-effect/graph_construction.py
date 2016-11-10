@@ -21,7 +21,7 @@ NUMERICAL = "Numerical"
 
 
 path = "Dream5ChallengeData/"
-filenameData = "net1_expression_data_InSilico.tsv"
+filenameData = "net3_expression_data_Ecoli_toy.tsv"
 
 outputPath = "output/Dream5/"
 test_set_name='net3_expression_data_Ecoli_toy'#'net1_expression_data_InSilico_'
@@ -65,16 +65,20 @@ def transformData(x):
     return transformedData
 
 var_names=df_input.columns.values
-skel_mat=np.ones((len(var_names),len(var_names))) #Skeleton matrix
+skel_mat=np.zeros((len(var_names),len(var_names))) #Skeleton matrix
 
 #### Create Skeleton ####
 print('Create skeleton'),
 
-for idx1, var1 in enumerate(var_names[:-1]):
-    for idx2, var2 in enumerate(var_names[idx1:]):
+for idx1 in range(len(var_names)-1):
+    for idx2 in range(idx1+1,len(var_names)):
+        print(idx1,idx2)
+        var1=var_names[idx1]
+        var2=var_names[idx2]
         skel_mat[idx1,idx2]=dc.dependency_functions[independancy_criterion](df_input[var1].values,df_input[var2].values,NUMERICAL,NUMERICAL)
         skel_mat[idx2,idx1]=skel_mat[idx1,idx2]
 
+print(skel_mat)
 # #Set diagonal terms
 # for idx in range(len(var_names)):
 #     skel_mat[idx,idx]=epsilon*1 #Reg. Hyperparameter?
