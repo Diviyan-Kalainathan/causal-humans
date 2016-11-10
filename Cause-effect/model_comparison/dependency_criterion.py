@@ -30,7 +30,7 @@ BINARY = "Binary"
 CATEGORICAL = "Categorical"
 NUMERICAL = "Numerical"
 
-max_proc = 1 #int(sys.argv[1])
+max_proc = int(sys.argv[1])
 #inputdata = '../input/kaggle/CEfinal_train'
 inputdata='../output/test/test_crit_'
 crit_names = ["Pearson's correlation",

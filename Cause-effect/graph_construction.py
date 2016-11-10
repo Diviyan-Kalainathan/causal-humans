@@ -11,34 +11,33 @@ import sys
 import pandas as pd
 import model_comparison.dependency_criterion as dc
 import causal_predict as cp
-from sklearn.metrics import auc, average_precision_score,precision_recall_curve
+from sklearn.metrics import auc, average_precision_score, precision_recall_curve
 from matplotlib import pyplot as plt
 
 BINARY = "Binary"
 CATEGORICAL = "Categorical"
 NUMERICAL = "Numerical"
 
-
-
 path = "Dream5ChallengeData/"
-test_set_name='net1_expression_data_InSilico'#'net3_expression_data_Ecoli_toy'
+test_set_name = 'net1_expression_data_InSilico'  # 'net3_expression_data_Ecoli_toy'#'net1_expression_data_InSilico'#
 
-filenameData = test_set_name+".tsv"
+filenameData = test_set_name + ".tsv"
 
 outputPath = "output/Dream5/"
-outputCausalityPairs = test_set_name+"_pairs.csv"
-outputPublicInfo = test_set_name+"_publicinfo.csv"
-outputforCausation=test_set_name+"_fcausation.csv"
-outputResults=test_set_name+"_results.csv"
-outputTarget=test_set_name+"_target.csv"
+outputCausalityPairs = test_set_name + "_pairs.csv"
+outputPublicInfo = test_set_name + "_publicinfo.csv"
+outputforCausation = test_set_name + "_fcausation.csv"
+outputResults = test_set_name + "_results.csv"
+outputTarget = path + test_set_name + "_target.tsv"
 
-
-df_input = pd.read_csv(path+filenameData, sep='\t', encoding="latin-1")
-
-nb_proc= 2  #int(sys.argv[1])
-independancy_criterion=0
-deconvolution_method=3
-predict_method=1
+df_input = pd.read_csv(path + filenameData, sep='\t', encoding="latin-1")
+if len(sys.argv) < 2:
+    print('Specify number of cores.')
+    raise ValueError
+nb_proc = int(sys.argv[1])
+independancy_criterion = 0
+deconvolution_method = 3
+predict_method = 1
 thresholdDepLink = 0.01
 # epsilon=0.5
 beta = 0.5
@@ -65,18 +64,21 @@ def transformData(x):
 
     return transformedData
 
-var_names=df_input.columns.values
-skel_mat=np.ones((len(var_names),len(var_names))) #Skeleton matrix
+
+var_names = df_input.columns.values
+skel_mat = np.ones((len(var_names), len(var_names)))  # Skeleton matrix
 
 #### Create Skeleton ####
 print('Create skeleton'),
 
-for idx1 in range(len(var_names)-1):
-    for idx2 in range(idx1+1,len(var_names)):
-        var1=var_names[idx1]
-        var2=var_names[idx2]
-        skel_mat[idx1,idx2]=dc.dependency_functions[independancy_criterion](df_input[var1].values,df_input[var2].values,NUMERICAL,NUMERICAL)
-        skel_mat[idx2,idx1]=skel_mat[idx1,idx2]
+for idx1 in range(len(var_names) - 1):
+    for idx2 in range(idx1 + 1, len(var_names)):
+        var1 = var_names[idx1]
+        var2 = var_names[idx2]
+        skel_mat[idx1, idx2] = dc.dependency_functions[independancy_criterion](df_input[var1].values,
+                                                                               df_input[var2].values, NUMERICAL,
+                                                                               NUMERICAL)
+        skel_mat[idx2, idx1] = skel_mat[idx1, idx2]
 
 print(skel_mat)
 # #Set diagonal terms
@@ -108,32 +110,29 @@ if deconvolution_method == 1:
     # mapping between 0 and 1
     skel_mat = (skel_mat - np.min(skel_mat)) / (np.max(skel_mat) - np.min(skel_mat))
 
-    #Set diagonal terms to 0
+    # Set diagonal terms to 0
     for idx in range(len(var_names)):
-        skel_mat[idx,idx] = 0
+        skel_mat[idx, idx] = 0
 
     # thresholding the input matrix
     y = np.percentile(skel_mat, alpha * 100)
     skel_mat[skel_mat < y] = 0
-
 
     D, U = np.linalg.eig(skel_mat)
 
     lam_n = abs(min(np.min(D), 0))
     lam_p = abs(max(np.max(D), 0))
 
-
     m1 = lam_p * (1 - beta) / beta;
     m2 = lam_n * (1 + beta) / beta;
     m = max(m1, m2);
 
-
-    D = D *np.identity(D.shape[0])
+    D = D * np.identity(D.shape[0])
 
     for i in range(0, D.shape[0]):
         D[i, i] = D[i, i] / (m + D[i, i]);
 
-    mat_new1 =np.dot( np.dot(U, D), np.linalg.inv(U))
+    mat_new1 = np.dot(np.dot(U, D), np.linalg.inv(U))
 
     m2 = np.min(mat_new1);
     mat_new2 = (mat_new1 + max(-m2, 0));
@@ -163,12 +162,12 @@ elif deconvolution_method == 2:
 
 elif deconvolution_method == 3:
     """Partial correlation coefficient"""
-    inv_mat=np.linalg.inv(skel_mat)
-    Gdir=np.zeros(inv_mat.shape)
+    inv_mat = np.linalg.inv(skel_mat)
+    Gdir = np.zeros(inv_mat.shape)
     for i in range(len(var_names)):
         for j in range(len(var_names)):
-            if i!=j:
-                Gdir[i,j]=-inv_mat[i,j]/np.sqrt(inv_mat[i,i]*inv_mat[j,j])
+            if i != j:
+                Gdir[i, j] = -inv_mat[i, j] / np.sqrt(inv_mat[i, i] * inv_mat[j, j])
 
 else:
     raise ValueError
@@ -177,21 +176,20 @@ print('...Done.')
 #### Causality computation ####
 
 print('Causality computation')
-#Prepare files
+# Prepare files
 print('Prepare Files'),
-df_output = pd.DataFrame(columns=["SampleID", "A", "B"],index=None)
-df_publicinfo = pd.DataFrame(columns=["SampleID", "A type", "B type"],index=None)
+df_output = pd.DataFrame(columns=["SampleID", "A", "B"], index=None)
+df_publicinfo = pd.DataFrame(columns=["SampleID", "A type", "B type"], index=None)
 
 print(Gdir)
 
-for i in range(0,Gdir.shape[0]):
+for i in range(0, Gdir.shape[0]):
 
-    for j in range(i+1, Gdir.shape[1]):
+    for j in range(i + 1, Gdir.shape[1]):
 
-        if(Gdir[i,j] > thresholdDepLink):
-
-            a = df_input.iloc[:,i].values
-            b = df_input.iloc[:,j].values
+        if (Gdir[i, j] > thresholdDepLink):
+            a = df_input.iloc[:, i].values
+            b = df_input.iloc[:, j].values
 
             aValuesParse = transformData(a)
             bValuesParse = transformData(b)
@@ -201,93 +199,141 @@ for i in range(0,Gdir.shape[0]):
             newLignOutput = pd.DataFrame([[sampleID, aValuesParse, bValuesParse]],
                                          columns=["SampleID", "A", "B"])
 
-            df_output = pd.concat([df_output, newLignOutput],ignore_index=True)
+            df_output = pd.concat([df_output, newLignOutput], ignore_index=True)
 
             newLignPublicinfo = pd.DataFrame([[sampleID, "Numerical", "Numerical"]],
-                                         columns=["SampleID", "A type", "B type"])
+                                             columns=["SampleID", "A type", "B type"])
 
-            df_publicinfo = pd.concat([df_publicinfo, newLignPublicinfo],ignore_index=True)
+            df_publicinfo = pd.concat([df_publicinfo, newLignPublicinfo], ignore_index=True)
 
 print(df_output)
-df_output.to_csv(outputPath + outputCausalityPairs, index=False, encoding='utf-8', sep= ",")
-df_publicinfo.to_csv(outputPath + outputPublicInfo, index=False, encoding='utf-8', sep= ",")
+df_output.to_csv(outputPath + outputCausalityPairs, index=False, encoding='utf-8', sep=",")
+df_publicinfo.to_csv(outputPath + outputPublicInfo, index=False, encoding='utf-8', sep=",")
 print('...Done.')
 
-#Compute causation
-#Create output file if not exists
+# Compute causation
+# Create output file if not exists
 print('Compute causation'),
-open(outputPath+outputforCausation,'a').close()
+open(outputPath + outputforCausation, 'a').close()
 
-cp.ce_pairs_predict(predict_method,[outputPath + outputCausalityPairs],
+cp.ce_pairs_predict(predict_method, [outputPath + outputCausalityPairs],
                     [outputPath + outputPublicInfo],
-                    [outputPath+outputforCausation],nb_proc)
-#Fetch results
-df_causation_results=pd.read_csv(outputPath+outputforCausation)
-df_causation_results.columns=['SampleID','Value']
+                    [outputPath + outputforCausation], nb_proc)
+# Fetch results
+df_causation_results = pd.read_csv(outputPath + outputforCausation)
+df_causation_results.columns = ['SampleID', 'Value']
 print('...Done.')
 
 print('Output values')
-results=[]
-#Write final results
-for idx,row in df_causation_results.iterrows():
-    v_names=row['SampleID'].split('-')
-    if row['Value']>0:
-        results.append([v_names[0],v_names[1],row['Value']])
+results = []
+# Write final results
+for idx, row in df_causation_results.iterrows():
+    v_names = row['SampleID'].split('-')
+    if row['Value'] > 0:
+        results.append([v_names[0], v_names[1], row['Value']])
     else:
-        results.append([v_names[1],v_names[0],abs(row['Value'])])
+        results.append([v_names[1], v_names[0], abs(row['Value'])])
 
-df_results=pd.DataFrame(results)
-df_results.columns=['Source','Target','Score']
+df_results = pd.DataFrame(results)
+df_results.columns = ['Source', 'Target', 'Score']
 df_results = df_results.sort_values(by='Score', ascending=False)
-df_results.to_csv(outputPath+outputResults,sep='\t', index=False)
+df_results.to_csv(outputPath + outputResults, sep='\t', index=False)
 
 #### Compare results to target values ####
-df_target=pd.read_csv(outputPath+outputTarget,sep='\t',encoding="latin-1")
-df_target.columns=['Source','Target','Score']
+df_target = pd.read_csv(outputTarget, sep='\t', encoding="latin-1")
+df_target.columns = ['Source', 'Target', 'Score']
 
-P=float(len(df_target.index))
-N=float(len(var_names)*(len(var_names)-1))-P
+P = float(len(df_target.index))
+N = float(len(var_names) * (len(var_names) - 1)) - P
 
-TP=0.0
-FP=0.0
-tpr=[] # = recall
-fpr=[]
-ppv=[]
+TP = 0.0
+FP = 0.0
+tpr = []  # = recall
+fpr = []
+ppv = []
 
-for idx,row in df_results.iterrows():
-    if ((df_target['Source']==row['Source']) & (df_target['Target']==row['Target'])).any(): #Scores  are only 1 :
-        #Need to modify if scores are different than 1.
-        TP+=1
+for idx, row in df_results.iterrows():
+    if ((df_target['Source'] == row['Source']) & (df_target['Target'] == row['Target'])).any():  # Scores  are only 1 :
+        # Need to modify if scores are different than 1.
+        TP += 1
     else:
-        FP+=1
+        FP += 1
 
     tpr.append(TP / P)  # TPR=recall
     fpr.append(FP / N)  # FPR
     ppv.append(TP / (TP + FP))
 
-tpr, fpr, ppv = (list(t) for t in zip(*sorted(zip(tpr, fpr, ppv))))
-auc_roc_score = auc(fpr, tpr)
-auc_pr_score=auc(tpr,ppv)
+auc_pr_score = auc(tpr, ppv, reorder=True)
+auc_roc_score = auc(fpr, tpr, reorder=True)
 fig1 = plt.figure()
 ax1 = fig1.add_subplot(111)
-fig2=plt.figure()
-ax2=fig2.add_subplot(111)
+fig2 = plt.figure()
+ax2 = fig2.add_subplot(111)
 
 pl1 = ax1.plot(fpr, tpr, label=' (area: {0:3f})'.format(auc_roc_score), color='r')
 pl2 = ax2.plot(tpr, ppv, label=' (area: {0:3f})'.format(auc_pr_score), color='r')
-
 
 ax1.plot([0, 1], [0, 1], linestyle='--', color='k',
          label='Luck')
 
 ax1.set_xlabel('False Positive Rate')
 ax1.set_ylabel('True Positive Rate')
-ax1.set_title('ROC Curve ')
+ax1.set_title('ROC Curve on directed graph')
 ax1.legend(loc="lower right")
 ax2.set_xlabel('Recall')
 ax2.set_ylabel('Precision')
-ax2.set_title('Precision recall curve')
+ax2.set_title('Precision recall curve on directed graph')
 ax2.legend(loc='best')
 plt.show()
+plt.savefig(outputPath + test_set_name + 'results_directed.pdf')
+plt.clf()
 
+#### Results on structure ####
+
+P = float(len(df_target.index))
+N = float(len(var_names) * (len(var_names) - 1)) / 2 - P
+
+TP = 0.0
+FP = 0.0
+tpr = []  # = recall
+fpr = []
+ppv = []
+
+for idx, row in df_results.iterrows():
+    if (((df_target['Source'] == row['Source']) & (df_target['Target'] == row['Target']))
+            | (df_target['Source'] == row['Target']) & (
+            df_target['Target'] == row['Source'])).any():  # Scores  are only 1 :
+        # Need to modify if scores are different than 1.
+        TP += 1
+    else:
+        FP += 1
+
+    tpr.append(TP / P)  # TPR=recall
+    fpr.append(FP / N)  # FPR
+    ppv.append(TP / (TP + FP))
+
+auc_pr_score = auc(tpr, ppv, reorder=True)
+auc_roc_score = auc(fpr, tpr, reorder=True)
+fig1 = plt.figure()
+ax1 = fig1.add_subplot(111)
+fig2 = plt.figure()
+ax2 = fig2.add_subplot(111)
+
+pl1 = ax1.plot(fpr, tpr, label=' (area: {0:3f})'.format(auc_roc_score), color='r')
+pl2 = ax2.plot(tpr, ppv, label=' (area: {0:3f})'.format(auc_pr_score), color='r')
+
+ax1.plot([0, 1], [0, 1], linestyle='--', color='k',
+         label='Luck')
+
+ax1.set_xlabel('False Positive Rate')
+ax1.set_ylabel('True Positive Rate')
+ax1.set_title('ROC Curve on graph structure')
+ax1.legend(loc="lower right")
+ax2.set_xlabel('Recall')
+ax2.set_ylabel('Precision')
+ax2.set_title('Precision recall curve on graph structure')
+ax2.legend(loc='best')
+plt.show()
+plt.savefig(outputPath + test_set_name + 'results_not_directed.pdf')
+plt.clf()
 print('End of program.')
