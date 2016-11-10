@@ -34,6 +34,7 @@ max_proc = int(sys.argv[1])
 #inputdata = '../input/kaggle/CEfinal_train'
 inputdata='../output/test/test_crit_'
 crit_names = ["Pearson's correlation",
+              "AbsPearson's correlation",
               "Pval-Pearson",
               "Chi2 test",
               "Mutual information",
@@ -94,8 +95,10 @@ def cramers_corrected_stat(confusion_matrix):
 
 
 def f_pearson(var1, var2, var1type, var2type):
-    return abs(stats.pearsonr(var1, var2)[0])
+    return stats.pearsonr(var1, var2)[0]
 
+def f_abspearson(var1, var2, var1type, var2type):
+    return abs(stats.pearsonr(var1, var2)[0])
 
 def f_pval_pearson(var1, var2, var1type, var2type):
     return 1 - abs(stats.pearsonr(var1, var2)[1])
@@ -249,6 +252,7 @@ def f_fsic(var1, var2, var1type, var2type):
 
 
 dependency_functions = [f_pearson,
+                        f_abspearson,
                          f_pval_pearson,
                          f_chi2_test,
                          f_mutual_info_score,
