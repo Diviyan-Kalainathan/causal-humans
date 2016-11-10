@@ -24,21 +24,21 @@ path = "Dream5ChallengeData/"
 filenameData = "net1_expression_data_InSilico.tsv"
 
 outputPath = "output/Dream5/"
-
-outputCausalityPairs = "net1_expression_data_InSilico_pairs.csv"
-outputPublicInfo = "net1_expression_data_InSilico_publicinfo.csv"
-outputforCausation="net1_expression_data_InSilico_fcausation.csv"
-outputResults="net1_expression_data_InSilico_results.csv"
-outputTarget="net1_expression_data_InSilico_target.csv"
+test_set_name='net3_expression_data_Ecoli_toy'#'net1_expression_data_InSilico_'
+outputCausalityPairs = test_set_name+"pairs.csv"
+outputPublicInfo = test_set_name+"publicinfo.csv"
+outputforCausation=test_set_name+"fcausation.csv"
+outputResults=test_set_name+"results.csv"
+outputTarget=test_set_name+"target.csv"
 
 
 df_input = pd.read_csv(path+filenameData, sep='\t', encoding="latin-1")
 
-nb_proc=int(sys.argv[1])
+nb_proc= 2  #int(sys.argv[1])
 independancy_criterion=0
 deconvolution_method=1
 predict_method=1
-thresholdDepLink = 0.1
+thresholdDepLink = 0.01
 # epsilon=0.5
 beta = 0.5
 alpha = 0.1
@@ -68,18 +68,19 @@ var_names=df_input.columns.values
 skel_mat=np.ones((len(var_names),len(var_names))) #Skeleton matrix
 
 #### Create Skeleton ####
+print('Create skeleton'),
 
 for idx1, var1 in enumerate(var_names[:-1]):
     for idx2, var2 in enumerate(var_names[idx1:]):
-        skel_mat[idx1,idx2]=dc.crit_names[independancy_criterion](df_input[var1].values,df_input[var2].values,NUMERICAL,NUMERICAL)
+        skel_mat[idx1,idx2]=dc.dependency_functions[independancy_criterion](df_input[var1].values,df_input[var2].values,NUMERICAL,NUMERICAL)
         skel_mat[idx2,idx1]=skel_mat[idx1,idx2]
 
 # #Set diagonal terms
 # for idx in range(len(var_names)):
 #     skel_mat[idx,idx]=epsilon*1 #Reg. Hyperparameter?
-
+print('...Done.')
 #### Apply deconvolution ####
-print('Deconvolution')
+print('Deconvolution'),
 
 if deconvolution_method == 1:
     """This is a python implementation/translation of network deconvolution
@@ -166,21 +167,23 @@ elif deconvolution_method == 3:
 
 else:
     raise ValueError
-print('Done.')
+print('...Done.')
 
 #### Causality computation ####
 
+print('Causality computation')
 #Prepare files
+print('Prepare Files'),
 df_output = pd.DataFrame(columns=["SampleID", "A", "B"])
 df_publicinfo = pd.DataFrame(columns=["SampleID", "A type", "B type"])
 
+print(Gdir)
 
 for i in range(0,Gdir.shape[0]):
 
     for j in range(i+1, Gdir.shape[1]):
 
         if(Gdir[i,j] > thresholdDepLink):
-
 
             a = df_input.iloc[:,i].values
             b = df_input.iloc[:,j].values
@@ -203,15 +206,20 @@ for i in range(0,Gdir.shape[0]):
 
 df_output.to_csv(outputPath + outputCausalityPairs, index=False, encoding='utf-8', sep= ",")
 df_publicinfo.to_csv(outputPath + outputPublicInfo, index=False, encoding='utf-8', sep= ",")
+print('...Done.')
 
 #Compute causation
 #Create output file if not exists
+print('Compute causation'),
 open(outputPath+outputforCausation,'a').close()
 
 cp.ce_pairs_predict(predict_method,outputPath + outputCausalityPairs,outputPath + outputPublicInfo,outputPath+outputforCausation,nb_proc)
 #Fetch results
 df_causation_results=pd.read_csv(outputPath+outputforCausation,columns=['SampleID','Value'])
 
+print('...Done.')
+
+print('Output values')
 results=[]
 #Write final results
 for idx,row in df_causation_results.iterrows():
@@ -272,3 +280,5 @@ ax2.set_ylabel('Precision')
 ax2.set_title('Precision recall curve')
 ax2.legend(loc='best')
 plt.show()
+
+print('End of program.')

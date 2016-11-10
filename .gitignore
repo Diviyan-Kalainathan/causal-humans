@@ -26,6 +26,8 @@ Cause-effect/datacauseeffect/
 Cause-effect/lib_otherdatasets
 Cause-effect/lib/mdlp
 Cause-effect/lib/mdlp/*
+*.tsv
+Cause-effect/Dream5ChallengeData/
 *.ps
 *.xlsx
 *.jpg
