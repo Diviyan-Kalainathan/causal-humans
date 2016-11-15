@@ -33,7 +33,9 @@ NUMERICAL = "Numerical"
 max_proc = int(sys.argv[1])
 #inputdata = '../input/kaggle/CEfinal_train'
 inputdata='../output/test/test_crit_'
-crit_names = ["Pearson's correlation",
+crit_names = "Mutual information",
+
+CRI2= ["Pearson's correlation",
               "AbsPearson's correlation",
               "Pval-Pearson",
               "Chi2 test",
@@ -278,10 +280,15 @@ def process_job_parts(part_number, index):
         var1 = [float(i) for i in var1]
         var2 = [float(i) for i in var2]
 
-        res = dependency_functions[index](var1, var2, row['A-Type'], row['B-Type'])
-        results.append([res, row['Pairtype']])
+        res = f_mutual_info_score(var1, var2, row['A-Type'], row['B-Type'])
+        #dependency_functions[index](var1, var2, row['A-Type'], row['B-Type'])
+        '''Debugging why Mutual Info works bad w/ some pairs ''' #ToDo : Remove section
 
-    r_df = pd.DataFrame(results, columns=['Target', 'Pairtype'])
+        results.append([res, row['Pairtype'],row['A-Type'], row['B-Type'],row['SampleID']])
+
+    r_df = pd.DataFrame(results, columns=['Target', 'Pairtype','A-Type','B-Type','SampleID'])
+    # r_df = r_df.sort_values(by='Target',ascending=False)
+    # r_df.ix[(r_df.index>300) | (r_df['Pairtype']=='O'),['A','B']]=0
     sys.stdout.write('Writing results for ' + crit_names[index][:4] + '-' + str(part_number) + '\n')
     sys.stdout.flush()
     r_df.to_csv(inputdata + crit_names[index][:4] + '-' + str(part_number) + '.csv', sep=';', index=False)
@@ -332,7 +339,7 @@ if __name__ == '__main__':
         if os.path.exists(inputdata + crit_names[idx_crit][:4] + '-1' + '.csv'):
             with open(inputdata + crit_names[idx_crit][:4] + '.csv', 'wb') as mergefile:
                 merger = csv.writer(mergefile, delimiter=';', lineterminator='\n')
-                merger.writerow(['Target', 'Pairtype'])
+                merger.writerow(['Target', 'Pairtype','A-Type','B-Type','SampleID'])
                 for i in range(1, part_number):
 
                     with open(inputdata + crit_names[idx_crit][:4] + '-' + str(i) + '.csv', 'rb') as partfile:
@@ -341,3 +348,8 @@ if __name__ == '__main__':
                         for row in reader:
                             merger.writerow(row)
                     os.remove(inputdata + crit_names[idx_crit][:4] + '-' + str(i) + '.csv') #For data in parts
+            print("Reorder data")
+            outputdata=pd.read_csv(inputdata + crit_names[idx_crit][:4] + '.csv',sep=';')
+            outputdata.columns=['Target', 'Pairtype','A-Type','B-Type','SampleID']
+            outputdata=outputdata.sort_values(by='Target',ascending=False)
+            outputdata.to_csv(inputdata + crit_names[idx_crit][:4] + '.csv',sep=';',index=False)

@@ -13,6 +13,7 @@ import model_comparison.dependency_criterion as dc
 import causal_predict as cp
 from sklearn.metrics import auc, average_precision_score, precision_recall_curve
 from matplotlib import pyplot as plt
+import deconvolution_methods as dm
 
 BINARY = "Binary"
 CATEGORICAL = "Categorical"
@@ -41,8 +42,7 @@ deconvolution_method = 1
 predict_method = 2
 thresholdDepLink = 0.01
 # epsilon=0.5
-beta = 0.5
-alpha = 0.1
+
 
 """
 #0 : "Pearson's correlation"
@@ -87,92 +87,10 @@ print(skel_mat)
 # for idx in range(len(var_names)):
 #     skel_mat[idx,idx]=epsilon*1 #Reg. Hyperparameter?
 print('...Done.')
+
 #### Apply deconvolution ####
 print('Deconvolution'),
-
-if deconvolution_method == 1:
-    """This is a python implementation/translation of network deconvolution
-
- AUTHORS:
-    Algorithm was programmed by Soheil Feizi.
-    Paper authors are S. Feizi, D. Marbach,  M. Medard and M. Kellis
-
- REFERENCES:
-   For more details, see the following paper:
-    Network Deconvolution as a General Method to Distinguish
-    Direct Dependencies over Networks
-    By: Soheil Feizi, Daniel Marbach,  Muriel Medard and Manolis Kellis
-    Nature Biotechnology"""  # Credits, Ref
-
-    # Gdir = np.dot(skel_mat, np.linalg.inv(np.identity(len(var_names)) + skel_mat))
-
-    """Author code transposed from matlab to python"""
-
-    # pre - processing the input matrix
-    # mapping between 0 and 1
-    skel_mat = (skel_mat - np.min(skel_mat)) / (np.max(skel_mat) - np.min(skel_mat))
-
-    # Set diagonal terms to 0
-    for idx in range(len(var_names)):
-        skel_mat[idx, idx] = 0
-
-    # thresholding the input matrix
-    y = np.percentile(skel_mat, alpha * 100)
-    skel_mat[skel_mat < y] = 0
-
-    D, U = np.linalg.eig(skel_mat)
-
-    lam_n = abs(min(np.min(D), 0))
-    lam_p = abs(max(np.max(D), 0))
-
-    m1 = lam_p * (1 - beta) / beta;
-    m2 = lam_n * (1 + beta) / beta;
-    m = max(m1, m2);
-
-    D = D * np.identity(D.shape[0])
-
-    for i in range(0, D.shape[0]):
-        D[i, i] = D[i, i] / (m + D[i, i]);
-
-    mat_new1 = np.dot(np.dot(U, D), np.linalg.inv(U))
-
-    m2 = np.min(mat_new1);
-    mat_new2 = (mat_new1 + max(-m2, 0));
-
-    m1 = np.min(mat_new2);
-    m2 = np.max(mat_new2);
-
-    Gdir = (mat_new2 - m1) / (m2 - m1);
-
-
-
-elif deconvolution_method == 2:
-    """This is a python implementation/translation of network deconvolution
-
-    AUTHORS :
-        B. Barzel, A.-L. Barab\'asi
-
-    REFERENCES :
-        Network link prediction by global silencing of indirect correlations
-        By: Baruch Barzel, Albert-L\'aszl\'o Barab\'asi
-        Nature Biotechnology"""  # Credits, Ref
-    mat_diag = np.zeros((len(var_names), len(var_names)))
-    D_temp = np.dot(skel_mat - np.identity(len(var_names)), skel_mat)
-    for i in range(len(var_names)):
-        mat_diag[i, i] = D_temp[i, i]
-    Gdir = np.dot((skel_mat - np.identity(len(var_names)) + mat_diag), np.linalg.inv(skel_mat))
-
-elif deconvolution_method == 3:
-    """Partial correlation coefficient"""
-    inv_mat = np.linalg.inv(skel_mat)
-    Gdir = np.zeros(inv_mat.shape)
-    for i in range(len(var_names)):
-        for j in range(len(var_names)):
-            if i != j:
-                Gdir[i, j] = -inv_mat[i, j] / np.sqrt(inv_mat[i, i] * inv_mat[j, j])
-
-else:
-    raise ValueError
+Gdir = dm.deconvolution_methods(deconvolution_method, skel_mat)
 print('...Done.')
 
 #### Causality computation ####
@@ -242,7 +160,6 @@ df_results.columns = ['Source', 'Target', 'Score']
 df_results = df_results.sort_values(by='Score', ascending=False)
 df_results.to_csv(outputPath + outputResults, sep='\t', index=False)
 
-
 ################################################# Results ############################################################
 
 #### Compare results to target values ####
@@ -309,7 +226,7 @@ ppv = []
 for idx, row in df_results.iterrows():
     if (((df_target['Source'] == row['Source']) & (df_target['Target'] == row['Target']))
             | (df_target['Source'] == row['Target']) & (
-            df_target['Target'] == row['Source'])).any():  # Scores  are only 1 :
+                    df_target['Target'] == row['Source'])).any():  # Scores  are only 1 :
         # Need to modify if scores are different than 1.
         TP += 1
     else:
@@ -362,8 +279,8 @@ for i in range(0, Gdir.shape[0]):
             if (((df_target['Source'] == var_names[i]) & (df_target['Target'] == var_names[j]))
                     | (df_target['Source'] == var_names[j]) & (
                             df_target['Target'] == var_names[i])).any():  # Scores  are only 1 :
-                    # Need to modify if scores are different than 1.
-                    TP += 1
+                # Need to modify if scores are different than 1.
+                TP += 1
             else:
                 FP += 1
 
@@ -382,7 +299,7 @@ pl1 = ax1.plot(fpr, tpr, label=' (area: {0:3f})'.format(auc_roc_score), color='r
 pl2 = ax2.plot(tpr, ppv, label=' (area: {0:3f})'.format(auc_pr_score), color='r')
 
 ax1.plot([0, 1], [0, 1], linestyle='--', color='k',
-label='Luck')
+         label='Luck')
 
 ax1.set_xlabel('False Positive Rate')
 ax1.set_ylabel('True Positive Rate')
@@ -398,27 +315,28 @@ plt.clf()
 
 #### Results on links with both contributions ####
 
-idx1=0
-idx2=1
-contrib_results=[]
+idx1 = 0
+idx2 = 1
+contrib_results = []
 for idx, row in df_causation_results.iterrows():
-    var=row['SampleID'].split('-')
-    while ((var[0]!=var_names[idx1] | var[1]!=var_names[idx2])&(var[1]!=var_names[idx1] | var[0]!=var_names[idx2])):
-        idx2+=1
-        if idx2==len(var_names):
-            idx1+=1
-            idx2=idx1+1
-            if idx1==len(var_names):
+    var = row['SampleID'].split('-')
+    while ((var[0] != var_names[idx1] | var[1] != var_names[idx2]) & (
+            var[1] != var_names[idx1] | var[0] != var_names[idx2])):
+        idx2 += 1
+        if idx2 == len(var_names):
+            idx1 += 1
+            idx2 = idx1 + 1
+            if idx1 == len(var_names):
                 print('Vars Not ordered')
                 raise ValueError
-    score= abs(Gdir[idx1,idx2])*row['Score']
-    if score>0:
-        contrib_results.append([var[0],var[1],score])
+    score = abs(Gdir[idx1, idx2]) * row['Score']
+    if score > 0:
+        contrib_results.append([var[0], var[1], score])
     else:
-        contrib_results.append([var[1],var[0],score])
+        contrib_results.append([var[1], var[0], score])
 
-df_results_contrib=pd.DataFrame(contrib_results,columns=['Source','Target','Score'])
-df_results_contrib=df_results_contrib.sort_values(by='Score', ascending=False)
+df_results_contrib = pd.DataFrame(contrib_results, columns=['Source', 'Target', 'Score'])
+df_results_contrib = df_results_contrib.sort_values(by='Score', ascending=False)
 df_results_contrib.to_csv(outputPath + outputResultsContrib, sep='\t', index=False)
 
 P = float(len(df_target.index))
