@@ -20,8 +20,10 @@ def kag_to_file(pthtofile):
             B.pop(0)
             A=[float(i) for i in A]
             B=[float(i) for i in B]
-            dfoutput=pd.DataFrame([A,B])
-            dfoutput.to_csv(dirname+'/'+row['SampleID']+'.txt',sep=';',columns=None,header=False,index=False)
+            dfoutput=pd.DataFrame()
+            dfoutput['A']=A
+            dfoutput['B']=B
+            dfoutput.to_csv(dirname+'/'+row['SampleID']+'.txt',sep=',',columns=None,header=False,index=False)
             print(row['SampleID'])
 
 if __name__ == '__main__':
