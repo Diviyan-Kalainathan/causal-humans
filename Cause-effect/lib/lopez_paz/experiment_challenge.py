@@ -3,6 +3,7 @@ Code made by David Lopez-Paz
 All credits to Mr. Lopez-Paz
 """
 import multiprocessing as mp
+import pandas as pd
 F_X_TR = "data/pairs.csv"
 F_Y_TR = "data/targets.csv"
 
@@ -47,9 +48,6 @@ except NameError:
     wy = rp(K, [0.15, 1.5, 15], 1)
     wz = rp(K, [0.15, 1.5, 15], 2)
 
-    print("wx " + str(wx.shape))
-    print("wy " + str(wy.shape))
-    print("wz " + str(wz.shape))
 
 def f1(x, w):
     return np.cos(np.dot(np.hstack((x, np.ones((x.shape[0], 1)))), w))
@@ -100,54 +98,60 @@ def featurizeTest(filename):
 
 
 
-'''
-print("featurize ")
-
-x_tr = featurize(F_X_TR)
-
-print("save features  ")
-
-np.savetxt("features.csv", x_tr)'''#Already trained
-
-'''print("load features  ")
-
-x_tr = np.loadtxt("features.csv")
-
-y_tr = np.genfromtxt(F_Y_TR, delimiter=",")
-
-# y_te = np.genfromtxt(F_Y_TE, delimiter=",")[:,1]
-# d_tr = (np.genfromtxt(F_Y_TR, delimiter=",")[:,2])==4
-# d_te = (np.genfromtxt(F_Y_TE, delimiter=",")[:,2])==4
-
-# pickle.dump(x_tr, open("x_tr", "w"))
-# pickle.dump(y_tr, open("y_tr", "w"))
-#
-# x_tr = pickle.load(open("x_tr"))
-# y_tr = pickle.load(open("y_tr"))
-
-y_tr = np.hstack((y_tr, -y_tr))
-
-# y_te = np.hstack((y_te,-y_te))
-# d_tr = np.hstack((d_tr,d_tr))
-# d_te = np.hstack((d_te,d_te))
+def task_featurize(inputdata,outputdata):
+    # print("featurize test ")
+    print("OK")
+    x_te = featurize(inputdata)
+    np.savetxt( outputdata, x_te)
 
 
-x_ab = x_tr[(y_tr == 1) | (y_tr == -1)]
-y_ab = y_tr[(y_tr == 1) | (y_tr == -1)]
 
-params = {'random_state': 0, 'n_estimators': E, 'max_features': None,
-          'max_depth': 50, 'min_samples_leaf': 10, 'verbose': 10}
+def featurizeData(data, outputdata, max_proc):
 
-params = {'random_state': 0, 'n_estimators': E, 'min_samples_leaf': L, 'n_jobs': 8}
+    pool = mp.Pool(processes=max_proc)
 
-print("start learning ")
+    for idx in range(len(data)):
+        print('Data ' + str(idx))
+        pool.apply_async(task_featurize, args=(data[idx], outputdata[idx],))
+    pool.close()
+    pool.join()
 
-clf0 = CLF(**params).fit(x_tr, y_tr != 0)  # causal or confounded?
-clf1 = CLF(**params).fit(x_ab, y_ab == 1)  # causal or anticausal?
-# clfd = CLF(**params).fit(x_tr,d_tr)    # dependent or independent?
 
-pickle.dump(clf0, open("clf0.p", "wb"))
-pickle.dump(clf1, open("clf1.p", "wb"))'''#Already trained
+def train(featurizedData, targetData, nameModel):
+
+
+    for idx in range(len(featurizedData)):
+        print('Data ' + str(idx))
+        x_tr_temp = np.loadtxt(featurizedData[idx])
+
+        dfTarget = pd.read_csv(targetData[idx], sep = ",")
+        y_tr_temp = dfTarget["Target"].values
+
+        y_tr_temp = np.hstack((y_tr_temp, -y_tr_temp))
+
+        if(idx == 0):
+            x_tr = x_tr_temp
+            y_tr = y_tr_temp
+        else :
+            x_tr = np.vstack((x_tr,x_tr_temp))
+            y_tr = np.hstack((y_tr, y_tr_temp))
+
+    x_ab = x_tr[(y_tr == 1) | (y_tr == -1)]
+    y_ab = y_tr[(y_tr == 1) | (y_tr == -1)]
+
+
+    params = {'random_state': 0, 'n_estimators': E, 'min_samples_leaf': L, 'n_jobs': 8}
+
+    print("start learning ")
+
+    clf0 = CLF(**params).fit(x_tr, y_tr != 0)  # causal or confounded?
+    clf1 = CLF(**params).fit(x_ab, y_ab == 1)  # causal or anticausal?
+
+    pickle.dump(clf0, open(nameModel + "0.p", "wb"))
+    pickle.dump(clf1, open(nameModel + "1.p", "wb"))
+
+
+
 
 def task_pred(inputdata,outputdata,clf0,clf1):
     # print("featurize test ")
@@ -164,6 +168,7 @@ def task_pred(inputdata,outputdata,clf0,clf1):
     Results.to_csv(outputdata, sep=';', encoding='utf-8')
     sys.stdout.write('Generated output file '+ outputdata)
     sys.stdout.flush()
+
 
 def predict(data,results,modelPath, max_proc):
 
