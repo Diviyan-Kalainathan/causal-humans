@@ -62,9 +62,12 @@ def output_summary(y_true, predictions, publicinfo):
         print("{}:\t{}".format(key, target_score(y_true[idx], predictions[idx])))
 
 
-def get_df(filename):
-    data = parse_dataframe(filename)
-    types = pd.read_csv(filename.replace("pairs", "publicinfo"))
+def get_df(filenames):
+    data=pd.DataFrame()
+    types= pd.DataFrame()
+    for filename in filenames:
+        data=pd.concat([data,parse_dataframe(filename)])
+        types = pd.concat([types,pd.read_csv(filename.replace("pairs", "publicinfo"))])
     return combine_data_and_types(data, types)
 
 
@@ -197,22 +200,24 @@ if __name__ == "__main__":
     except:
         write_submission(valid_file, predictions)
 
-def train_model(train_file):
+
+def train_model(train_files):
 
     np.random.seed(1)
     #train_file = SETTINGS.FC_TRAIN.TRAIN_FILE
-    train = get_df(train_file)
+    train = get_df(train_files)
 
     train_store = FeatureCache(train)
     train_feat = preprocess(train_store)
 
-    valid_file = SETTINGS.FC_TRAIN.VALID_FILE
-    valid = get_df(valid_file)
+    #valid_file = SETTINGS.FC_TRAIN.VALID_FILE
+    #valid = get_df(valid_files)
 
-    valid_store = FeatureCache(valid)
-    valid_feat = preprocess(valid_store)
-
-    target_df = pd.read_csv(train_file.replace("pairs", "target"))
+    #valid_store = FeatureCache(valid)
+    #valid_feat = preprocess(valid_store)
+    target_df=pd.DataFrame()
+    for train_file in train_files:
+        target_df=pd.concat([target_df,pd.read_csv(train_file.replace("pairs", "target"))])
     target_col = [col for col in target_df if "Target" in col]
     assert len(target_col) == 1
     target = target_df[target_col]
@@ -226,13 +231,13 @@ def train_model(train_file):
     double = True
     if double:
         train_feat = double_data(train_feat)
-        valid_feat = double_data(valid_feat)
+        #valid_feat = double_data(valid_feat)
         target = np.vstack((target, -target))
         train = double_original_data(train)
-        valid = double_original_data(valid)
+        #valid = double_original_data(valid)
 
     add_metafeatures(train, train_feat)
-    add_metafeatures(valid, valid_feat)
+    #add_metafeatures(valid, valid_feat)
 
     if 0:
         std = train_feat.std()
@@ -248,14 +253,14 @@ def train_model(train_file):
                   8674, 8675, 8676, 8677, 8678, 8679, 8680, 8681, 8682, 8683, 8684]:
             keep[x] = False
     train_feat = train_feat.ix[:, keep]
-    valid_feat = valid_feat.ix[:, keep]
+    #valid_feat = valid_feat.ix[:, keep]
 
     # TODO feature cross product here
 
     if 0:  # use symmetric features only
         cols = filter(lambda x: "difference" in x, train_feat.columns)
         train_feat = train_feat[cols]
-        valid_feat = valid_feat[cols]
+        #valid_feat = valid_feat[cols]
 
     # model cached until here
 
@@ -463,7 +468,7 @@ def train_model(train_file):
                8493, 8494, 8495, 8496, 8499, 8501, 8502, 8504, 8508, 8511, 8513, 8514, 8519, 8520, 8522, 8523, 8524,
                8525, 8526, 8528, 8532, 8536, 8539, 8544, 8545, 8548, 8552, 8556, 8559]
         train_feat = train_feat.as_matrix()[:, idx]
-        valid_feat = valid_feat.as_matrix()[:, idx]
+        #valid_feat = valid_feat.as_matrix()[:, idx]
         clf = SETTINGS.FC_TRAIN.CLF
         clf.fit(train_feat, target)
 
@@ -714,12 +719,17 @@ def train_model(train_file):
                8519, 8523, 8527, 8528, 8529, 8532, 8533, 8537, 8539, 8540, 8541, 8544, 8545, 8548, 8549, 8550, 8552,
                8554, 8556, 8557, 8560]
         train_feat = train_feat.as_matrix()[:, idx]
-        valid_feat = valid_feat.as_matrix()[:, idx]
+        #valid_feat = valid_feat.as_matrix()[:, idx]
         clf = SETTINGS.FC_TRAIN.CLF
         clf.fit(train_feat, target)
-        utils.quick_save()
-    predictions = clf.predict(valid_feat)
 
+    model_name=""
+    for i in train_files:
+        model_name+=i[0]
+
+    utils.quick_save(SETTINGS.TEST_ONLY.CLF_DIR,model_name+'.pickle',clf)
+    #predictions = clf.predict(valid_feat)
+    '''
     if double:
         pred_len = predictions.shape[0] / 2
         predictions = predictions[:pred_len] - predictions[pred_len:]
@@ -744,4 +754,4 @@ def train_model(train_file):
         valid_types = pd.read_csv(valid_file.replace("pairs", "publicinfo"))
         output_summary(y_true, predictions, valid_types)
     except:
-        write_submission(valid_file, predictions)
+        write_submission(valid_file, predictions)'''
