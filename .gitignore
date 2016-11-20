@@ -10,6 +10,8 @@
 *.csv#
 *.iml
 *.ods
+*.pickle
+*.picklea*
 Cause-effect/ext
 Data_analysis/
 Cause-effect/lib_lopez_paz/data
