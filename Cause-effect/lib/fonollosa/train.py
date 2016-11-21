@@ -26,23 +26,54 @@ MODEL_PARAMS = {'weights':[0.383, 0.370, 0.247], 'n_jobs':-1}
 def parse_dataframe(df):
     parse_cell = lambda cell: np.fromstring(cell, dtype=np.float, sep=" ")
     df = df.applymap(parse_cell)
+
+    # for i in range(df.shape[0]):
+    #     lign =
+
+    convert_cell = lambda cell: np.array([float(int(x*10000)) for x in cell])
+    df = df.applymap(convert_cell)
+
+
     return df
 
-def read_data(pairs_path, info_path):
-    df_pairs = parse_dataframe(pd.read_csv(pairs_path, index_col="SampleID"))
-    df_info = pd.read_csv(info_path, index_col="SampleID")
-    features = pd.concat([df_pairs, df_info], axis=1)
-    features_inverse = features.copy()
-    features_inverse['A'] = features['B']
-    features_inverse['A type'] = features['B type']
-    features_inverse['B'] = features['A']
-    features_inverse['B type'] = features['A type']
-    original_index = np.array(zip(features.index, features.index)).flatten()
-    features = pd.concat([features, features_inverse])
-    features.index = range(0,len(features),2)+range(1,len(features),2)
-    features.sort(inplace=True)
-    features.index = original_index
-    features.index.name = "SampleID"
+def read_data(pairs_path, info_path, featurizeddata_path):
+
+    try:
+        features = pd.DataFrame();
+        features = features.from_csv(featurizeddata_path);
+
+    except (IOError, EOFError):
+
+        df_chunk = pd.read_csv(pairs_path, sep = ',', index_col="SampleID", iterator = True, chunksize = 10)
+
+        # df_pairs = pd.DataFrame()
+
+        # for chunk in df_chunk:
+        #     df_pairs = pd.concat([df_pairs,chunk])
+
+        df_pairs = next(df_chunk)
+
+        # print('OK')
+        df_pairs = parse_dataframe(df_pairs)
+
+        print(df_pairs)
+
+        df_info = pd.read_csv(info_path, index_col="SampleID")
+        features = pd.concat([df_pairs, df_info], axis=1)
+        features_inverse = features.copy()
+        features_inverse['A'] = features['B']
+        features_inverse['A type'] = features['B type']
+        features_inverse['B'] = features['A']
+        features_inverse['B type'] = features['A type']
+        original_index = np.array(zip(features.index, features.index)).flatten()
+        features = pd.concat([features, features_inverse])
+        features.index = range(0,len(features),2)+range(1,len(features),2)
+        features.sort(inplace=True)
+        features.index = original_index
+        features.index.name = "SampleID"
+
+        print(features)
+
     return features
 
 def read_target(targets_path):
@@ -66,7 +97,7 @@ def save_model(model, modelpath):
     pickle.dump(model, open(modelpath, "w"))
 
 
-def train(datapairs, datapublicinfo, datatarget, model_path):
+def train(datapairs, datapublicinfo, datatarget,featurizedData, model_path):
 
     model = MODEL(**MODEL_PARAMS)
 
@@ -74,9 +105,13 @@ def train(datapairs, datapublicinfo, datatarget, model_path):
     train_filter2 = None
 
     print("Reading in training data " + datapairs[0])
-    train = read_data(datapairs[0], datapublicinfo[0])
+    train = read_data(datapairs[0], datapublicinfo[0], featurizedData[0])
+
     print("Extracting features")
     train = model.extract(train)
+    print("Write features")
+    train.to_csv(featurizedData[0])
+
     target = read_target(datatarget[0])
 
     train2 = None
@@ -84,9 +119,11 @@ def train(datapairs, datapublicinfo, datatarget, model_path):
 
     for idx in range(1,len(datapairs)):
         print "Reading in training data", datapairs[idx]
-        tr = read_data(datapairs[idx],datapublicinfo[idx])
+        tr = read_data(datapairs[idx],datapublicinfo[idx], featurizedData[idx])
         print "Extracting features"
         tr = model.extract(tr)
+        print("Write features")
+        tr.to_csv(featurizedData[idx])
 
         tg = read_target(datatarget[idx])
 

@@ -49,7 +49,12 @@ def weighted_mean_and_std(values, weights):
     return (average, np.sqrt(variance))
 
 def count_unique(x):
-    return len(set(x))
+
+    try:
+        return len(set(x))
+    except TypeError as e:
+        print(x)
+        raise e
 
 def count_unique_ratio(x):
     return len(set(x))/float(len(x))
@@ -439,7 +444,13 @@ class SimpleTransform(BaseEstimator):
         return self.transform(X)
 
     def transform(self, X, y=None):
-        return np.array([self.transformer(x) for x in X], ndmin=2).T
+
+        try:
+            return np.array([self.transformer(x) for x in X], ndmin=2).T
+        except TypeError as e:
+            print(self.transformer)
+            raise e
+
 
 class MultiColumnTransform(BaseEstimator):
     def __init__(self, transformer):
@@ -624,6 +635,7 @@ def calculate_method(args):
     return method(*margs)
 
 def extract_features(X, features=all_features, y=None, n_jobs=-1):
+    n_jobs = 1
     if n_jobs != 1:
         pool = Pool(n_jobs if n_jobs != -1 else None)
         pmap = pool.map
