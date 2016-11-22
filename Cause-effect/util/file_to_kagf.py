@@ -38,11 +38,11 @@ def file_to_kag(pthtofile):
     print(len(type_info))
     info=pd.DataFrame([SplID,type_info,type_info])
     info=info.transpose()
-    info.columns=['SampleID','Type-A','Type-B']
+    info.columns=['SampleID','A type','B type']
     #info['SampleID']=pd.Series(SplID,index=info.index)
     #info['Type-A']=pd.Series(type_info,index=info.index)
     #info['Type-B']=pd.Series(type_info,index=info.index)
-    info.to_csv(pthtofile+'final_publicinfo.csv',index=False)
+    info.to_csv(pthtofile+'Efinal_publicinfo.csv',index=False)
 if __name__ == '__main__':
 
     inputfile_type='/home/diviyan/Documents/CausalPairwiseC/DLP_Generator/txtfiles/pair'
