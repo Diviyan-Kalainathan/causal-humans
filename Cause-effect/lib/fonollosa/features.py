@@ -448,6 +448,7 @@ class SimpleTransform(BaseEstimator):
         try:
             return np.array([self.transformer(x) for x in X], ndmin=2).T
         except TypeError as e:
+            print(X)
             print(self.transformer)
             raise e
 
@@ -635,13 +636,13 @@ def calculate_method(args):
     return method(*margs)
 
 def extract_features(X, features=all_features, y=None, n_jobs=-1):
-    n_jobs = 1
+    #n_jobs = 1
     if n_jobs != 1:
         pool = Pool(n_jobs if n_jobs != -1 else None)
         pmap = pool.map
     else:
         pmap = map
-        
+
     def complete_feature_name(feature_name, column_names):
         if type(column_names) is list:
             long_feature_name = feature_name + '[' + ','.join(column_names) + ']'
@@ -650,20 +651,20 @@ def extract_features(X, features=all_features, y=None, n_jobs=-1):
         if feature_name[0] == '+':
             long_feature_name = long_feature_name[1:]
         return long_feature_name
-    
+
     def is_in_X(column_names):
         if type(column_names) is list:
             return set(column_names).issubset(X.columns)
         else:
             return column_names in X.columns
-        
+
     def can_be_extracted(feature_name, column_names):
         long_feature_name = complete_feature_name(feature_name, column_names)
         to_be_extracted = ((feature_name[0] == '+') or (long_feature_name not in X.columns))
         return to_be_extracted and is_in_X(column_names)
 
     while True:
-        new_features_list = [(complete_feature_name(feature_name, column_names), column_names, extractor) 
+        new_features_list = [(complete_feature_name(feature_name, column_names), column_names, extractor)
             for feature_name, column_names, extractor in features if can_be_extracted(feature_name, column_names)]
         if not new_features_list:
             break

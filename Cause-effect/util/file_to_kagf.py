@@ -32,6 +32,8 @@ def file_to_kag(pthtofile):
             SplID.append(SampleID)
             type_info.append('Numerical')
             writer.writerow([SampleID,A,B])
+            if i==26091:
+                break
             i+=1
 
     print(len(SplID))
@@ -42,8 +44,8 @@ def file_to_kag(pthtofile):
     #info['SampleID']=pd.Series(SplID,index=info.index)
     #info['Type-A']=pd.Series(type_info,index=info.index)
     #info['Type-B']=pd.Series(type_info,index=info.index)
-    info.to_csv(pthtofile+'Efinal_publicinfo.csv',index=False)
+    info.to_csv(pthtofile+'Dfinal_publicinfo.csv',index=False)
 if __name__ == '__main__':
 
-    inputfile_type='/home/diviyan/Documents/CausalPairwiseC/DLP_Generator/txtfiles/pair'
+    inputfile_type='/users/ao/diviyan/NoSave/DatasetD/pair'
     file_to_kag(inputfile_type)

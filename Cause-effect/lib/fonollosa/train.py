@@ -28,11 +28,11 @@ def parse_dataframe(df):
     df = df.applymap(parse_cell)
 
     # for i in range(df.shape[0]):
-    #     lign =
+    #     lign =ls
 
     convert_cell = lambda cell: np.array([float(int(x*10000)) for x in cell])
     df = df.applymap(convert_cell)
-
+    if pd.isnull(df).any().any(): raise ValueError
 
     return df
 
@@ -44,16 +44,18 @@ def read_data(pairs_path, info_path, featurizeddata_path):
 
     except (IOError, EOFError):
 
-        df_chunk = pd.read_csv(pairs_path, sep = ',', index_col="SampleID", iterator = True, chunksize = 10)
+        df_chunk= pd.read_csv(pairs_path, sep = ',', index_col="SampleID", chunksize = 100)
+        print(df_chunk)
+        df_pairs = pd.DataFrame()
 
-        # df_pairs = pd.DataFrame()
-
-        # for chunk in df_chunk:
-        #     df_pairs = pd.concat([df_pairs,chunk])
-
-        df_pairs = next(df_chunk)
+        for chunk in df_chunk:
+             #print(chunk)
+             #df_pairs=chunk
+             df_pairs = pd.concat([df_pairs,chunk])
+             if pd.isnull(df_pairs).any().any(): raise ValueError
 
         # print('OK')
+        print(type(df_pairs))
         df_pairs = parse_dataframe(df_pairs)
 
         print(df_pairs)
