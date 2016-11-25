@@ -1,0 +1,206 @@
+@article{cereq2016,
+  title={Typologie sectorielle des modes de gestion de la main-d'oeuvre},
+  author={d'Agostino, Alexandra and Delanoë, Anne},
+  journal={Cereq Net.Doc},
+  Number = 157,
+  year={2016}
+}
+
+@article{gonzalez2002incidence,
+  title={L’incidence du recours {\`a} l’int{\'e}rim sur la mesure de la productivit{\'e} du travail des branches industrielles; suivi d'un commentaire de Ferhat Mihoubi},
+  author={Gonzalez, Lucie and Mihoubi, Ferhat},
+  journal={{\'E}conomie et statistique},
+  volume={357},
+  number={1},
+  pages={103--137},
+  year={2002},
+  publisher={Pers{\'e}e-Portail des revues scientifiques en SHS}
+}
+
+@article{allouche2005meta,
+  title={A meta-analytical investigation of the relationship between corporate social and financial performance},
+  author={Allouche, Jos{\'e} and Laroche, Patrice},
+  journal={Revue de gestion des ressources humaines},
+  number={57},
+  pages={18},
+  year={2005}
+}
+
+
+@book{lebart2006statistique,
+  title={Statistique exploratoire multidimensionnelle},
+  author={Lebart, Ludovic and Morineau, Alain and Piron, Marie},
+  year={2006},
+  publisher={Dunod}
+}
+@book{datchary2011dispersion,
+title={La dispersion au travail},
+author={Datchary.C},
+year={2011},
+publisher={Octarès Editions}
+
+
+}
+
+@inproceedings{arthur2007k,
+  title={k-means++: The advantages of careful seeding},
+  author={Arthur, David and Vassilvitskii, Sergei},
+  booktitle={Proceedings of the eighteenth annual ACM-SIAM symposium on Discrete algorithms},
+  pages={1027--1035},
+  year={2007},
+  organization={Society for Industrial and Applied Mathematics}
+}
+
+
+@inproceedings{meilua2006uniqueness,
+  title={The uniqueness of a good optimum for k-means},
+  author={Meil{\u{a}}, Marina},
+  booktitle={Proceedings of the 23rd international conference on Machine learning},
+  pages={625--632},
+  year={2006},
+  organization={ACM}
+}
+
+
+@article{lachman2010,
+  title={Bien-être et efficacité au travail},
+  author={Lachmann, H and Larose, C and Penicaud, M},
+  journal={Rapport pour l'Agence nationale pour l'amélioration des conditions de travail},
+
+  year={2010}
+}
+
+@article{INSEE_secteurs,
+  title={Unités légales selon le nombre de salariés et l'activité en 2013},
+  author={{INSEE}},
+
+  year={2013}
+}
+
+@article{granger1969causality,
+ISSN = {00129682, 14680262},
+URL = {http://www.jstor.org/stable/1912791},
+abstract = {There occurs on some occasions a difficulty in deciding the direction of causality between
+two related variables and also whether or not feedback is occurring. Testable definitions of causality
+and feedback are proposed and illustrated by use of simple two-variable models. The important
+problem of apparent instantaneous causality is discussed and it is suggested that the problem often
+arises due to slowness in recording information or because a sufficiently wide class of possible causal
+variables has not been used. It can be shown that the cross spectrum between two variables can be
+decomposed into two parts, each relating to a single causal arm of a feedback situation. Measures of
+causal lag and causal strength can then be constructed. A generalisation of this result with the partial
+cross spectrum is suggested.},
+author = {C. W. J. Granger},
+journal = {Econometrica},
+number = {3},
+pages = {424-438},
+publisher = {[Wiley, Econometric Society]},
+title = {Investigating Causal Relations by Econometric Models and Cross-spectral Methods},
+volume = {37},
+year = {1969}
+}
+
+@article{sparckjones1972,
+doi = "10.1108/eb026526",
+issn = "0022-0418",
+title = "A statistical interpretation of term specificity and its application in retrival",
+journal = "Journal of Documentation",
+publisher = "Emerald",
+number = "1",
+volume = "28",
+pages = "11-21",
+author = "Karen Spark Jones",
+year = "1972",
+month = "01"
+}
+
+@ARTICLE{lopez-paz2015learningcausality,
+   author = {{Lopez-Paz}, D. and {Muandet}, K. and {Sch{\"o}lkopf}, B. and 
+	{Tolstikhin}, I.},
+    title = "{Towards a Learning Theory of Cause-Effect Inference}",
+  journal = {ArXiv e-prints},
+archivePrefix = "arXiv",
+   eprint = {1502.02398},
+ primaryClass = "stat.ML",
+ keywords = {Statistics - Machine Learning, Mathematics - Probability, Mathematics - Statistics Theory},
+     year = 2015,
+    month = feb,
+}
+
+@ARTICLE{follonosa2016causalityvar,
+   author = {{Fonollosa}, J.~A.~R.},
+    title = "{Conditional distribution variability measures for causality detection}",
+  journal = {ArXiv e-prints},
+archivePrefix = "arXiv",
+   eprint = {1601.06680},
+ primaryClass = "stat.ML",
+ keywords = {Statistics - Machine Learning, Computer Science - Learning},
+     year = 2016,
+    month = jan,
+}
+@book{bourdu2016qvt,
+author={Bourdu, \'Emilie and Péretié, Marie-Madeleine and Richer, Martin},
+title="{La qualité de vie au travail : un levier de compétitivité}",
+year=2016,
+publisher="La Fabrique de l'industrie",
+
+}
+
+@article{statnikov2012new,
+  title={New methods for separating causes from effects in genomics data},
+  author={Statnikov, Alexander},
+  journal={BMC genomics},
+  volume={13},
+  number={8},
+  pages={1},
+  year={2012},
+  publisher={BioMed Central}
+}
+
+@article{pearl2000causal,
+  title={Causal inference without counterfactuals: Comment},
+  author={Pearl, Judea},
+  journal={Journal of the American Statistical Association},
+  volume={95},
+  number={450},
+  pages={428--431},
+  year={2000},
+  publisher={JSTOR}
+}
+@inproceedings{stegle2010probabilistic,
+  title={Probabilistic latent variable models for distinguishing between cause and effect},
+  author={Stegle, Oliver and Janzing, Dominik and Zhang, Kun and Mooij, Joris M and Sch{\"o}lkopf, Bernhard},
+  booktitle={Advances in Neural Information Processing Systems},
+  pages={1687--1695},
+  year={2010}
+}
+@article{barzel2013network,
+  title={Network link prediction by global silencing of indirect correlations},
+  author={Barzel, Baruch and Barab{\'a}si, Albert-L{\'a}szl{\'o}},
+  journal={Nature biotechnology},
+  volume={31},
+  number={8},
+  pages={720--725},
+  year={2013},
+  publisher={Nature Publishing Group}
+}
+@article{feizi2013network,
+  title={Network deconvolution as a general method to distinguish direct dependencies in networks},
+  author={Feizi, Soheil and Marbach, Daniel and M{\'e}dard, Muriel and Kellis, Manolis},
+  journal={Nature biotechnology},
+  volume={31},
+  number={8},
+  pages={726--733},
+  year={2013},
+  publisher={Nature Publishing Group}
+}
+
+@article{aliferis2010local,
+  title={Local causal and markov blanket induction for causal discovery and feature selection for classification part i: Algorithms and empirical evaluation},
+  author={Aliferis, Constantin F and Statnikov, Alexander and Tsamardinos, Ioannis and Mani, Subramani and Koutsoukos, Xenofon D},
+  journal={Journal of Machine Learning Research},
+  volume={11},
+  number={Jan},
+  pages={171--234},
+  year={2010}
+}
+
