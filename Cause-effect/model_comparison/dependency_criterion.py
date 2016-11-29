@@ -33,9 +33,9 @@ NUMERICAL = "Numerical"
 max_proc = int(sys.argv[1])
 #inputdata = '../input/kaggle/CEfinal_train'
 inputdata='../output/test/test_crit_'
-crit_names = "Mutual information",
+#crit_names = "Mutual information",
 
-CRI2= ["Pearson's correlation",
+crit_names= ["Pearson's correlation",
               "AbsPearson's correlation",
               "Pval-Pearson",
               "Chi2 test",
@@ -52,6 +52,16 @@ CRI2= ["Pearson's correlation",
 # FSIC param :
 # Significance level of the test
 
+def bin_variables(var1,var1type, var2,var2type):
+    if var1type==NUMERICAL:
+        val1=numpy.digitize(var1,numpy.histogram(var1,bins='auto'))
+    else: val1=var1
+    if var2type == NUMERICAL:
+        val2 = numpy.digitize(var2, numpy.histogram(var2, bins='auto'))
+    else:
+        val2= var2
+
+    return val1,val2
 
 def confusion_mat(val1, val2):
     '''
@@ -159,7 +169,7 @@ def f_sc_pearson(var1, var2, var1type, var2type):
 
 
 def f_chi2_test(var1, var2, var1type, var2type):
-    values1, values2 = features.discretized_sequences(var1, var1type, var2, var2type)
+    values1, values2 = bin_variables(var1, var1type, var2, var2type)
     contingency_table = confusion_mat(values1, values2)
 
     if contingency_table.size > 0 and min(contingency_table.shape) > 1:
@@ -170,7 +180,7 @@ def f_chi2_test(var1, var2, var1type, var2type):
 
 
 def f_mutual_info_score(var1, var2, var1type, var2type):
-    values1, values2 = features.discretized_sequences(var1, var1type, var2, var2type)
+    values1, values2 = bin_variables(var1, var1type, var2, var2type)
     return metrics.adjusted_mutual_info_score(values1, values2)
 
 
@@ -187,7 +197,7 @@ def f_bf_mutual_info_mat(var1, var2, var1type, var2type):
 
 
 def f_corr_CramerV(var1, var2, var1type, var2type):
-    values1, values2 = features.discretized_sequences(var1, var1type, var2, var2type)
+    values1, values2 = bin_variables(var1, var1type, var2, var2type)
     contingency_table = confusion_mat(values1, values2)
 
     if contingency_table.size > 0 and min(contingency_table.shape) > 1:
@@ -280,8 +290,8 @@ def process_job_parts(part_number, index):
         var1 = [float(i) for i in var1]
         var2 = [float(i) for i in var2]
 
-        res = f_mutual_info_score(var1, var2, row['A-Type'], row['B-Type'])
-        #dependency_functions[index](var1, var2, row['A-Type'], row['B-Type'])
+        #res = f_mutual_info_score(var1, var2, row['A-Type'], row['B-Type'])
+        res = dependency_functions[index](var1, var2, row['A-Type'], row['B-Type'])
         '''Debugging why Mutual Info works bad w/ some pairs ''' #ToDo : Remove section
 
         results.append([res, row['Pairtype'],row['A-Type'], row['B-Type'],row['SampleID']])
