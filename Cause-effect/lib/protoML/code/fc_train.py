@@ -217,7 +217,7 @@ def train_model(train_files):
     #valid_feat = preprocess(valid_store)
     target_df=pd.DataFrame()
     for train_file in train_files:
-        target_df=pd.concat([target_df,pd.read_csv(train_file.replace("pairs", "target"))])
+        target_df=pd.concat([target_df,pd.read_csv(train_file.replace("pairs", "targets"))])
     target_col = [col for col in target_df if "Target" in col]
     assert len(target_col) == 1
     target = target_df[target_col]
@@ -727,7 +727,8 @@ def train_model(train_files):
     for i in train_files:
         model_name+=i[0]
 
-    utils.quick_save(SETTINGS.TEST_ONLY.CLF_DIR,model_name+'.pickle',clf)
+    utils.quick_save(SETTINGS.TEST_ONLY.CLF_DIR, model_name + '_ft_data.pickle', train_feat)
+    utils.quick_save(SETTINGS.TEST_ONLY.CLF_DIR,model_name+'_model.pickle',clf)
     #predictions = clf.predict(valid_feat)
     '''
     if double:
