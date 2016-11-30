@@ -14,6 +14,7 @@ from sklearn.metrics import auc, average_precision_score,precision_recall_curve
 inputdata='../output/test/results/'
 colors = cycle(['cyan', 'indigo', 'seagreen', 'gold', 'blue', 'darkorange','red','grey','darkviolet','mediumslateblue'])
 crit_names = ["Pearson's correlation",
+              "AbsPearson's correlation",
               "Pvalue Pearson",
               "Chi2 test",
               "Mutual information",
