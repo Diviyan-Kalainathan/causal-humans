@@ -24,6 +24,158 @@ def to_percent(y, position):
 
 output_folder = 'Cluster_6_subj'
 
+
+syn_axis_a1={## ??"contr_ry":[], # Intensité du travail
+             "poly":[1,1,0],
+             "objectif":[1,0],
+             "objmodif":[1,1,1,0],
+             "objattein":[1,1,0,0 ],
+             "procedur":[1,0],
+             "debord":[1,0],
+             "contrad":[1,0],
+             ## ?? "attention":[],
+             "a1i":[0,0,1,1,0],
+             "depech":[1,1,0,0],
+             "a2a":[1,1,0,0],
+             "a2b":[1,1,0,0],
+             "a2c":[1,1,0,0],
+             "restmai":[1,0]}
+
+syn_axis_a2={"detresse":[1,0], #exigences émotionnelles
+             "calmer":[1,0],
+             "tension4":[1,0],
+             "public":[1,0],
+             "a2i":[1,1,0,0],
+             "a2j":[1,1,0,0],
+             "a2k":[1,1,0,0],
+             "b4a":[1,0],
+             "b4b":[1,0]}
+
+syn_axis_a3={"comment":[0,1], #autonomie
+             "stark":[0,1,1],
+             "incident":[1,0,0],
+             "delais":[1,0],
+             "interup":[1,0],
+             "a1j":[0,0,1,1],
+             "monoton":[0,0,1,1],
+             "b5e":[0,0,1,1],
+             "a2g":[1,1,0,0],
+             "nouvelle":[1,0],
+             "a1l":[0,0,1,1],
+             "computil1":[1,0],
+             "computil2":[1,0],
+             "chaine":[0,1],
+             "repete":[0,1],
+             "cycle":[0,1]}
+
+syn_axis_a4={"aidchef":[1,0], #rapports sociaux
+             "aidcoll":[1,0],
+             "aidautr":[1,0],
+             "aidext":[1,0],
+             "aidom":[1,0],
+             "travseul":[0,0,1,1],
+             "chgtcoll":[1,0,0],
+             "collect":[1,0],
+             "acchef":[0,0,1,1],
+             "accol":[0,0,1,1],
+             "tension2":[0,1],
+             "tension3":[0,1],
+             "tension4":[0,1],
+             "encadr":[1,1,0],
+             "a1a":[0,0,1,1],
+             "a1b":[0,0,1,1],
+             "a1e":[0,0,1,1],
+             "a1f":[0,0,1,1],
+             "b1a":[0,1],
+             "b1b":[0,1],
+             "b1c":[0,1],
+             "b1d":[0,1],
+             "b1e":[0,1],
+             "b1f":[0,1],
+             "b1g":[0,1],
+             "b1h":[0,1],
+             "b1i":[0,1],
+             "b1j":[0,1],
+             "b4c":[0,1],
+             "b4d":[0,1],
+             "b5f":[1,1,0,0]}
+
+syn_axis_a5={"a2d":[1,1,0,0], #Conflits de valeur
+             "a2h":[1,1,0,0],
+             "b5a":[0,0,1,1],
+             "b5b":[0,0,1,1],
+             "b5c":[1,1,0,0],
+             "corrtan":[0,1],
+             "corrinf":[0,1],
+             "corrcop":[0,1],
+             "corrcol":[0,1],
+             "corrlog":[0,1],
+             "corrmat":[0,1],
+             "corrform":[0,1]}
+
+
+syn_axis_a6={"crainte":[1,0], #Insécurité économique et ses changements
+             "metier":[1,0],
+             "nochom":[0,1],
+             "tenir":[0,1],
+             "souhait":[0,1],
+             "fortmod1":[1,0],
+             "fortmod2":[1,0],
+             "fortmod3":[1,0],
+             "fortmod4":[1,0],
+             "fortmod5":[1,0],
+             "fortmod6":[1,0],
+             "fortmod7":[1,0],
+             "changop":[0,1],
+             "chgtinfo":[0,1],
+             "chgtcons":[0,1],
+             "chgtinfl":[0,1],
+             "a2e":[0,0,1,1],
+             "a2f":[1,1,0,0,],
+             "b5d":[1,1,0,0]}
+
+syn_axis_a7={"a1g":[0,0,1,1], #Reconaissance, rémunération et evaluation
+             "a1h":[0,0,1,1],
+             "payecom":[1,1,1,0,0],
+             "sieg34":[1,0],
+             "a1c":[0,0,1,1],
+             "a1d":[0,0,1,1],
+             "a2l":[1,1,0,0],
+             "eva":[1,0],
+             "evacrit":[1,0]}
+
+syn_axis_a8={"cwdebou":[1,0], #Contraintes physiques
+             "cwpostu":[1,0],
+             "cwlourd":[1,0],
+             "cwdepla":[1,0],
+             "cwmvt":[1,0],
+             "cwvib":[1,0],
+             ## ? "contr_envt":[],
+             "entendr":[1,0,0],
+             "secfupou":[1,0],
+             "sectoxno":[1,0],
+             "secinfec":[1,0],
+             "secaccid":[1,0],
+             "secrout":[1,0],
+             "conduite":[1,0]}
+
+syn_axis_a9={## ? "h_hebdo":[], # Contraintes horaires organisation du temps de travail
+             "repos":[0,1],
+             "samedi":[1,1,0],
+             "dimanche":[1,1,0],
+             "horangt":[0,1],
+             "previs":[1,1,0,0],
+             "horvar":[0,1,1,1],
+             "periode":[1,0],
+             "ptmatin":[1,1,0],
+             "soir":[1,1,0],
+             "nuit":[1,1,0],
+             "hsup":[1,1,0,0],
+             "astreinte":[1,0],
+             "jourtr":[6,7], ## ??
+             "controle":[0,1,1,1,1],
+             "joindre":[1,0]}
+
 var_to_analyze = [('naf17', 17), ('tranchre', 14), ('statut', 10), ('typemploi', 7), ('csei', 18), ('diplome', 9),
                   ('public', 2), ('public1', 4), ('public2', 4), ('tension1', 2), ('tension2', 2), ('tension3', 2),
                   ('tension4', 2),
