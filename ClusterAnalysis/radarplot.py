@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-Plotting results / V-test analysis
+Plotting results
 Author : Diviyan Kalainathan
 Date : 4/08/2016
 '''
@@ -13,20 +13,8 @@ from itertools import cycle
 import complex_radar as CR
 
 
-def to_percent(y, position):
-    # Ignore the passed in position. This has the effect of scaling the default
-    # tick locations.
-    s = str(100 * y)
-
-    # The percent symbol needs escaping in latex
-    if matplotlib.rcParams['text.usetex'] is True:
-        return s + r'$\%$'
-    else:
-        return s + '%'
-
-
-obj=False
-
+obj=True
+ssech=True
 syn_axis_a = []
 syn_axis_a.append({  ## ??"contr_ry":[], # Intensité du travail
     "poly": [1, 1, 0],
@@ -54,54 +42,54 @@ syn_axis_a.append({"detresse": [1, 0],  # exigences émotionnelles
                    "b4a": [1, 0],
                    "b4b": [1, 0]})
 
-syn_axis_a.append({"comment": [0, 1],  # autonomie
-                   "stark": [0, 1, 1],
-                   "incident": [1, 0, 0],
-                   "delais": [1, 0],
-                   "interup": [1, 0],
-                   "a1j": [0, 0, 1, 1],
-                   "monoton": [0, 0, 1, 1],
-                   "b5e": [0, 0, 1, 1],
-                   "a2g": [1, 1, 0, 0],
-                   "nouvelle": [1, 0],
-                   "a1l": [0, 0, 1, 1],
+syn_axis_a.append({"comment": [1, 0],  # autonomie
+                   "stark": [1, 0, 0, 0],
+                   "incident": [0, 1, 1],
+                   "delais": [0, 1, 0],
+                   "interup": [0, 1],
+                   "a1j": [1, 1, 0, 0],
+                   "monoton": [1, 1, 0, 0],
+                   "b5e": [1, 1, 0, 0],
+                   "a2g": [0, 0, 1, 1],
+                   "nouvelle": [0, 1],
+                   "a1l": [1, 1, 0, 0],
                    "computil1": [1, 0],
                    "computil2": [1, 0],
-                   "chaine": [0, 1],
-                   "repete": [0, 1],
-                   "cycle": [0, 1]})
+                   "chaine": [1, 0],
+                   "repete": [1, 0],
+                   "cycle": [1, 0]})
 
-syn_axis_a.append({"aidchef": [1, 0],  # rapports sociaux
-                   "aidcoll": [1, 0],
-                   "aidautr": [1, 0],
-                   "aidext": [1, 0],
-                   "aidom": [1, 0],
-                   "travseul": [0, 0, 1, 1],
-                   "chgtcoll": [1, 0, 0],
-                   "collect": [1, 0],
-                   "acchef": [0, 0, 1, 1],
-                   "accol": [0, 0, 1, 1],
-                   "tension2": [0, 1],
-                   "tension3": [0, 1],
-                   "tension4": [0, 1],
-                   "encadr": [1, 1, 0],
-                   "a1a": [0, 0, 1, 1],
-                   "a1b": [0, 0, 1, 1],
-                   "a1e": [0, 0, 1, 1],
-                   "a1f": [0, 0, 1, 1],
-                   "b1a": [0, 1],
-                   "b1b": [0, 1],
-                   "b1c": [0, 1],
-                   "b1d": [0, 1],
-                   "b1e": [0, 1],
-                   "b1f": [0, 1],
-                   "b1g": [0, 1],
-                   "b1h": [0, 1],
-                   "b1i": [0, 1],
-                   "b1j": [0, 1],
-                   "b4c": [0, 1],
-                   "b4d": [0, 1],
-                   "b5f": [1, 1, 0, 0]})
+syn_axis_a.append({"aidchef": [0, 1],  # rapports sociaux
+                   "aidcoll": [0, 1],
+                   "aidautr": [0, 1],
+                   "aidext": [0, 1],
+                   "aidom": [0, 1],
+                   "travseul": [1, 1, 0, 0],
+                   "chgtcoll": [0, 1, 1],
+                   "collect": [0, 1],
+                   "acchef": [1, 1, 0, 0],
+                   "accol": [1, 1, 0, 0],
+                   "tension2": [1, 0],
+                   "tension3": [1, 0],
+                   "tension4": [1, 0],
+                   "encadr": [0, 0, 1],
+                   "a1a": [1, 1, 0, 0],
+                   "a1b": [1, 1, 0, 0],
+                   "a1e": [1, 1, 0, 0],
+                   "a1f": [1, 1, 0, 0],
+                   "b1a": [1, 0],
+                   "b1b": [1, 0],
+                   "b1c": [1, 0],
+                   "b1d": [1, 0],
+                   "b1e": [1, 0],
+                   "b1f": [1, 0],
+                   "b1g": [1, 0],
+                   "b1h": [1, 0],
+                   "b1i": [1, 0],
+                   "b1j": [1, 0],
+                   "b4c": [1, 0],
+                   "b4d": [1, 0],
+                   "b5f": [0, 0, 1, 1]})
 
 syn_axis_a.append({"a2d": [1, 1, 0, 0],  # Conflits de valeur
                    "a2h": [1, 1, 0, 0],
@@ -136,15 +124,15 @@ syn_axis_a.append({"crainte": [1, 0],  # Insécurité économique et ses changem
                    "a2f": [1, 1, 0, 0, ],
                    "b5d": [1, 1, 0, 0]})
 
-syn_axis_a.append({"a1g": [0, 0, 1, 1],  # Reconaissance, rémunération et evaluation
-                   "a1h": [0, 0, 1, 1],
-                   "payecom": [1, 1, 1, 0, 0],
-                   "sieg34": [1, 0],
-                   "a1c": [0, 0, 1, 1],
-                   "a1d": [0, 0, 1, 1],
-                   "a2l": [1, 1, 0, 0],
-                   "eva": [1, 0],
-                   "evacrit": [1, 0]})
+syn_axis_a.append({"a1g": [1, 1, 0, 0],  # Reconaissance, rémunération et evaluation
+                   "a1h": [1, 1, 0, 0],
+                   "payecom": [0, 0, 0, 1, 1],
+                   "sieg34": [0, 1],
+                   "a1c": [1, 1, 0, 0],
+                   "a1d": [1, 1, 0, 0],
+                   "a2l": [0, 0, 1, 1],
+                   "eva": [0, 1],
+                   "evacrit": [0, 1]})
 
 syn_axis_a.append({"cwdebou": [1, 0],  # Contraintes physiques
                    "cwpostu": [1, 0],
@@ -178,6 +166,7 @@ syn_axis_a.append({  ## ? "h_hebdo":[], # Contraintes horaires organisation du t
                     "controle": [0, 1, 1, 1, 1],
                     "joindre": [1, 0]})
 
+add_vars=['ssech']
 obj_names = ['Indep.', u'Santé', 'Ouvriers', u'CSP+Privé', 'ServPart', 'CSP+Public', 'Immigr.', 'Accid.']
 subj_names = ['RAS', 'Tens.Col', 'Indep.', 'Heur.', 'Tens.Hie', 'Chgts']
 permutation_obj = [0, 4, 6, 2, 3, 5, 1, 7]
@@ -192,6 +181,8 @@ def compute_axis_value(df_o, axis_def):
     axis_vars = []
     for key in axis_def:
         axis_vars.append(key)
+
+
     # Refilter df
     df_column_names = [name for name in df_o.columns if any(name.startswith(key + '_') for key in axis_vars)]
     df = df_o[df_column_names]
@@ -223,16 +214,18 @@ df_data = pd.DataFrame()
 for chunk in df_chunk:
     df_data = pd.concat([df_data, chunk])
 df_data.reset_index()
-
+print()
 var_names = []
 for axis in syn_axis_a:
     for key in axis:
         var_names.append(key)
+for extra_var in add_vars:
+    var_names.append(extra_var)
 var_names = set(var_names)  # Take unique names
 
 # Filter DF
 df_column_names = [name for name in df_data.columns if any(
-    name.startswith(key + '_') for key in var_names)]  ## Select all variables that we are going to use
+    name.startswith(key) for key in var_names)]  ## Select all variables that we are going to use add '_' for categorical later
 df_data = df_data[df_column_names]
 print(df_column_names)
 
@@ -300,6 +293,22 @@ for matrix in result_matrixes:
         if obj:
             data_o[i].append(numpy.mean(matrix[i]))
         else: data_o[i].append(numpy.mean(matrix[:,i]))
+
+if ssech:
+    axis_values_sorted=[[[] for i in range(6)] for j in range(len(syn_axis_a))]
+    df_temp=df_data[df_data['ssech_flag']==1]
+    # df_sum_ssech=df_temp['ssech_1']*1+df_temp['ssech_2']*2+df_temp['ssech_3']*3+df_temp['ssech_4']*4 + df_temp['ssech_5']*4+df_temp['ssech_6']*4
+    idx_ssech=df_temp['ssech'].as_matrix()
+    print(idx_ssech)
+    for idx, row in synth_axis.iterrows():
+        for axis_number in range(len(row)):
+            axis_values_sorted[axis_number][idx_ssech[idx]-1].append(row[axis_number])  # reclassing values in order according to : axis, cluster o & s
+
+    names=['Echantillon principal', u"Salariés de l'Etat", u'Salariés de collectivités territoriales', u'Hôpital Public', u'Santé privé', u'Public social & médico-social']
+    data_o=[[] for i in range(len(names))]
+    for i in range(len(names)):
+        for j in range(len(syn_axis_a)):
+            data_o[i].append(numpy.mean(axis_values_sorted[j][i]))
 
 # Normalize
 # (numpy.min([data_o[j][i] for j in range(len(data_o))]),
