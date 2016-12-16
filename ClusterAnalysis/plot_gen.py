@@ -10,6 +10,9 @@ import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.font_manager import FontProperties
 from matplotlib.ticker import FuncFormatter
+import pandas as pd
+from itertools import cycle
+
 
 def to_percent(y, position):
     # Ignore the passed in position. This has the effect of scaling the default
@@ -24,8 +27,8 @@ def to_percent(y, position):
 
 output_folder = 'Cluster_6_subj'
 
-
-syn_axis_a1={## ??"contr_ry":[], # Intensité du travail
+syn_axis_a=[]
+syn_axis_a.append({## ??"contr_ry":[], # Intensité du travail
              "poly":[1,1,0],
              "objectif":[1,0],
              "objmodif":[1,1,1,0],
@@ -39,9 +42,9 @@ syn_axis_a1={## ??"contr_ry":[], # Intensité du travail
              "a2a":[1,1,0,0],
              "a2b":[1,1,0,0],
              "a2c":[1,1,0,0],
-             "restmai":[1,0]}
+             "restmai":[1,0]})
 
-syn_axis_a2={"detresse":[1,0], #exigences émotionnelles
+syn_axis_a.append({"detresse":[1,0], #exigences émotionnelles
              "calmer":[1,0],
              "tension4":[1,0],
              "public":[1,0],
@@ -49,9 +52,9 @@ syn_axis_a2={"detresse":[1,0], #exigences émotionnelles
              "a2j":[1,1,0,0],
              "a2k":[1,1,0,0],
              "b4a":[1,0],
-             "b4b":[1,0]}
+             "b4b":[1,0]})
 
-syn_axis_a3={"comment":[0,1], #autonomie
+syn_axis_a.append({"comment":[0,1], #autonomie
              "stark":[0,1,1],
              "incident":[1,0,0],
              "delais":[1,0],
@@ -66,9 +69,9 @@ syn_axis_a3={"comment":[0,1], #autonomie
              "computil2":[1,0],
              "chaine":[0,1],
              "repete":[0,1],
-             "cycle":[0,1]}
+             "cycle":[0,1]})
 
-syn_axis_a4={"aidchef":[1,0], #rapports sociaux
+syn_axis_a.append({"aidchef":[1,0], #rapports sociaux
              "aidcoll":[1,0],
              "aidautr":[1,0],
              "aidext":[1,0],
@@ -98,9 +101,9 @@ syn_axis_a4={"aidchef":[1,0], #rapports sociaux
              "b1j":[0,1],
              "b4c":[0,1],
              "b4d":[0,1],
-             "b5f":[1,1,0,0]}
+             "b5f":[1,1,0,0]})
 
-syn_axis_a5={"a2d":[1,1,0,0], #Conflits de valeur
+syn_axis_a.append({"a2d":[1,1,0,0], #Conflits de valeur
              "a2h":[1,1,0,0],
              "b5a":[0,0,1,1],
              "b5b":[0,0,1,1],
@@ -111,10 +114,10 @@ syn_axis_a5={"a2d":[1,1,0,0], #Conflits de valeur
              "corrcol":[0,1],
              "corrlog":[0,1],
              "corrmat":[0,1],
-             "corrform":[0,1]}
+             "corrform":[0,1]})
 
 
-syn_axis_a6={"crainte":[1,0], #Insécurité économique et ses changements
+syn_axis_a.append({"crainte":[1,0], #Insécurité économique et ses changements
              "metier":[1,0],
              "nochom":[0,1],
              "tenir":[0,1],
@@ -132,9 +135,9 @@ syn_axis_a6={"crainte":[1,0], #Insécurité économique et ses changements
              "chgtinfl":[0,1],
              "a2e":[0,0,1,1],
              "a2f":[1,1,0,0,],
-             "b5d":[1,1,0,0]}
+             "b5d":[1,1,0,0]})
 
-syn_axis_a7={"a1g":[0,0,1,1], #Reconaissance, rémunération et evaluation
+syn_axis_a.append({"a1g":[0,0,1,1], #Reconaissance, rémunération et evaluation
              "a1h":[0,0,1,1],
              "payecom":[1,1,1,0,0],
              "sieg34":[1,0],
@@ -142,9 +145,9 @@ syn_axis_a7={"a1g":[0,0,1,1], #Reconaissance, rémunération et evaluation
              "a1d":[0,0,1,1],
              "a2l":[1,1,0,0],
              "eva":[1,0],
-             "evacrit":[1,0]}
+             "evacrit":[1,0]})
 
-syn_axis_a8={"cwdebou":[1,0], #Contraintes physiques
+syn_axis_a.append({"cwdebou":[1,0], #Contraintes physiques
              "cwpostu":[1,0],
              "cwlourd":[1,0],
              "cwdepla":[1,0],
@@ -157,9 +160,9 @@ syn_axis_a8={"cwdebou":[1,0], #Contraintes physiques
              "secinfec":[1,0],
              "secaccid":[1,0],
              "secrout":[1,0],
-             "conduite":[1,0]}
+             "conduite":[1,0]})
 
-syn_axis_a9={## ? "h_hebdo":[], # Contraintes horaires organisation du temps de travail
+syn_axis_a.append({## ? "h_hebdo":[], # Contraintes horaires organisation du temps de travail
              "repos":[0,1],
              "samedi":[1,1,0],
              "dimanche":[1,1,0],
@@ -172,9 +175,9 @@ syn_axis_a9={## ? "h_hebdo":[], # Contraintes horaires organisation du temps de 
              "nuit":[1,1,0],
              "hsup":[1,1,0,0],
              "astreinte":[1,0],
-             "jourtr":[6,7], ## ??
+             #"jourtr":[], ##>5 ??
              "controle":[0,1,1,1,1],
-             "joindre":[1,0]}
+             "joindre":[1,0]})
 
 var_to_analyze = [('naf17', 17), ('tranchre', 14), ('statut', 10), ('typemploi', 7), ('csei', 18), ('diplome', 9),
                   ('public', 2), ('public1', 4), ('public2', 4), ('tension1', 2), ('tension2', 2), ('tension3', 2),
@@ -196,7 +199,7 @@ else:
 
 legend = [legend[elt] for elt in permutation_clusters]
 
-mode =3
+mode =4
 # 1 : matrices of v-tests for some vars
 # 2 : highest values of v-test per cluster
 # 3 : matrices of distance between objective and subjective clusters
@@ -556,6 +559,7 @@ elif mode == 3:
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
+    
     if not autonomy:
         draw = ax.matshow(res1, vmax=0.35)
         plt.xlabel('Clusters objectifs ')
@@ -613,23 +617,23 @@ elif mode == 3:
             plt.plot(range(res1.shape[0]-1),res1[1:,i],linewidth=2.5)
         else:
             plt.plot(range(res1.shape[0]-1), res1[1:, i],'--', linewidth=2.5)
+    else:
+        plt.title(u'Représentation en coordonnées parallèles \n de l\'autonomie en fonction des clusters')
+        plt.xlabel('Clusters subjectifs')
+        plt.ylabel("Score d'autonomie")
+        xticks= ['RAS', 'Tens.Col', 'Indep.', 'Heur.', 'Tens.Hie', 'Chgts']
+        
+        legend = ['Indep.', u'Santé', 'Ouvriers', u'CSP+Privé', 'ServPart', 'CSP+Public', 'Immigr.', 'Accid.']
+        xticks = [xticks[elt] for elt in permutation_subj]
+        legend = [legend[elt] for elt in permutation_obj]
+        xticks.remove('Indep.')
+        legend.remove('Indep.')
+        plt.xticks(xrange(len(xticks)), xticks)
+        fontP = FontProperties()
+        fontP.set_size('small')
+        plt.legend(legend, prop=fontP,loc='best')
 
-    plt.title(u'Représentation en coordonnées parallèles \n de l\'autonomie en fonction des clusters')
-    plt.xlabel('Clusters subjectifs')
-    plt.ylabel("Score d'autonomie")
-    xticks= ['RAS', 'Tens.Col', 'Indep.', 'Heur.', 'Tens.Hie', 'Chgts']
-
-    legend = ['Indep.', u'Santé', 'Ouvriers', u'CSP+Privé', 'ServPart', 'CSP+Public', 'Immigr.', 'Accid.']
-    xticks = [xticks[elt] for elt in permutation_subj]
-    legend = [legend[elt] for elt in permutation_obj]
-    xticks.remove('Indep.')
-    legend.remove('Indep.')
-    plt.xticks(xrange(len(xticks)), xticks)
-    fontP = FontProperties()
-    fontP.set_size('small')
-    plt.legend(legend, prop=fontP,loc='best')
-
-    plt.show()
+        plt.show()
 
 elif mode == 4:
     # Parallel coordinates
@@ -707,4 +711,6 @@ elif mode == 4:
     plt.grid()
     plt.show()
 
+else:
+    raise ValueError
 print('Done !')
