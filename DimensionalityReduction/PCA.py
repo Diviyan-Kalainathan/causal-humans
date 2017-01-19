@@ -4,7 +4,6 @@ Author : Diviyan Kalainathan
 Date : 1/06/2016
 
 '''
-
 import numpy, csv, re
 import matplotlib.pyplot as plt
 from sklearn.manifold import TSNE
